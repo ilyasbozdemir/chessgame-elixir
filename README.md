@@ -13,7 +13,7 @@ Ayrıca izleyiciler (spectator) devam eden maçları canlı olarak takip edebili
 # ♟️ Chess Realtime Server
 
 [![Elixir CI](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/elixir.yml/badge.svg)](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/elixir.yml)
-[![Next.js Deploy](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/deploy.yml/badge.svg)](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/deploy.yml)
+[![Next.js Deploy](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/deploy.yml/badge.svg)](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/nextjs.yml)
 
 
 
