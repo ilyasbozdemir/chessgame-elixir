@@ -9,6 +9,14 @@ Ayrıca izleyiciler (spectator) devam eden maçları canlı olarak takip edebili
 
 ---
 
+
+# ♟️ Chess Realtime Server
+
+[![Elixir CI](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/elixir.yml/badge.svg)](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/elixir.yml)
+[![Next.js Deploy](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/deploy.yml/badge.svg)](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/deploy.yml)
+
+
+
 ## 🧱 Mimari Genel Bakış
 
 ```
@@ -94,12 +102,6 @@ Backend: [http://localhost:4000](http://localhost:4000)
 - [ ] Oyun geçmişi kaydı
 
 ---
-
-# ♟️ Chess Realtime Server
-
-[![Elixir CI](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/elixir.yml/badge.svg)](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/elixir.yml)
-
-## Phoenix + Elixir tabanlı gerçek zamanlı satranç sunucusu.
 
 ## 👨‍💻 Geliştirici
 
