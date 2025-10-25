@@ -12,13 +12,17 @@ permissions:
 jobs:
   build:
     name: Build and test
-    runs-on: ubuntu-22.04 # sabitledik, ubuntu24 sorunu çözülür
+    runs-on: ubuntu-22.04  # ubuntu24 hatası çözülür
+
+    defaults:
+      run:
+        working-directory: server/chess_realtime_server  # tüm komutlar bu dizinde çalışır
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Elixir
-        uses: erlef/setup-beam@v1 # otomatik olarak en güncel sürümü alır
+        uses: erlef/setup-beam@v1
         with:
           elixir-version: '1.15.2'
           otp-version: '26.0'
@@ -26,12 +30,15 @@ jobs:
       - name: Restore dependencies cache
         uses: actions/cache@v3
         with:
-          path: deps
+          path: server/chess_realtime_server/deps
           key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
           restore-keys: ${{ runner.os }}-mix-
 
       - name: Install dependencies
         run: mix deps.get
+
+      - name: Compile project
+        run: mix compile --warnings-as-errors
 
       - name: Run tests
         run: mix test
