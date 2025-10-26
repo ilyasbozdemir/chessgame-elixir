@@ -41,6 +41,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { socket } from "@/lib/socket";
 
 interface PageClientProps {
   //
@@ -180,12 +181,46 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       setHasHydrated(true);
     });
 
-    // zaten hydrate olmuşsa direkt true yap
     if (useIdentityStore.persist.hasHydrated()) {
       setHasHydrated(true);
     }
 
     return unsub;
+  }, []);
+
+  useEffect(() => {
+    socket.connect();
+
+    const channel = socket.channel("game:lobby", {
+      name: currentPlayer?.name || "Anonim",
+    });
+
+    channel
+      .join()
+      .receive("ok", (resp) => {
+        console.log("✅ Lobby'e bağlandı:", resp);
+      })
+      .receive("error", (err) => {
+        console.error("❌ Lobby bağlantı hatası:", err);
+      });
+
+    channel.on("player_joined", (msg) => {
+      console.log("👋 Oyuncu katıldı:", msg.name);
+    });
+
+    channel.on("player_left", (msg) => {
+      console.log("🚪 Oyuncu ayrıldı:", msg.name);
+    });
+
+    if (currentPlayer?.name) {
+      channel.push("update_player", { name: currentPlayer.name });
+    }
+
+    return () => {
+      console.log("🔌 Kanal bağlantısı kapatılıyor...");
+      channel.leave();
+      socket.disconnect();
+    };
   }, []);
 
   useEffect(() => {
