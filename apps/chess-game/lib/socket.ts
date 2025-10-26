@@ -4,4 +4,3 @@ export const socket = new Socket("ws://localhost:4000/socket", {
   params: { token: "" },
 });
 
-socket.connect();

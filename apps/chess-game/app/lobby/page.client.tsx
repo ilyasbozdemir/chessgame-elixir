@@ -185,41 +185,41 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       setHasHydrated(true);
     }
 
-    return unsub;
-  }, []);
+    const player = useIdentityStore.getState().currentPlayer;
 
-  useEffect(() => {
+    if (!useIdentityStore.persist.hasHydrated() || !player) {
+      console.log("⏳ Hydration veya player bekleniyor...");
+      return () => unsub();
+    }
+
+    console.log("🌐 Hazır oyuncu ile socket başlatılıyor:", player);
     socket.connect();
 
     const channel = socket.channel("game:lobby", {
-      name: currentPlayer?.name || "Anonim",
+      name: player?.name || "Anonim",
     });
 
     channel
       .join()
-      .receive("ok", (resp) => {
-        console.log("✅ Lobby'e bağlandı:", resp);
-      })
-      .receive("error", (err) => {
-        console.error("❌ Lobby bağlantı hatası:", err);
-      });
+      .receive("ok", (resp) => console.log("✅ Lobby'e bağlandı:", resp))
+      .receive("error", (err) =>
+        console.error("❌ Lobby bağlantı hatası:", err)
+      );
 
-    channel.on("player_joined", (msg) => {
-      console.log("👋 Oyuncu katıldı:", msg.name);
-    });
+    channel.on("player_joined", (msg) =>
+      console.log("👋 Oyuncu katıldı:", msg.name)
+    );
+    channel.on("player_left", (msg) =>
+      console.log("🚪 Oyuncu ayrıldı:", msg.name)
+    );
 
-    channel.on("player_left", (msg) => {
-      console.log("🚪 Oyuncu ayrıldı:", msg.name);
-    });
-
-    if (currentPlayer?.name) {
-      channel.push("update_player", { name: currentPlayer.name });
-    }
+    channel.push("update_player", { name: player.name });
 
     return () => {
       console.log("🔌 Kanal bağlantısı kapatılıyor...");
       channel.leave();
       socket.disconnect();
+      unsub();
     };
   }, []);
 
@@ -227,6 +227,8 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     if (currentPlayer) {
       setIsPlayerNameSet(true);
     }
+
+    console.log("🌐 currentPlayer değişti:", currentPlayer);
   }, [currentPlayer]);
 
   if (!hasHydrated)
