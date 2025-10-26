@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { Player, GameState, Position, GameTable } from "./chess-types";
 import { initializeBoard, isValidMove, movePiece } from "./chess-logic";
+import { Play } from "next/font/google";
 
 interface ChessStore {
   // Player state
@@ -16,7 +17,7 @@ interface ChessStore {
 
   // Actions
   addPlayer: (name: string) => void;
-  setCurrentPlayer: (player: Player) => void;
+  setCurrentPlayer: (player: Player | null) => void;
   removePlayer: (id: string) => void;
   setPlayerReady: (id: string, ready: boolean) => void;
   assignColors: () => void;
@@ -111,7 +112,7 @@ export const useChessStore = create(
         }
       },
 
-      setCurrentPlayer: (player: Player) => {
+      setCurrentPlayer: (player: Player | null) => {
         set({ currentPlayer: player });
       },
 
