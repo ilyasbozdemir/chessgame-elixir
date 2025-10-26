@@ -322,7 +322,7 @@ export const useChessStore = create(
             t.id === currentTable.id ? updatedTable : t
           ),
           currentTable: null,
-          currentPlayer: null,
+          //currentPlayer: null,
           players: [],
         }));
       },
