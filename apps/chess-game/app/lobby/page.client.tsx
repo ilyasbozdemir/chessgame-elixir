@@ -34,28 +34,31 @@ import { useIdentityStore } from "@/lib/identity-store";
 import { Play } from "next/font/google";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { socket } from "@/lib/socket";
 import { usePresence } from "@/hooks/use-presence";
 import { usePresenceCount } from "@/hooks/use-presence-count";
+import { createPlayer } from "../actions/db/player";
+import { usePlayer } from "@/context/player-context";
 
 interface PageClientProps {
   //
 }
 
 const PageClient: React.FC<PageClientProps> = ({}) => {
+  const { player, loading, refresh } = usePlayer();
+
   const router = useRouter();
 
   const [playerName, setPlayerName] = useState("");
   const [newTableName, setNewTableName] = useState("");
   const [showCreateTable, setShowCreateTable] = useState(false);
-  const [isPlayerNameSet, setIsPlayerNameSet] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const [profileSection, setProfileSection] = useState<
@@ -66,6 +69,8 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   const [channel, setChannel] = useState<any>(null);
   const playersOnline = usePresence(channel);
   const playersOnlineCount = usePresenceCount(channel);
+
+  console.log("🏓 [lobby/page.client.tsx] Aktif Player:", player);
 
   const {
     tables,
@@ -88,20 +93,24 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     console.log("Oyun izleniyor:", tableId);
   };
 
-  const handleSetPlayerName = () => {
+  const handleSetPlayerName = async () => {
     if (playerName.trim()) {
       const player = ensureIdentity(playerName.trim());
       setCurrentPlayer(player);
-      setIsPlayerNameSet(true);
 
-      console.log("✅ Oyuncu store’a kaydedildi:", player);
+      const res = await fetch("/api/player", {
+        method: "POST",
+        body: JSON.stringify({ id: player.id, name: player.name }),
+        headers: { "Content-Type": "application/json" },
+      });
 
-      setIsPlayerNameSet(true);
+      if (!res.ok) console.warn("player kaydı hatası", await res.text());
+      else console.log("player server'a kaydedildi ve cookie atıldı");
     }
   };
 
   const handleCreateTable = () => {
-    if (newTableName.trim() && isPlayerNameSet && currentPlayer) {
+    if (newTableName.trim() && player && currentPlayer) {
       console.log("🧩 Masa oluşturma başlatıldı:", {
         tableName: newTableName,
         playerName,
@@ -124,14 +133,13 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     } else {
       console.warn("🚫 Eksik bilgi:", {
         newTableName,
-        isPlayerNameSet,
         currentPlayer,
       });
     }
   };
 
   const handleJoinTable = (tableId: string) => {
-    if (isPlayerNameSet) {
+    if (player) {
       joinTable(tableId, playerName);
     }
   };
@@ -253,6 +261,34 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       socket.disconnect();
     };
   }, [currentPlayer]);
+
+  
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+        <div className="w-80 p-6 rounded-2xl border border-border bg-card shadow-md animate-pulse">
+          <div className="flex flex-col items-center space-y-4">
+            {/* Profil placeholder */}
+            <div className="w-16 h-16 rounded-full bg-muted" />
+
+            {/* İsim ve durum */}
+            <div className="space-y-2 w-full">
+              <div className="h-5 w-2/3 bg-muted rounded mx-auto" />
+              <div className="h-4 w-1/2 bg-muted rounded mx-auto" />
+            </div>
+
+            {/* Buton placeholder */}
+            <div className="w-full h-10 bg-muted rounded-lg mt-4" />
+          </div>
+        </div>
+
+        {/* Alt açıklama */}
+        <p className="mt-6 text-sm text-muted-foreground animate-pulse">
+          Oyuncu bilgileri yükleniyor...
+        </p>
+      </div>
+    );
+  }
 
   if (currentTable) {
     return (
@@ -391,7 +427,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
       <div className="w-full max-w-5xl space-y-6">
-        {!isPlayerNameSet ? (
+        {!player ? (
           <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
             <Card className="border-primary shadow-lg w-full max-w-md">
               <CardHeader className="text-center p-6 sm:p-8 space-y-4">
@@ -575,7 +611,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                                 onClick={() => {
                                   setCurrentPlayer(null);
                                   setProfileSection("main");
-                                  setIsPlayerNameSet(false);
                                   clearIdentity();
                                 }}
                               >
@@ -770,7 +805,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                     </Dialog>
                   )}
 
-                  {isPlayerNameSet && (
+                  {player && (
                     <Dialog
                       open={isCreateDialogOpen}
                       onOpenChange={setIsCreateDialogOpen}
