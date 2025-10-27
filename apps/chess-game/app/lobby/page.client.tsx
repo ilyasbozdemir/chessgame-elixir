@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useChessStore } from "@/lib/chess-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,8 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { socket } from "@/lib/socket";
+import { usePresence } from "@/hooks/use-presence";
+import { usePresenceCount } from "@/hooks/use-presence-count";
 
 interface PageClientProps {
   //
@@ -60,6 +62,10 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     "main" | "edit" | "settings" | "stats"
   >("main");
   const [editName, setEditName] = useState("");
+
+  const [channel, setChannel] = useState<any>(null);
+  const playersOnline = usePresence(channel);
+  const playersOnlineCount = usePresenceCount(channel);
 
   const {
     tables,
@@ -91,6 +97,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       setIsPlayerNameSet(true);
 
       console.log("✅ Oyuncu store’a kaydedildi:", player);
+
       setIsPlayerNameSet(true);
     }
   };
@@ -199,6 +206,8 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       name: player?.name || "Anonim",
     });
 
+    setChannel(channel);
+
     channel
       .join()
       .receive("ok", (resp) => console.log("✅ Lobby'e bağlandı:", resp))
@@ -223,13 +232,53 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     };
   }, []);
 
+
+
+
   useEffect(() => {
-    if (currentPlayer) {
-      setIsPlayerNameSet(true);
+    if (!hasHydrated) {
+      console.log("🕓 Persist hydration bekleniyor...");
+      return;
     }
 
-    console.log("🌐 currentPlayer değişti:", currentPlayer);
-  }, [currentPlayer]);
+    if (!currentPlayer) {
+      console.log("⏳ Oyuncu yok, socket bağlanmıyor.");
+      return;
+    }
+
+    console.log("🌐 Socket başlatılıyor, oyuncu:", currentPlayer.name);
+
+    socket.connect();
+
+    const channel = socket.channel("game:lobby", {
+      name: currentPlayer.name,
+    });
+    setChannel(channel);
+
+    channel
+      .join()
+      .receive("ok", (resp) => console.log("✅ Lobby'e bağlandı:", resp))
+      .receive("error", (err) =>
+        console.error("❌ Lobby bağlantı hatası:", err)
+      );
+
+    channel.on("player_joined", (msg) =>
+      console.log("👋 Oyuncu katıldı:", msg.name)
+    );
+    channel.on("player_left", (msg) =>
+      console.log("🚪 Oyuncu ayrıldı:", msg.name)
+    );
+
+    channel.push("update_player", { name: currentPlayer.name });
+
+    return () => {
+      console.log("🔌 Kanal bağlantısı kapatılıyor...");
+      channel.leave();
+      socket.disconnect();
+    };
+  }, [hasHydrated, currentPlayer]);
+
+
 
   if (!hasHydrated)
     return (
@@ -378,7 +427,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
-      <div className="w-full max-w-4xl space-y-6">
+      <div className="w-full max-w-5xl space-y-6">
         {!isPlayerNameSet ? (
           <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
             <Card className="border-primary shadow-lg w-full max-w-md">
@@ -425,7 +474,54 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
             </Card>
           </div>
         ) : (
-          <>
+          <React.Fragment>
+            {/* Stats Bar */}
+            <div>
+              <div className="container mx-auto px-4 py-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/50">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Users className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Aktif Oyuncu
+                      </p>
+                      <p className="text-xl font-bold text-foreground">
+                        {playersOnline.length}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/50">
+                    <div className="w-10 h-10 rounded-lg bg-chart-1/10 flex items-center justify-center">
+                      <PlayCircle className="w-5 h-5 text-chart-1" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Aktif Oyun
+                      </p>
+                      <p className="text-xl font-bold text-foreground">
+                        {activeTables.length}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/50">
+                    <div className="w-10 h-10 rounded-lg bg-chart-2/10 flex items-center justify-center">
+                      <Trophy className="w-5 h-5 text-chart-2" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Bekleyen Masa
+                      </p>
+                      <p className="text-xl font-bold text-foreground">
+                        {waitingTables.length}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <Card>
               <CardHeader className="p-4 sm:p-6">
                 <div className="flex items-center justify-between gap-4">
@@ -712,214 +808,167 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                   )}
 
                   {isPlayerNameSet && (
-                    <>
-                      <Dialog
-                        open={isCreateDialogOpen}
-                        onOpenChange={setIsCreateDialogOpen}
-                      >
-                        <DialogTrigger asChild>
-                          <Button className="gap-2">
-                            <Plus className="w-4 h-4" />
-                            Yeni Masa
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Yeni Masa Oluştur</DialogTitle>
-                            <DialogDescription>
-                              Oyun masanızın detaylarını belirleyin
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="space-y-4 pt-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="table-name">Masa Adı</Label>
-                              <Input
-                                id="table-name"
-                                placeholder="Örn: Hızlı Oyun"
-                                value={newTableName}
-                                onChange={(e) =>
-                                  setNewTableName(e.target.value)
-                                }
-                              />
-                            </div>
-
-                            <Button
-                              onClick={handleCreateTable}
-                              className="w-full"
-                              disabled={!newTableName.trim()}
-                            >
-                              Masa Oluştur
-                            </Button>
+                    <Dialog
+                      open={isCreateDialogOpen}
+                      onOpenChange={setIsCreateDialogOpen}
+                    >
+                      <DialogTrigger asChild>
+                        <Button className="gap-2">
+                          <Plus className="w-4 h-4" />
+                          Yeni Masa
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Yeni Masa Oluştur</DialogTitle>
+                          <DialogDescription>
+                            Oyun masanızın detaylarını belirleyin
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 pt-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="table-name">Masa Adı</Label>
+                            <Input
+                              id="table-name"
+                              placeholder="Örn: Hızlı Oyun"
+                              value={newTableName}
+                              onChange={(e) => setNewTableName(e.target.value)}
+                            />
                           </div>
-                        </DialogContent>
-                      </Dialog>
-                    </>
+
+                          <Button
+                            onClick={handleCreateTable}
+                            className="w-full"
+                            disabled={!newTableName.trim()}
+                          >
+                            Masa Oluştur
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   )}
                 </div>
               </CardHeader>
             </Card>
 
-            {/* Stats Bar */}
-            <div className="border-b border-border bg-card/30">
-              <div className="container mx-auto px-4 py-4">
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/50">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Users className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Aktif Oyuncu
-                      </p>
-                      <p className="text-xl font-bold text-foreground">
-                        {tables.reduce((acc, t) => acc + t.players.length, 0)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/50">
-                    <div className="w-10 h-10 rounded-lg bg-chart-1/10 flex items-center justify-center">
-                      <PlayCircle className="w-5 h-5 text-chart-1" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Aktif Oyun
-                      </p>
-                      <p className="text-xl font-bold text-foreground">
-                        {activeTables.length}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/50">
-                    <div className="w-10 h-10 rounded-lg bg-chart-2/10 flex items-center justify-center">
-                      <Trophy className="w-5 h-5 text-chart-2" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Bekleyen Masa
-                      </p>
-                      <p className="text-xl font-bold text-foreground">
-                        {waitingTables.length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <div className="container mx-auto px-4 py-8">
               <div className="space-y-8">
                 {/* Waiting Tables */}
-                <section>
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold text-foreground">
-                      Bekleyen Masalar
-                    </h2>
-                    <Badge variant="secondary" className="text-sm">
-                      {waitingTables.length} Masa
-                    </Badge>
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {waitingTables.map((table) => (
-                      <Card
-                        key={table.id}
-                        className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 relative overflow-hidden"
-                      >
-                        <div className="absolute top-2 right-2 text-4xl opacity-10 pointer-events-none">
-                          {table.id === "1"
-                            ? "♔"
-                            : table.id === "3"
-                            ? "♕"
-                            : "♖"}
-                        </div>
-                        <CardContent className="p-5 space-y-4 relative z-10">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="space-y-1 min-w-0 flex-1">
-                              <h3 className="font-bold text-lg text-foreground truncate">
-                                {table.name}
-                              </h3>
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Clock className="w-3.5 h-3.5 shrink-0" />
-                                <span>{formatTime(table.createdAt)}</span>
+                {activeTables.length > 0 && (
+                  <section>
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-2xl font-bold text-foreground">
+                        Bekleyen Masalar
+                      </h2>
+                      <Badge variant="secondary" className="text-sm">
+                        {waitingTables.length} Masa
+                      </Badge>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {waitingTables.map((table) => (
+                        <Card
+                          key={table.id}
+                          className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 relative overflow-hidden"
+                        >
+                          <div className="absolute top-2 right-2 text-4xl opacity-10 pointer-events-none">
+                            {table.id === "1"
+                              ? "♔"
+                              : table.id === "3"
+                              ? "♕"
+                              : "♖"}
+                          </div>
+                          <CardContent className="p-5 space-y-4 relative z-10">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="space-y-1 min-w-0 flex-1">
+                                <h3 className="font-bold text-lg text-foreground truncate">
+                                  {table.name}
+                                </h3>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <Clock className="w-3.5 h-3.5 shrink-0" />
+                                  <span>{formatTime(table.createdAt)}</span>
+                                </div>
+                                {table.ownerName && (
+                                  <p className="text-xs text-muted-foreground">
+                                    Sahibi: {table.ownerName}
+                                  </p>
+                                )}
                               </div>
-                              {table.ownerName && (
-                                <p className="text-xs text-muted-foreground">
-                                  Sahibi: {table.ownerName}
-                                </p>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                              <Badge
-                                variant="default"
-                                className="shrink-0 bg-chart-2 text-chart-2-foreground"
-                              >
-                                Bekliyor
-                              </Badge>
-                              {table.ownerId === currentPlayer?.id && (
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6 shrink-0 hover:bg-destructive/10 hover:text-destructive"
-                                  onClick={() => deleteTable(table.id)}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50">
-                            <Users className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-sm font-semibold text-foreground">
-                              {table.players.length}/{table.maxPlayers} Oyuncu
-                            </span>
-                            <div className="flex-1" />
-                            <div className="flex gap-1">
-                              {Array.from({ length: table.maxPlayers }).map(
-                                (_, i) => (
-                                  <div
-                                    key={i}
-                                    className={`text-sm ${
-                                      i < table.players.length
-                                        ? "opacity-100"
-                                        : "opacity-20"
-                                    }`}
-                                  >
-                                    {i % 2 === 0 ? "♟" : "♙"}
-                                  </div>
-                                )
-                              )}
-                            </div>
-                          </div>
-
-                          {table.players.length > 0 && (
-                            <div className="flex gap-2 flex-wrap">
-                              {table.players.map((player) => (
+                              <div className="flex items-center gap-2 shrink-0">
                                 <Badge
-                                  key={player.id}
-                                  variant="outline"
-                                  className="text-xs"
+                                  variant="default"
+                                  className="shrink-0 bg-chart-2 text-chart-2-foreground"
                                 >
-                                  {player.name}
+                                  Bekliyor
                                 </Badge>
-                              ))}
+                                {table.ownerId === currentPlayer?.id && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 shrink-0 hover:bg-destructive/10 hover:text-destructive"
+                                    onClick={() => deleteTable(table.id)}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
                             </div>
-                          )}
 
-                          <Button
-                            onClick={() => handleJoinTable(table.id)}
-                            disabled={table.players.length >= table.maxPlayers}
-                            className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                            size="lg"
-                          >
-                            {table.players.length >= table.maxPlayers
-                              ? "Masa Dolu"
-                              : "Masaya Katıl"}
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </section>
+                            <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50">
+                              <Users className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm font-semibold text-foreground">
+                                {table.players.length}/{table.maxPlayers} Oyuncu
+                              </span>
+                              <div className="flex-1" />
+                              <div className="flex gap-1">
+                                {Array.from({ length: table.maxPlayers }).map(
+                                  (_, i) => (
+                                    <div
+                                      key={i}
+                                      className={`text-sm ${
+                                        i < table.players.length
+                                          ? "opacity-100"
+                                          : "opacity-20"
+                                      }`}
+                                    >
+                                      {i % 2 === 0 ? "♟" : "♙"}
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            </div>
+
+                            {table.players.length > 0 && (
+                              <div className="flex gap-2 flex-wrap">
+                                {table.players.map((player) => (
+                                  <Badge
+                                    key={player.id}
+                                    variant="outline"
+                                    className="text-xs"
+                                  >
+                                    {player.name}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+
+                            <Button
+                              onClick={() => handleJoinTable(table.id)}
+                              disabled={
+                                table.players.length >= table.maxPlayers
+                              }
+                              className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                              size="lg"
+                            >
+                              {table.players.length >= table.maxPlayers
+                                ? "Masa Dolu"
+                                : "Masaya Katıl"}
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </section>
+                )}
 
                 {/* Active Games */}
                 {activeTables.length > 0 && (
@@ -996,7 +1045,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                 )}
               </div>
             </div>
-          </>
+          </React.Fragment>
         )}
       </div>
     </div>

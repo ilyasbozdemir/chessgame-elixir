@@ -15,7 +15,8 @@ defmodule ChessRealtimeServer.Application do
       # Start a worker by calling: ChessRealtimeServer.Worker.start_link(arg)
       # {ChessRealtimeServer.Worker, arg},
       # Start to serve requests, typically the last entry
-      ChessRealtimeServerWeb.Endpoint
+      ChessRealtimeServerWeb.Endpoint,
+       ChessRealtimeServerWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
