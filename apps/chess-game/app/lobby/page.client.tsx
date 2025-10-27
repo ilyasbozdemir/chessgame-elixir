@@ -84,8 +84,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   const waitingTables = tables.filter((t) => t.status === "waiting");
   const activeTables = tables.filter((t) => t.status === "playing");
 
-  const [hasHydrated, setHasHydrated] = useState(false);
-
   const handleWatchGame = (tableId: string) => {
     console.log("Oyun izleniyor:", tableId);
   };
@@ -184,20 +182,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   };
 
   useEffect(() => {
-    const unsub = useIdentityStore.persist.onFinishHydration(() => {
-      setHasHydrated(true);
-    });
-
-    if (useIdentityStore.persist.hasHydrated()) {
-      setHasHydrated(true);
-    }
-
     const player = useIdentityStore.getState().currentPlayer;
-
-    if (!useIdentityStore.persist.hasHydrated() || !player) {
-      console.log("⏳ Hydration veya player bekleniyor...");
-      return () => unsub();
-    }
 
     console.log("🌐 Hazır oyuncu ile socket başlatılıyor:", player);
     socket.connect();
@@ -222,25 +207,16 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       console.log("🚪 Oyuncu ayrıldı:", msg.name)
     );
 
-    channel.push("update_player", { name: player.name });
+    channel.push("update_player", { name: player?.name || "Anonim" });
 
     return () => {
       console.log("🔌 Kanal bağlantısı kapatılıyor...");
       channel.leave();
       socket.disconnect();
-      unsub();
     };
   }, []);
 
-
-
-
   useEffect(() => {
-    if (!hasHydrated) {
-      console.log("🕓 Persist hydration bekleniyor...");
-      return;
-    }
-
     if (!currentPlayer) {
       console.log("⏳ Oyuncu yok, socket bağlanmıyor.");
       return;
@@ -276,20 +252,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       channel.leave();
       socket.disconnect();
     };
-  }, [hasHydrated, currentPlayer]);
-
-
-
-  if (!hasHydrated)
-    return (
-      <div className="flex flex-col items-center justify-center h-screen text-muted-foreground gap-4">
-        <div className="relative">
-          <span className="text-5xl animate-bounce">♟️</span>
-          <Loader2 className="h-6 w-6 text-primary absolute -bottom-2 -right-2 animate-spin" />
-        </div>
-        <p className="text-sm tracking-wide">Satranç tahtası hazırlanıyor...</p>
-      </div>
-    );
+  }, [currentPlayer]);
 
   if (currentTable) {
     return (
