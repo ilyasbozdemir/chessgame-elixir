@@ -332,9 +332,12 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
               <div className="grid gap-2 sm:gap-3">
                 {players.map((player) => (
                   <Card
-                    key={player.id}
+                    key={player._id}
                     className={
-                      currentPlayer?.id === player.id ? "border-primary" : ""
+                      currentPlayer &&
+                      currentPlayer._id?.toString() === player._id?.toString()
+                        ? "border-primary"
+                        : ""
                     }
                   >
                     <CardContent className="flex items-center justify-between p-3 sm:p-4 gap-2">
@@ -354,7 +357,8 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                                   : "⚫ Siyah"}
                               </Badge>
                             )}
-                            {currentPlayer?.id === player.id && (
+                            {currentPlayer?._id?.toString() ===
+                              player._id?.toString() && (
                               <Badge variant="secondary" className="text-xs">
                                 Siz
                               </Badge>
@@ -397,12 +401,16 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                 className="w-full"
                 size="default"
                 variant={
-                  players.find((p) => p.id === currentPlayer.id)?.isReady
+                  players.find(
+                    (p) => p._id?.toString() === currentPlayer._id?.toString()
+                  )?.isReady
                     ? "outline"
                     : "default"
                 }
               >
-                {players.find((p) => p.id === currentPlayer.id)?.isReady
+                {players.find(
+                  (p) => p._id?.toString() === currentPlayer._id?.toString()
+                )?.isReady
                   ? "Hazır Değilim"
                   : "Hazırım"}
               </Button>
