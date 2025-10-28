@@ -31,47 +31,6 @@ interface ChessStore {
   leaveTable: () => void;
 }
 
-const mockTables: GameTable[] = [
-  {
-    id: "table-1",
-    name: "Başlangıç Masası",
-    players: [{ _id: "mock-1", name: "Ahmet", color: "white", isReady: true }],
-    maxPlayers: 2,
-    status: "waiting",
-    createdAt: new Date(Date.now() - 300000),
-  },
-  {
-    id: "table-2",
-    name: "Hızlı Oyun",
-    players: [],
-    maxPlayers: 2,
-    status: "waiting",
-    createdAt: new Date(Date.now() - 600000),
-  },
-  {
-    id: "table-3",
-    name: "Profesyonel Masa",
-    players: [
-      { _id: "mock-2", name: "Mehmet", color: "white", isReady: false },
-      { _id: "mock-3", name: "Ayşe", color: "black", isReady: true },
-    ],
-    maxPlayers: 2,
-    status: "waiting",
-    createdAt: new Date(Date.now() - 900000),
-  },
-  {
-    id: "table-4",
-    name: "Turnuva Masası",
-    players: [
-      { _id: "mock-4", name: "Fatma", color: "white", isReady: true },
-      { _id: "mock-5", name: "Ali", color: "black", isReady: true },
-    ],
-    maxPlayers: 2,
-    status: "playing",
-    createdAt: new Date(Date.now() - 1200000),
-  },
-];
-
 export const useChessStore = create<ChessStore>((set, get) => ({
   players: [],
   currentPlayer: null,
@@ -184,7 +143,9 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     }
 
     // Check if it's the current player's turn
-    const playerColor = players.find((p) => p._id === currentPlayer?._id)?.color;
+    const playerColor = players.find(
+      (p) => p._id === currentPlayer?._id
+    )?.color;
     if (piece.color !== currentTurn || piece.color !== playerColor) {
       return;
     }

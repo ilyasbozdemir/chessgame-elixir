@@ -29,7 +29,10 @@ export async function listTables() {
   return JSON.parse(JSON.stringify(docs));
 }
 
-export async function joinTable(tableId: string, player: { id: string; name: string }) {
+export async function joinTable(
+  tableId: string,
+  player: { id: string; name: string }
+) {
   await connectToDatabase();
   await Table.updateOne(
     { id: tableId, $expr: { $lt: [{ $size: "$players" }, "$maxPlayers"] } },
@@ -40,11 +43,18 @@ export async function joinTable(tableId: string, player: { id: string; name: str
 
 export async function leaveTable(tableId: string, playerId: string) {
   await connectToDatabase();
-  await Table.updateOne({ id: tableId }, { $pull: { players: { id: playerId } } });
+  await Table.updateOne(
+    { id: tableId },
+    { $pull: { players: { id: playerId } } }
+  );
   return { ok: true };
 }
 
-export async function setPlayerReady(tableId: string, playerId: string, isReady: boolean) {
+export async function setPlayerReady(
+  tableId: string,
+  playerId: string,
+  isReady: boolean
+) {
   await connectToDatabase();
   await Table.updateOne(
     { id: tableId, "players.id": playerId },
@@ -53,7 +63,10 @@ export async function setPlayerReady(tableId: string, playerId: string, isReady:
   return { ok: true };
 }
 
-export async function setStatus(tableId: string, status: "waiting" | "playing" | "finished") {
+export async function setStatus(
+  tableId: string,
+  status: "waiting" | "playing" | "finished"
+) {
   await connectToDatabase();
   await Table.updateOne({ id: tableId }, { $set: { status } });
   return { ok: true };

@@ -1,5 +1,6 @@
 "use client";
 
+import { useChessStore } from "@/lib/chess-store";
 import { socket } from "@/lib/socket";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
@@ -54,8 +55,19 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  async function fetchTables() {
+    try {
+      const res = await fetch("/api/tables", { cache: "no-store" });
+      const data = await res.json();
+      useChessStore.setState({ tables: data });
+    } catch (err) {
+      console.error("❌ Masalar alınamadı:", err);
+    }
+  }
+
   useEffect(() => {
     loadPlayer();
+    fetchTables();
   }, []);
 
   useEffect(() => {
