@@ -50,7 +50,7 @@ interface PageClientProps {
   //
 }
 
-const PageClient: React.FC<PageClientProps> = ({}) => {
+const PageClient: React.FC<PageClientProps> = ({ }) => {
   const { player, loading, refresh } = usePlayer();
 
   const [currentPlayer, setCurrentPlayer] = useState<PlayerDoc | null>(null);
@@ -339,7 +339,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                     key={player._id}
                     className={
                       currentPlayer &&
-                      currentPlayer._id?.toString() === player._id?.toString()
+                        currentPlayer._id?.toString() === player._id?.toString()
                         ? "border-primary"
                         : ""
                     }
@@ -363,10 +363,10 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                             )}
                             {currentPlayer?._id?.toString() ===
                               player._id?.toString() && (
-                              <Badge variant="secondary" className="text-xs">
-                                Siz
-                              </Badge>
-                            )}
+                                <Badge variant="secondary" className="text-xs">
+                                  Siz
+                                </Badge>
+                              )}
                           </div>
                         </div>
                       </div>
@@ -621,9 +621,17 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                               <Button
                                 variant="destructive"
                                 className="w-full"
-                                onClick={() => {
+                                onClick={async () => {
                                   setCurrentPlayer(null);
                                   setProfileSection("main");
+                                  const res = await fetch("/api/logout", { method: "POST" });
+                                  if (res.ok) {
+                                    console.log("✅ Oyuncu çıkış yaptı");
+                                    setCurrentPlayer(null);
+                                  } else {
+                                    console.error("❌ Çıkış hatası");
+                                  }
+
                                 }}
                               >
                                 Çıkış Yap
@@ -884,8 +892,8 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                             {table.id === "1"
                               ? "♔"
                               : table.id === "3"
-                              ? "♕"
-                              : "♖"}
+                                ? "♕"
+                                : "♖"}
                           </div>
                           <CardContent className="p-5 space-y-4 relative z-10">
                             <div className="flex items-start justify-between gap-2">
@@ -934,11 +942,10 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                                   (_, i) => (
                                     <div
                                       key={i}
-                                      className={`text-sm ${
-                                        i < table.players.length
+                                      className={`text-sm ${i < table.players.length
                                           ? "opacity-100"
                                           : "opacity-20"
-                                      }`}
+                                        }`}
                                     >
                                       {i % 2 === 0 ? "♟" : "♙"}
                                     </div>
