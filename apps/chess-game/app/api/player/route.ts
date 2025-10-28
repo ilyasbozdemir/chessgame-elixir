@@ -4,16 +4,12 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { Player } from "@/models/player";
 
 export async function POST(req: Request) {
-  const { name, id } = await req.json();
+  const { name } = await req.json();
   await connectToDatabase();
 
   let player: any = null;
 
   try {
-    // 🔹 ID varsa ama geçerli formatta değilse, Mongo’ya sorma
-    if (id && mongoose.isValidObjectId(id)) {
-      player = await Player.findById(id).lean();
-    }
 
     if (player) {
       const res = NextResponse.json(player, { status: 200 });

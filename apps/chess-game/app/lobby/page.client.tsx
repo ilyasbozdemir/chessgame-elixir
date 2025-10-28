@@ -99,7 +99,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     if (playerName.trim()) {
       const res = await fetch("/api/player", {
         method: "POST",
-        body: JSON.stringify({ id: player?._id, name: player?.name }),
+        body: JSON.stringify({ name: playerName }),
         headers: { "Content-Type": "application/json" },
       });
 
