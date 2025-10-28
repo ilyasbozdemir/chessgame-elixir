@@ -1,0 +1,4 @@
+encryptionsalt: v1:jkKqcvbROtM=:v1:olbD+RMFI6e40nsg:ykxRIsbY+zubJIaobSxyOYWOzz1vTw==
+config:
+  chess-infra:db_password:
+    secure: v1:LHTohom8kioPADbs:0+WXFXs46ogVhiSpijC+bXYkAKKsqpiF0g==

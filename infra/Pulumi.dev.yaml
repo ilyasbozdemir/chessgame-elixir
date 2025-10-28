@@ -1,0 +1,3 @@
+encryptionsalt: v1:vO6tcWDTnwk=:v1:mkfHhuRdk7yf8i2P:1gXZ6HVUnQ3F6fzciHfQW9QM0G/GeQ==
+config:
+  chess-infra:db_user: postgres

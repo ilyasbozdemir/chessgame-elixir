@@ -84,6 +84,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     startGame,
     gameState,
   } = useChessStore();
+
   const { ensureIdentity, currentPlayer, clearIdentity } = useIdentityStore();
 
   const waitingTables = tables.filter((t) => t.status === "waiting");
@@ -262,22 +263,19 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     };
   }, [currentPlayer]);
 
-  
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center">
         <div className="w-80 p-6 rounded-2xl border border-border bg-card shadow-md animate-pulse">
           <div className="flex flex-col items-center space-y-4">
-            {/* Profil placeholder */}
             <div className="w-16 h-16 rounded-full bg-muted" />
 
-            {/* İsim ve durum */}
             <div className="space-y-2 w-full">
               <div className="h-5 w-2/3 bg-muted rounded mx-auto" />
               <div className="h-4 w-1/2 bg-muted rounded mx-auto" />
             </div>
 
-            {/* Buton placeholder */}
             <div className="w-full h-10 bg-muted rounded-lg mt-4" />
           </div>
         </div>
@@ -566,10 +564,10 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                               </div>
                               <div>
                                 <p className="font-bold text-lg text-foreground">
-                                  {currentPlayer.name}
+                                  {player.name}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                  Oyuncu ID: {currentPlayer.id}
+                                  Oyuncu ID: {player?._id}
                                 </p>
                               </div>
                             </div>

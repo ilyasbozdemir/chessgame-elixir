@@ -33,6 +33,8 @@ chessgame-elixir/
 - 💨 **TailwindCSS + shadcn/ui** – UI tasarımı ve responsive layout
 - 🐳 **Docker / Postgres** – Geliştirme ortamı ve veritabanı altyapısı
 - 🔁 **WebSocket Event Bridge** – Elixir ↔ Next.js arasında veri akışı
+- ☁️ **Pulumi** – Kodla tanımlanabilir altyapı (IaC) yönetimi
+
 
 ---
 
