@@ -5,7 +5,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 interface Player {
   _id: string;
   name: string;
-  color: string | null;
+  color: string;
   isReady: boolean;
   createdAt: string;
 }

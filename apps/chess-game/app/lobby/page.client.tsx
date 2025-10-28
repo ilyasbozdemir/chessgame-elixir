@@ -30,8 +30,6 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useIdentityStore } from "@/lib/identity-store";
-import { Play } from "next/font/google";
 import {
   Dialog,
   DialogContent,
@@ -44,7 +42,6 @@ import { Label } from "@/components/ui/label";
 import { socket } from "@/lib/socket";
 import { usePresence } from "@/hooks/use-presence";
 import { usePresenceCount } from "@/hooks/use-presence-count";
-import { createPlayer } from "../actions/db/player";
 import { usePlayer } from "@/context/player-context";
 import { PlayerDoc } from "@/models/player";
 import { Player } from "@/lib/chess-types";
@@ -102,6 +99,11 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
         body: JSON.stringify({ name: playerName }),
         headers: { "Content-Type": "application/json" },
       });
+
+      const data = await res.json();
+      console.log("📦 Player API response:", JSON.stringify(data, null, 2));
+
+      setCurrentPlayer(data as PlayerDoc);
 
       if (!res.ok) console.warn("player kaydı hatası", await res.text());
       else console.log("player server'a kaydedildi ve cookie atıldı");
@@ -237,6 +239,8 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       console.log("⏳ Oyuncu yok, socket bağlanmıyor.");
       return;
     }
+
+    setCurrentPlayer(player as unknown as PlayerDoc);
 
     console.log("🌐 Socket başlatılıyor, oyuncu:", player.name);
     socket.connect();
@@ -436,7 +440,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
       <div className="w-full max-w-5xl space-y-6">
-        {!player ? (
+        {!currentPlayer ? (
           <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
             <Card className="border-primary shadow-lg w-full max-w-md">
               <CardHeader className="text-center p-6 sm:p-8 space-y-4">
@@ -575,7 +579,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                               </div>
                               <div>
                                 <p className="font-bold text-lg text-foreground">
-                                  {player.name}
+                                  {player && player.name}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
                                   Oyuncu ID: {player?._id}
