@@ -2,7 +2,7 @@ defmodule ChessRealtimeServerWeb.UserSocket do
   use Phoenix.Socket
 
   ## Kanallar
-  channel "game:lobby", ChessRealtimeServerWeb.ChessChannel
+  channel "game:*", ChessRealtimeServerWeb.ChessChannel
 
   @impl true
   def connect(_params, socket, _connect_info), do: {:ok, socket}

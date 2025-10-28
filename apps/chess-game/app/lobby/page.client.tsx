@@ -39,21 +39,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { socket } from "@/lib/socket";
-import { usePresence } from "@/hooks/use-presence";
-import { usePresenceCount } from "@/hooks/use-presence-count";
 import { usePlayer } from "@/context/player-context";
-import { PlayerDoc } from "@/models/player";
 import { Player } from "@/lib/chess-types";
 
 interface PageClientProps {
   //
 }
 
-const PageClient: React.FC<PageClientProps> = ({ }) => {
-  const { player, loading, refresh } = usePlayer();
-
-  const [currentPlayer, setCurrentPlayer] = useState<PlayerDoc | null>(null);
+const PageClient: React.FC<PageClientProps> = ({}) => {
+  const { player, setPlayer, presenceCount, loading, refresh } = usePlayer();
 
   const router = useRouter();
 
@@ -66,12 +60,6 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
     "main" | "edit" | "settings" | "stats"
   >("main");
   const [editName, setEditName] = useState("");
-
-  const [channel, setChannel] = useState<any>(null);
-  const playersOnline = usePresence(channel);
-  const playersOnlineCount = usePresenceCount(channel);
-
-  console.log("🏓 [lobby/page.client.tsx] Aktif Player:", player);
 
   const {
     tables,
@@ -103,7 +91,7 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
       const data = await res.json();
       console.log("📦 Player API response:", JSON.stringify(data, null, 2));
 
-      setCurrentPlayer(data as PlayerDoc);
+      await refresh();
 
       if (!res.ok) console.warn("player kaydı hatası", await res.text());
       else console.log("player server'a kaydedildi ve cookie atıldı");
@@ -111,21 +99,21 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
   };
 
   const handleCreateTable = () => {
-    if (!currentPlayer?._id) {
+    if (!player?._id) {
       console.warn("Oyuncunun _id değeri yok, tablo oluşturulamadı.");
       return;
     }
 
-    if (newTableName.trim() && player && currentPlayer) {
+    if (newTableName.trim() && player) {
       console.log("🧩 Masa oluşturma başlatıldı:", {
         tableName: newTableName,
         playerName,
-        currentPlayer,
+        player,
       });
 
       const tableId = createTable(newTableName.trim(), {
-        ...currentPlayer,
-        _id: currentPlayer?._id.toString(),
+        ...player,
+        _id: player?._id.toString(),
       } as unknown as Player);
 
       console.log("✅ createTable dönen ID:", tableId);
@@ -142,7 +130,7 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
     } else {
       console.warn("🚫 Eksik bilgi:", {
         newTableName,
-        currentPlayer,
+        player,
       });
     }
   };
@@ -157,19 +145,15 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
     console.log("🚪 Oyuncu masadan ayrılıyor:", {
       currentTableId: currentTable?.id,
       playerName,
-      currentPlayer,
+      player,
     });
 
     leaveTable();
   };
 
   const handleReady = () => {
-    if (currentPlayer?._id) {
-      const player = players.find(
-        (p) => p._id?.toString() === currentPlayer._id?.toString()
-      );
-
-      setPlayerReady(currentPlayer._id.toString(), !player?.isReady);
+    if (player?._id) {
+      setPlayerReady(player._id.toString(), !player?.isReady);
     }
   };
 
@@ -200,76 +184,6 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
       }));
     }
   };
-
-  useEffect(() => {
-    console.log("🌐 Hazır oyuncu ile socket başlatılıyor:", player);
-    socket.connect();
-
-    const channel = socket.channel("game:lobby", {
-      name: player?.name || "Anonim",
-    });
-
-    setChannel(channel);
-
-    channel
-      .join()
-      .receive("ok", (resp) => console.log("✅ Lobby'e bağlandı:", resp))
-      .receive("error", (err) =>
-        console.error("❌ Lobby bağlantı hatası:", err)
-      );
-
-    channel.on("player_joined", (msg) =>
-      console.log("👋 Oyuncu katıldı:", msg.name)
-    );
-    channel.on("player_left", (msg) =>
-      console.log("🚪 Oyuncu ayrıldı:", msg.name)
-    );
-
-    channel.push("update_player", { name: player?.name || "Anonim" });
-
-    return () => {
-      console.log("🔌 Kanal bağlantısı kapatılıyor...");
-      channel.leave();
-      socket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!player) {
-      console.log("⏳ Oyuncu yok, socket bağlanmıyor.");
-      return;
-    }
-
-    setCurrentPlayer(player as unknown as PlayerDoc);
-
-    console.log("🌐 Socket başlatılıyor, oyuncu:", player.name);
-    socket.connect();
-
-    const channel = socket.channel("game:lobby", { name: player.name });
-    setChannel(channel);
-
-    channel
-      .join()
-      .receive("ok", (resp) => console.log("✅ Lobby'e bağlandı:", resp))
-      .receive("error", (err) =>
-        console.error("❌ Lobby bağlantı hatası:", err)
-      );
-
-    channel.on("player_joined", (msg) =>
-      console.log("👋 Oyuncu katıldı:", msg.name)
-    );
-    channel.on("player_left", (msg) =>
-      console.log("🚪 Oyuncu ayrıldı:", msg.name)
-    );
-
-    channel.push("update_player", { name: player.name });
-
-    return () => {
-      console.log("🔌 Kanal bağlantısı kapatılıyor...");
-      channel.leave();
-      socket.disconnect();
-    };
-  }, [player]);
 
   if (loading) {
     return (
@@ -338,8 +252,8 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
                   <Card
                     key={player._id}
                     className={
-                      currentPlayer &&
-                        currentPlayer._id?.toString() === player._id?.toString()
+                      player &&
+                      player._id?.toString() === player._id?.toString()
                         ? "border-primary"
                         : ""
                     }
@@ -361,12 +275,12 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
                                   : "⚫ Siyah"}
                               </Badge>
                             )}
-                            {currentPlayer?._id?.toString() ===
+                            {player?._id?.toString() ===
                               player._id?.toString() && (
-                                <Badge variant="secondary" className="text-xs">
-                                  Siz
-                                </Badge>
-                              )}
+                              <Badge variant="secondary" className="text-xs">
+                                Siz
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -399,21 +313,21 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
               </div>
             </div>
 
-            {currentPlayer && players.length === 2 && (
+            {player && players.length === 2 && (
               <Button
                 onClick={handleReady}
                 className="w-full"
                 size="default"
                 variant={
                   players.find(
-                    (p) => p._id?.toString() === currentPlayer._id?.toString()
+                    (p) => p._id?.toString() === player._id?.toString()
                   )?.isReady
                     ? "outline"
                     : "default"
                 }
               >
                 {players.find(
-                  (p) => p._id?.toString() === currentPlayer._id?.toString()
+                  (p) => p._id?.toString() === player._id?.toString()
                 )?.isReady
                   ? "Hazır Değilim"
                   : "Hazırım"}
@@ -426,7 +340,7 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
               </Button>
             )}
 
-            {players.length === 1 && currentPlayer && (
+            {players.length === 1 && player && (
               <div className="text-center text-xs sm:text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
                 İkinci oyuncunun katılması bekleniyor...
               </div>
@@ -440,7 +354,7 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
       <div className="w-full max-w-5xl space-y-6">
-        {!currentPlayer ? (
+        {!player ? (
           <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
             <Card className="border-primary shadow-lg w-full max-w-md">
               <CardHeader className="text-center p-6 sm:p-8 space-y-4">
@@ -487,57 +401,10 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
           </div>
         ) : (
           <React.Fragment>
-            {/* Stats Bar */}
-            <div>
-              <div className="container mx-auto px-4 py-4">
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/50">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Users className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Aktif Oyuncu
-                      </p>
-                      <p className="text-xl font-bold text-foreground">
-                        {playersOnline.length}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/50">
-                    <div className="w-10 h-10 rounded-lg bg-chart-1/10 flex items-center justify-center">
-                      <PlayCircle className="w-5 h-5 text-chart-1" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Aktif Oyun
-                      </p>
-                      <p className="text-xl font-bold text-foreground">
-                        {activeTables.length}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/50">
-                    <div className="w-10 h-10 rounded-lg bg-chart-2/10 flex items-center justify-center">
-                      <Trophy className="w-5 h-5 text-chart-2" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Bekleyen Masa
-                      </p>
-                      <p className="text-xl font-bold text-foreground">
-                        {waitingTables.length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <Card>
               <CardHeader className="p-4 sm:p-6">
                 <div className="flex items-center justify-between gap-4">
-                  {currentPlayer ? (
+                  {player ? (
                     <Dialog
                       onOpenChange={(open) =>
                         !open && setProfileSection("main")
@@ -547,7 +414,7 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
                         <Button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 transition-colors cursor-pointer">
                           <UserCircle className="w-5 h-5 text-accent-foreground" />
                           <span className="font-medium text-accent-foreground">
-                            {currentPlayer.name}
+                            {player.name}
                           </span>
                         </Button>
                       </DialogTrigger>
@@ -592,7 +459,7 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
                                 variant="outline"
                                 className="w-full justify-start bg-transparent"
                                 onClick={() => {
-                                  setEditName(currentPlayer.name);
+                                  setEditName(player.name);
                                   setProfileSection("edit");
                                 }}
                               >
@@ -622,16 +489,18 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
                                 variant="destructive"
                                 className="w-full"
                                 onClick={async () => {
-                                  setCurrentPlayer(null);
+                                  setPlayer(null);
                                   setProfileSection("main");
-                                  const res = await fetch("/api/logout", { method: "POST" });
+                                  const res = await fetch("/api/logout", {
+                                    method: "POST",
+                                  });
                                   if (res.ok) {
                                     console.log("✅ Oyuncu çıkış yaptı");
-                                    setCurrentPlayer(null);
+                                    setPlayer(null);
                                   } else {
                                     console.error("❌ Çıkış hatası");
                                   }
-
+                                  await refresh();
                                 }}
                               >
                                 Çıkış Yap
@@ -663,8 +532,8 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
                                 className="flex-1"
                                 disabled={!editName.trim()}
                                 onClick={() => {
-                                  setCurrentPlayer({
-                                    ...currentPlayer,
+                                  setPlayer({
+                                    ...player,
                                     name: editName,
                                   });
                                   setProfileSection("main");
@@ -892,8 +761,8 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
                             {table.id === "1"
                               ? "♔"
                               : table.id === "3"
-                                ? "♕"
-                                : "♖"}
+                              ? "♕"
+                              : "♖"}
                           </div>
                           <CardContent className="p-5 space-y-4 relative z-10">
                             <div className="flex items-start justify-between gap-2">
@@ -918,7 +787,7 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
                                 >
                                   Bekliyor
                                 </Badge>
-                                {table.ownerId === currentPlayer?._id && (
+                                {table.ownerId === player?._id && (
                                   <Button
                                     variant="ghost"
                                     size="icon"
@@ -942,10 +811,11 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
                                   (_, i) => (
                                     <div
                                       key={i}
-                                      className={`text-sm ${i < table.players.length
+                                      className={`text-sm ${
+                                        i < table.players.length
                                           ? "opacity-100"
                                           : "opacity-20"
-                                        }`}
+                                      }`}
                                     >
                                       {i % 2 === 0 ? "♟" : "♙"}
                                     </div>

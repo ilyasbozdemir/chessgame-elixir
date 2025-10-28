@@ -2,10 +2,18 @@ defmodule ChessRealtimeServerWeb.ChessChannel do
   use Phoenix.Channel
   alias ChessRealtimeServerWeb.Presence
 
-  # 🔹 Oyuncu kanala katıldığında
-  def join("game:lobby", %{"name" => name}, socket) do
-    IO.puts("✅ #{name} kanala katıldı.")
+  # 🔹 Kayıtlı oyuncuların bağlandığı kanal
+  def join("game:lobby:players", %{"name" => name}, socket) do
+    IO.puts("✅ [PLAYER] #{name} kanala katıldı.")
     socket = assign(socket, :player_name, name)
+    send(self(), :after_join)
+    {:ok, socket}
+  end
+
+  # 🔹 Anonim oyuncuların bağlandığı kanal
+  def join("game:lobby:guests", %{"name" => name}, socket) do
+    IO.puts("🟡 [GUEST] #{name} kanala katıldı.")
+    socket = assign(socket, :player_name, "[Guest] " <> name)
     send(self(), :after_join)
     {:ok, socket}
   end
