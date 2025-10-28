@@ -11,7 +11,7 @@ export default function GamePage() {
 
   useEffect(() => {
     if (!currentTable || gameState.gameStatus !== "playing") {
-      router.replace("/lobby");
+      //router.replace("/lobby");
     }
   }, [currentTable, gameState.gameStatus, router]);
 

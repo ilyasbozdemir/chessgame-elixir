@@ -110,7 +110,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
                   d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                 />
               </svg>
-              <span className="font-medium">12 izleyici</span>
+              <span className="font-medium">1 izleyici</span>
             </div>
           </div>
         )}
@@ -119,7 +119,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
           <CardHeader className="p-3 sm:p-4 lg:p-6">
             <CardTitle className="flex items-center justify-between text-sm sm:text-base gap-2">
               <span className="truncate">
-                {players.find((p) => p.color === "white")?.name || "Beyaz"}
+                {players.find((p) => p.color === "white")?.name || "PlayWhite"}
               </span>
               <Badge
                 variant={currentTurn === "white" ? "default" : "outline"}
@@ -221,7 +221,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
           <CardHeader className="p-3 sm:p-4 lg:p-6">
             <CardTitle className="flex items-center justify-between text-sm sm:text-base gap-2">
               <span className="truncate">
-                {players.find((p) => p.color === "black")?.name || "Siyah"}
+                {players.find((p) => p.color === "black")?.name || "PlayBlack"}
               </span>
               <Badge
                 variant={currentTurn === "black" ? "default" : "outline"}

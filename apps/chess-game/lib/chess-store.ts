@@ -35,7 +35,7 @@ const mockTables: GameTable[] = [
   {
     id: "table-1",
     name: "Başlangıç Masası",
-    players: [{ id: "mock-1", name: "Ahmet", color: "white", isReady: true }],
+    players: [{ _id: "mock-1", name: "Ahmet", color: "white", isReady: true }],
     maxPlayers: 2,
     status: "waiting",
     createdAt: new Date(Date.now() - 300000),
@@ -52,8 +52,8 @@ const mockTables: GameTable[] = [
     id: "table-3",
     name: "Profesyonel Masa",
     players: [
-      { id: "mock-2", name: "Mehmet", color: "white", isReady: false },
-      { id: "mock-3", name: "Ayşe", color: "black", isReady: true },
+      { _id: "mock-2", name: "Mehmet", color: "white", isReady: false },
+      { _id: "mock-3", name: "Ayşe", color: "black", isReady: true },
     ],
     maxPlayers: 2,
     status: "waiting",
@@ -63,8 +63,8 @@ const mockTables: GameTable[] = [
     id: "table-4",
     name: "Turnuva Masası",
     players: [
-      { id: "mock-4", name: "Fatma", color: "white", isReady: true },
-      { id: "mock-5", name: "Ali", color: "black", isReady: true },
+      { _id: "mock-4", name: "Fatma", color: "white", isReady: true },
+      { _id: "mock-5", name: "Ali", color: "black", isReady: true },
     ],
     maxPlayers: 2,
     status: "playing",
@@ -97,7 +97,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     if (players.length >= 2) return;
 
     const newPlayer: Player = {
-      id: Math.random().toString(36).substr(2, 9),
+      _id: Math.random().toString(36).substr(2, 9),
       name,
       color: null,
       isReady: false,
@@ -116,19 +116,19 @@ export const useChessStore = create<ChessStore>((set, get) => ({
 
   removePlayer: (id: string) => {
     const { players, currentPlayer } = get();
-    const newPlayers = players.filter((p) => p.id !== id);
+    const newPlayers = players.filter((p) => p._id !== id);
 
     set({
       players: newPlayers,
       currentPlayer:
-        currentPlayer?.id === id ? newPlayers[0] || null : currentPlayer,
+        currentPlayer?._id === id ? newPlayers[0] || null : currentPlayer,
     });
   },
 
   setPlayerReady: (id: string, ready: boolean) => {
     set((state) => ({
       players: state.players.map((p) =>
-        p.id === id ? { ...p, isReady: ready } : p
+        p._id === id ? { ...p, isReady: ready } : p
       ),
     }));
 
@@ -184,7 +184,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     }
 
     // Check if it's the current player's turn
-    const playerColor = players.find((p) => p.id === currentPlayer?.id)?.color;
+    const playerColor = players.find((p) => p._id === currentPlayer?._id)?.color;
     if (piece.color !== currentTurn || piece.color !== playerColor) {
       return;
     }
@@ -263,7 +263,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
       maxPlayers: 2,
       status: "waiting",
       createdAt: new Date(),
-      ownerId: owner.id,
+      ownerId: owner._id,
       ownerName: owner.name,
     };
 
@@ -281,7 +281,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     if (!table || table.players.length >= table.maxPlayers) return;
 
     const newPlayer: Player = {
-      id: Math.random().toString(36).substr(2, 9),
+      _id: Math.random().toString(36).substr(2, 9),
       name: playerName,
       color: null,
       isReady: false,
@@ -305,7 +305,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     if (!currentTable || !currentPlayer) return;
 
     const updatedPlayers = currentTable.players.filter(
-      (p) => p.id !== currentPlayer.id
+      (p) => p._id !== currentPlayer._id
     );
     const updatedTable = {
       ...currentTable,

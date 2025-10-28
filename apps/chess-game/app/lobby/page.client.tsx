@@ -46,6 +46,8 @@ import { usePresence } from "@/hooks/use-presence";
 import { usePresenceCount } from "@/hooks/use-presence-count";
 import { createPlayer } from "../actions/db/player";
 import { usePlayer } from "@/context/player-context";
+import { PlayerDoc } from "@/models/player";
+import { Player } from "@/lib/chess-types";
 
 interface PageClientProps {
   //
@@ -53,6 +55,8 @@ interface PageClientProps {
 
 const PageClient: React.FC<PageClientProps> = ({}) => {
   const { player, loading, refresh } = usePlayer();
+
+  const [currentPlayer, setCurrentPlayer] = useState<PlayerDoc | null>(null);
 
   const router = useRouter();
 
@@ -80,12 +84,9 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     joinTable,
     leaveTable,
     setPlayerReady,
-    setCurrentPlayer,
     startGame,
     gameState,
   } = useChessStore();
-
-  const { ensureIdentity, currentPlayer, clearIdentity } = useIdentityStore();
 
   const waitingTables = tables.filter((t) => t.status === "waiting");
   const activeTables = tables.filter((t) => t.status === "playing");
@@ -96,12 +97,9 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
   const handleSetPlayerName = async () => {
     if (playerName.trim()) {
-      const player = ensureIdentity(playerName.trim());
-      setCurrentPlayer(player);
-
       const res = await fetch("/api/player", {
         method: "POST",
-        body: JSON.stringify({ id: player.id, name: player.name }),
+        body: JSON.stringify({ id: player?._id, name: player?.name }),
         headers: { "Content-Type": "application/json" },
       });
 
@@ -111,6 +109,11 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   };
 
   const handleCreateTable = () => {
+    if (!currentPlayer?._id) {
+      console.warn("Oyuncunun _id değeri yok, tablo oluşturulamadı.");
+      return;
+    }
+
     if (newTableName.trim() && player && currentPlayer) {
       console.log("🧩 Masa oluşturma başlatıldı:", {
         tableName: newTableName,
@@ -118,7 +121,10 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
         currentPlayer,
       });
 
-      const tableId = createTable(newTableName.trim(), currentPlayer);
+      const tableId = createTable(newTableName.trim(), {
+        ...currentPlayer,
+        _id: currentPlayer?._id.toString(),
+      } as unknown as Player);
 
       console.log("✅ createTable dönen ID:", tableId);
 
@@ -156,9 +162,12 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   };
 
   const handleReady = () => {
-    if (currentPlayer) {
-      const player = players.find((p) => p.id === currentPlayer.id);
-      setPlayerReady(currentPlayer.id, !player?.isReady);
+    if (currentPlayer?._id) {
+      const player = players.find(
+        (p) => p._id?.toString() === currentPlayer._id?.toString()
+      );
+
+      setPlayerReady(currentPlayer._id.toString(), !player?.isReady);
     }
   };
 
@@ -183,7 +192,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     const { tables, currentPlayer } = useChessStore.getState();
     const table = tables.find((t) => t.id === tableId);
 
-    if (table && table.ownerId === currentPlayer?.id) {
+    if (table && table.ownerId === currentPlayer?._id) {
       useChessStore.setState((state) => ({
         tables: state.tables.filter((t) => t.id !== tableId),
       }));
@@ -191,8 +200,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   };
 
   useEffect(() => {
-    const player = useIdentityStore.getState().currentPlayer;
-
     console.log("🌐 Hazır oyuncu ile socket başlatılıyor:", player);
     socket.connect();
 
@@ -226,18 +233,15 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   }, []);
 
   useEffect(() => {
-    if (!currentPlayer) {
+    if (!player) {
       console.log("⏳ Oyuncu yok, socket bağlanmıyor.");
       return;
     }
 
-    console.log("🌐 Socket başlatılıyor, oyuncu:", currentPlayer.name);
-
+    console.log("🌐 Socket başlatılıyor, oyuncu:", player.name);
     socket.connect();
 
-    const channel = socket.channel("game:lobby", {
-      name: currentPlayer.name,
-    });
+    const channel = socket.channel("game:lobby", { name: player.name });
     setChannel(channel);
 
     channel
@@ -254,15 +258,14 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       console.log("🚪 Oyuncu ayrıldı:", msg.name)
     );
 
-    channel.push("update_player", { name: currentPlayer.name });
+    channel.push("update_player", { name: player.name });
 
     return () => {
       console.log("🔌 Kanal bağlantısı kapatılıyor...");
       channel.leave();
       socket.disconnect();
     };
-  }, [currentPlayer]);
-
+  }, [player]);
 
   if (loading) {
     return (
@@ -609,7 +612,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                                 onClick={() => {
                                   setCurrentPlayer(null);
                                   setProfileSection("main");
-                                  clearIdentity();
                                 }}
                               >
                                 Çıkış Yap
@@ -896,7 +898,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                                 >
                                   Bekliyor
                                 </Badge>
-                                {table.ownerId === currentPlayer?.id && (
+                                {table.ownerId === currentPlayer?._id && (
                                   <Button
                                     variant="ghost"
                                     size="icon"
@@ -937,7 +939,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                               <div className="flex gap-2 flex-wrap">
                                 {table.players.map((player) => (
                                   <Badge
-                                    key={player.id}
+                                    key={player._id}
                                     variant="outline"
                                     className="text-xs"
                                   >
@@ -1015,7 +1017,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                             <div className="flex gap-2 flex-wrap">
                               {table.players.map((player) => (
                                 <Badge
-                                  key={player.id}
+                                  key={player._id}
                                   variant="outline"
                                   className="text-xs"
                                 >

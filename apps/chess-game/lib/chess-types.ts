@@ -20,7 +20,7 @@ export interface Position {
 export type Board = (ChessPiece | null)[][];
 
 export interface Player {
-  id: string;
+  _id: string;
   name: string;
   color: PieceColor | null;
   isReady: boolean;
