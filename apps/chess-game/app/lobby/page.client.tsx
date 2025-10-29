@@ -60,7 +60,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
   const [playerName, setPlayerName] = useState("");
   const [newTableName, setNewTableName] = useState("");
-  const [showCreateTable, setShowCreateTable] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const [profileSection, setProfileSection] = useState<
@@ -147,7 +146,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
           console.log("🎮 Oyuncu masaya katıldı:", { tableId, playerName });
 
           setNewTableName("");
-          setShowCreateTable(false);
 
           const normalizedPlayer = {
             ...player,
@@ -225,26 +223,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       }));
     }
   };
-
-  useEffect(() => {
-    const joinSub = PubSub.subscribe("PLAYER_JOINED", (_, { joined }) => {
-      console.log("🙌 Yeni oyuncular:", joined);
-    });
-
-    const leftSub = PubSub.subscribe("PLAYER_LEFT", (_, { left }) => {
-      console.log("👋 Ayrılan oyuncular:", left);
-    });
-
-    const fullState = PubSub.subscribe("PRESENCE_STATE", (_, { players }) => {
-      console.log("📋 Güncel liste:", players);
-    });
-
-    return () => {
-      PubSub.unsubscribe(joinSub);
-      PubSub.unsubscribe(leftSub);
-      PubSub.unsubscribe(fullState);
-    };
-  }, []);
 
   if (loading) {
     return (
@@ -455,7 +433,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                   size="lg"
                 >
                   <User className="w-5 h-5 mr-2" />
-                  Oyuna Başla
+                  Kaydet
                 </Button>
                 <p className="text-xs text-center text-muted-foreground">
                   Devam ederek kullanım şartlarını kabul etmiş olursunuz

@@ -4,7 +4,6 @@ import { useChessStore } from "@/lib/chess-store";
 import { socket } from "@/lib/socket";
 import { TableDoc } from "@/models/table";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import PubSub from "pubsub-js";
 
 // zustandaki tipleri de kaldırıp PlayerDoc kullanabiliriz su anlık hatlaarı fixlemeden ocne bu  durumda kalması lazım,
 interface Player {
@@ -74,8 +73,6 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   useEffect(() => {
-    if (loading) return;
-
     const name = player?.name || "Anonim";
     const topic = player ? "game:lobby:players" : "game:lobby:guests";
 
@@ -90,9 +87,10 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
 
     ch.push("update_player", { name });
 
-    ch.on("player_joined", (msg) =>
-      console.log("👋 Oyuncu katıldı:", msg.name)
-    );
+    ch.on("player_joined", (msg) => {
+      console.log("➕ Yeni oyuncu katıldı:", msg.name);
+    });
+
     ch.on("player_left", (msg) => console.log("🚪 Oyuncu ayrıldı:", msg.name));
 
     setChannel(ch);
@@ -103,13 +101,16 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
       socket.disconnect();
       setChannel(null);
     };
-  }, [player, loading]);
+  }, [player?._id]);
 
   useEffect(() => {
     if (!channel) return;
 
     channel.on("table_created", (newTable: TableDoc) => {
-      PubSub.publish("TABLE_CREATED", newTable);
+      console.log("📡 Yeni masa geldi:", newTable);
+      useChessStore.setState((state: any) => ({
+        tables: [...state.tables, newTable],
+      }));
     });
 
     // 🔹 Başlangıç listesi
@@ -117,8 +118,6 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
       const playerNames = Object.keys(state);
       setPresenceList(playerNames);
       setPresenceCount(playerNames.length);
-
-      PubSub.publish("PRESENCE_STATE", { players: playerNames });
     });
 
     // 🔹 Giren-çıkan farkları
@@ -129,9 +128,6 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
         let next = Array.from(new Set([...prev, ...joined]));
         next = next.filter((p) => !left.includes(p));
         setPresenceCount(next.length);
-
-        if (joined.length > 0) PubSub.publish("PLAYER_JOINED", { joined });
-        if (left.length > 0) PubSub.publish("PLAYER_LEFT", { left });
 
         return next;
       });
