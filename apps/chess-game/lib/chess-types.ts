@@ -19,24 +19,6 @@ export interface Position {
 
 export type Board = (ChessPiece | null)[][];
 
-export interface Player {
-  _id: string;
-  name: string;
-  color: PieceColor | null;
-  isReady: boolean;
-}
-
-export interface GameTable {
-  id: string;
-  name: string;
-  players: Player[];
-  maxPlayers: number;
-  status: "waiting" | "playing" | "finished";
-  createdAt: Date;
-  ownerId?: string; 
-  ownerName?: string; 
-}
-
 export interface GameState {
   board: Board;
   currentTurn: PieceColor;

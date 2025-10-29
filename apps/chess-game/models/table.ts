@@ -1,24 +1,16 @@
-import mongoose, { Schema, models } from "mongoose";
+import mongoose, { Schema, models, Types } from "mongoose";
+import { PlayerDoc } from "./player";
+import { TablePlayerSchema } from "./table-player";
+
+export type TablePlayer = PlayerDoc & {
+  isReady: boolean;
+};
 
 const TableSchema = new Schema(
   {
     _id: { type: Schema.Types.ObjectId, auto: true },
     name: { type: String, required: true },
-    players: {
-      type: [
-        {
-          id: String,
-          name: String,
-          color: {
-            type: String,
-            enum: ["white", "black", null],
-            default: null,
-          },
-          isReady: { type: Boolean, default: false },
-        },
-      ],
-      default: [],
-    },
+    players: { type: [TablePlayerSchema], default: [] },
     maxPlayers: { type: Number, default: 2 },
     status: {
       type: String,
@@ -26,7 +18,7 @@ const TableSchema = new Schema(
       default: "waiting",
     },
     createdAt: { type: Date, default: Date.now },
-    ownerId: { type: String, required: false },
+    ownerId: { type: Schema.Types.ObjectId, ref: "Player", required: false },
     ownerName: { type: String, required: false },
   },
   { versionKey: false }
@@ -34,4 +26,19 @@ const TableSchema = new Schema(
 
 export const Table = models.Table || mongoose.model("Table", TableSchema);
 
-export type TableDoc = mongoose.InferSchemaType<typeof TableSchema>;
+type InferTable = mongoose.InferSchemaType<typeof TableSchema>;
+
+export type TableDoc = Omit<
+  InferTable,
+  "players" | "_id" | "ownerId" | "ownerName"
+> & {
+  _id?: Types.ObjectId | null;
+  ownerId?: Types.ObjectId | null;
+  ownerName?: string | null;
+  players?: {
+    id: Types.ObjectId | null;
+    name: string;
+    color: "white" | "black" | null;
+    isReady: boolean;
+  }[];
+};

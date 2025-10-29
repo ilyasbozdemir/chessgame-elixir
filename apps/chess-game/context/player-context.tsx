@@ -2,21 +2,13 @@
 
 import { useChessStore } from "@/lib/chess-store";
 import { socket } from "@/lib/socket";
+import { PlayerDoc } from "@/models/player";
 import { TableDoc } from "@/models/table";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-// zustandaki tipleri de kaldırıp PlayerDoc kullanabiliriz su anlık hatlaarı fixlemeden ocne bu  durumda kalması lazım,
-interface Player {
-  _id: string;
-  name: string;
-  color: string;
-  isReady: boolean;
-  createdAt: string;
-}
-
 interface PlayerContextType {
-  player: Player | null;
-  setPlayer: React.Dispatch<React.SetStateAction<Player | null>>;
+  player: PlayerDoc | null;
+  setPlayer: React.Dispatch<React.SetStateAction<PlayerDoc | null>>;
   loading: boolean;
   channel: any;
   refresh: () => Promise<void>;
@@ -35,7 +27,7 @@ const PlayerContext = createContext<PlayerContextType>({
 export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [player, setPlayer] = useState<Player | null>(null);
+  const [player, setPlayer] = useState<PlayerDoc | null>(null);
   const [channel, setChannel] = useState<any>(null);
 
   const [presenceList, setPresenceList] = useState<string[]>([]);

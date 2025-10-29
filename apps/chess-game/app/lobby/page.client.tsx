@@ -47,6 +47,7 @@ import {
   joinTable as joinTableDB,
 } from "@/app/actions/db/table";
 import { formatTime } from "@/lib/utils";
+import mongoose from "mongoose";
 
 interface PageClientProps {
   //
@@ -121,7 +122,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
         const newTable = await createTableDB({
           id: Math.random().toString(36).substr(2, 9),
           name: newTableName.trim(),
-          ownerId: player._id,
+          ownerId: player._id?.toString(),
           ownerName: player.name,
           maxPlayers: 2,
         });
@@ -136,9 +137,12 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
         console.log("✅ createTable dönen ID:", tableId);
 
         if (tableId) {
-          joinTable(tableId, playerName);
+          joinTable(tableId, player);
 
-          await joinTableDB(newTable.id, { id: player._id, name: player.name });
+          await joinTableDB(newTable.id, {
+            id: player._id.toString(),
+            name: player.name,
+          });
           console.log("🎮 Oyuncu masaya eklendi:", player.name);
 
           // 3️⃣ Lokal store'u güncelle
@@ -166,7 +170,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
           }
 
           useChessStore.getState().createTable(newTable.name, normalizedPlayer);
-          useChessStore.getState().joinTable(newTable.id, player.name);
+          useChessStore.getState().joinTable(newTable.id, player);
         } else {
           console.warn("⚠️ createTable bir ID döndürmedi!");
         }
@@ -181,15 +185,18 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
   const handleJoinTable = async (tableId: string) => {
     if (player) {
-      joinTable(tableId, playerName);
-      await joinTableDB(tableId, { id: player._id, name: player.name });
+      joinTable(tableId, player);
+      await joinTableDB(tableId, {
+        id: player._id!.toString(),
+        name: player.name,
+      });
       console.log("🎮 Oyuncu masaya eklendi:", player.name);
     }
   };
 
   const handleLeaveTable = () => {
     console.log("🚪 Oyuncu masadan ayrılıyor:", {
-      currentTableId: currentTable?.id,
+      currentTableId: currentTable?._id,
       playerName,
       player,
     });
@@ -198,8 +205,14 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   };
 
   const handleReady = () => {
-    if (player?._id) {
-      setPlayerReady(player._id.toString(), !player?.isReady);
+    const currentTable = useChessStore.getState().currentTable;
+    if (player?._id && currentTable?.players) {
+      const playerInTable = currentTable.players.find(
+        (p: { id: mongoose.Types.ObjectId | null; isReady: boolean }) =>
+          p.id?.toString() === player._id?.toString()
+      );
+
+      setPlayerReady(player._id.toString(), !playerInTable?.isReady);
     }
   };
 
@@ -209,17 +222,18 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   };
 
   const canStartGame =
-    players.length === 2 &&
-    players.every((p) => p.isReady) &&
+    currentTable &&
+    currentTable.players?.length === 2 &&
+    currentTable.players.every((p) => p.isReady) &&
     gameState.gameStatus === "ready";
 
   const deleteTable = (tableId: string) => {
     const { tables, currentPlayer } = useChessStore.getState();
-    const table = tables.find((t) => t.id === tableId);
+    const table = tables.find((t) => t._id?.toString() === tableId);
 
     if (table && table.ownerId === currentPlayer?._id) {
       useChessStore.setState((state) => ({
-        tables: state.tables.filter((t) => t.id !== tableId),
+        tables: state.tables.filter((t) => t._id?.toString() === tableId),
       }));
     }
   };
@@ -287,11 +301,11 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
               </div>
 
               <div className="grid gap-2 sm:gap-3">
-                {players.map((player) => {
+                {players.map((player, index) => {
                   if (!player?.name) return null;
                   return (
                     <Card
-                      key={player._id}
+                      key={player._id?.toString()}
                       className={
                         player &&
                         player._id?.toString() === player._id?.toString()
@@ -327,7 +341,9 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">
-                          {player.isReady ? (
+                          {currentTable?.players?.find(
+                            (p) => p.id?.toString() === player._id?.toString()
+                          )?.isReady ? (
                             <Badge className="bg-primary text-xs sm:text-sm">
                               Hazır
                             </Badge>
@@ -355,21 +371,21 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
               </div>
             </div>
 
-            {player && players.length === 2 && (
+            {player && currentTable?.players?.length === 2 && (
               <Button
                 onClick={handleReady}
                 className="w-full"
                 size="default"
                 variant={
-                  players.find(
-                    (p) => p._id?.toString() === player._id?.toString()
+                  currentTable.players.find(
+                    (p) => p.id?.toString() === player._id?.toString()
                   )?.isReady
                     ? "outline"
                     : "default"
                 }
               >
-                {players.find(
-                  (p) => p._id?.toString() === player._id?.toString()
+                {currentTable.players.find(
+                  (p) => p.id?.toString() === player._id?.toString()
                 )?.isReady
                   ? "Hazır Değilim"
                   : "Hazırım"}
@@ -796,15 +812,15 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       {waitingTables.map((table, index) => (
                         <Card
-                          key={table.id || `waiting-table-${index}`}
+                          key={table._id?.toString()}
                           className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 relative overflow-hidden"
                         >
                           <div className="absolute top-2 right-2 text-4xl opacity-10 pointer-events-none">
-                            {table.id === "1"
+                            {table.status === "waiting"
+                              ? "♙"
+                              : table.status === "playing"
                               ? "♔"
-                              : table.id === "3"
-                              ? "♕"
-                              : "♖"}
+                              : "♕"}
                           </div>
                           <CardContent className="p-5 space-y-4 relative z-10">
                             <div className="flex items-start justify-between gap-2">
@@ -834,7 +850,9 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                                     variant="ghost"
                                     size="icon"
                                     className="h-6 w-6 shrink-0 hover:bg-destructive/10 hover:text-destructive"
-                                    onClick={() => deleteTable(table.id)}
+                                    onClick={() =>
+                                      deleteTable(table._id?.toString() ?? "")
+                                    }
                                   >
                                     <X className="h-4 w-4" />
                                   </Button>
@@ -845,7 +863,8 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                             <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50">
                               <Users className="w-4 h-4 text-muted-foreground" />
                               <span className="text-sm font-semibold text-foreground">
-                                {table.players.length}/{table.maxPlayers} Oyuncu
+                                {table.players && table.players.length}/
+                                {table.maxPlayers} Oyuncu
                               </span>
                               <div className="flex-1" />
                               <div className="flex gap-1">
@@ -854,7 +873,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                                     <div
                                       key={i}
                                       className={`text-sm ${
-                                        i < table.players.length
+                                        i < (table.players?.length ?? 0)
                                           ? "opacity-100"
                                           : "opacity-20"
                                       }`}
@@ -866,11 +885,11 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                               </div>
                             </div>
 
-                            {table.players.length > 0 && (
+                            {(table.players?.length ?? 0) > 0 && (
                               <div className="flex gap-2 flex-wrap">
-                                {table.players.map((player) => (
+                                {table.players?.map((player, index) => (
                                   <Badge
-                                    key={player._id}
+                                    key={index}
                                     variant="outline"
                                     className="text-xs"
                                   >
@@ -881,16 +900,20 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                             )}
 
                             <Button
-                              onClick={() => handleJoinTable(table.id)}
+                              onClick={() =>
+                                handleJoinTable(table._id?.toString() ?? "")
+                              }
                               disabled={
-                                table.players.length >= table.maxPlayers
+                                (table.players?.length ?? 0) >= table.maxPlayers
                               }
                               className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                               size="lg"
                             >
-                              {table.ownerId === player?._id
+                              {table.ownerId?.toString() ===
+                              player?._id?.toString()
                                 ? "Oyunu Başlat"
-                                : table.players.length >= table.maxPlayers
+                                : (table.players?.length ?? 0) >=
+                                  table.maxPlayers
                                 ? "Masa Dolu"
                                 : "Masaya Katıl"}
                             </Button>
@@ -913,14 +936,19 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                       </Badge>
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                      {activeTables.map((table) => (
+                      {activeTables.map((table, index) => (
                         <Card
-                          key={table.id}
+                          key={index}
                           className="group hover:shadow-lg transition-all duration-300 border-chart-1/30 relative overflow-hidden"
                         >
                           <div className="absolute top-2 right-2 text-4xl opacity-10 pointer-events-none">
-                            {table.id === "2" ? "♚" : "♛"}
+                            {table.status === "playing"
+                              ? "♚"
+                              : table.status === "waiting"
+                              ? "♙"
+                              : "♛"}
                           </div>
+
                           <CardContent className="p-5 space-y-4 relative z-10">
                             <div className="flex items-start justify-between gap-2">
                               <div className="space-y-1 min-w-0 flex-1">
@@ -943,24 +971,29 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                             <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/30">
                               <Users className="w-4 h-4 text-muted-foreground" />
                               <span className="text-sm font-semibold text-foreground">
-                                {table.players.length}/{table.maxPlayers} Oyuncu
+                                {table.players?.length ?? 0}/{table.maxPlayers}{" "}
+                                Oyuncu
                               </span>
                             </div>
 
-                            <div className="flex gap-2 flex-wrap">
-                              {table.players.map((player) => (
-                                <Badge
-                                  key={player._id}
-                                  variant="outline"
-                                  className="text-xs"
-                                >
-                                  {player.name}
-                                </Badge>
-                              ))}
-                            </div>
+                            {(table.players?.length ?? 0) > 0 && (
+                              <div className="flex gap-2 flex-wrap">
+                                {table.players?.map((player) => (
+                                  <Badge
+                                    key={player.id?.toString() ?? player.name}
+                                    variant="outline"
+                                    className="text-xs"
+                                  >
+                                    {player.name}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
 
                             <Button
-                              onClick={() => handleWatchGame(table.id)}
+                              onClick={() =>
+                                handleWatchGame(table._id?.toString() ?? "")
+                              }
                               className="w-full gap-2"
                               variant="outline"
                               size="lg"
