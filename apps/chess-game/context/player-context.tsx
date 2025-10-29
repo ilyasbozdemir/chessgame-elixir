@@ -2,8 +2,11 @@
 
 import { useChessStore } from "@/lib/chess-store";
 import { socket } from "@/lib/socket";
+import { TableDoc } from "@/models/table";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import PubSub from "pubsub-js";
 
+// zustandaki tipleri de kaldırıp PlayerDoc kullanabiliriz su anlık hatlaarı fixlemeden ocne bu  durumda kalması lazım,
 interface Player {
   _id: string;
   name: string;
@@ -105,28 +108,37 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (!channel) return;
 
+    channel.on("table_created", (newTable: TableDoc) => {
+      PubSub.publish("TABLE_CREATED", newTable);
+    });
+
     // 🔹 Başlangıç listesi
     channel.on("presence_state", (state: Record<string, any>) => {
       const playerNames = Object.keys(state);
-      console.log("📋 Mevcut oyuncular:", playerNames);
       setPresenceList(playerNames);
       setPresenceCount(playerNames.length);
+
+      PubSub.publish("PRESENCE_STATE", { players: playerNames });
     });
 
     // 🔹 Giren-çıkan farkları
     channel.on("presence_diff", (diff: Record<string, any>) => {
-      console.log("🔄 Presence diff:", diff);
       setPresenceList((prev) => {
         const joined = Object.keys(diff.joins || {});
         const left = Object.keys(diff.leaves || {});
         let next = Array.from(new Set([...prev, ...joined]));
         next = next.filter((p) => !left.includes(p));
         setPresenceCount(next.length);
+
+        if (joined.length > 0) PubSub.publish("PLAYER_JOINED", { joined });
+        if (left.length > 0) PubSub.publish("PLAYER_LEFT", { left });
+
         return next;
       });
     });
 
     return () => {
+      channel.off("table_created");
       channel.off("presence_state");
       channel.off("presence_diff");
     };

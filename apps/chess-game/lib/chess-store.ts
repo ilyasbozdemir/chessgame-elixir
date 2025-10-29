@@ -1,8 +1,6 @@
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
 import type { Player, GameState, Position, GameTable } from "./chess-types";
 import { initializeBoard, isValidMove, movePiece } from "./chess-logic";
-import { Play } from "next/font/google";
 
 interface ChessStore {
   // Player state

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useChessStore } from "@/lib/chess-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,7 +53,8 @@ interface PageClientProps {
 }
 
 const PageClient: React.FC<PageClientProps> = ({}) => {
-  const { player, setPlayer, presenceCount, loading, refresh } = usePlayer();
+  const { player, channel, setPlayer, presenceCount, loading, refresh } =
+    usePlayer();
 
   const router = useRouter();
 
@@ -95,6 +96,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       });
 
       const data = await res.json();
+      console.log("📦 Player API response:", JSON.stringify(data, null, 2));
 
       await refresh();
 
@@ -153,7 +155,17 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
               player.color === "white" || player.color === "black"
                 ? player.color
                 : null,
-          } as Player;
+          } as any;
+
+          if (channel) {
+            channel.push("table_created", newTable);
+            console.log(
+              "📡 Kanal üzerinden masa yayını gönderildi:",
+              newTable.name
+            );
+          } else {
+            console.warn("⚠️ Kanal tanımsız, push atılamadı!");
+          }
 
           useChessStore.getState().createTable(newTable.name, normalizedPlayer);
           useChessStore.getState().joinTable(newTable.id, player.name);
@@ -172,6 +184,8 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   const handleJoinTable = async (tableId: string) => {
     if (player) {
       joinTable(tableId, playerName);
+      await joinTableDB(tableId, { id: player._id, name: player.name });
+      console.log("🎮 Oyuncu masaya eklendi:", player.name);
     }
   };
 
@@ -211,6 +225,26 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       }));
     }
   };
+
+  useEffect(() => {
+    const joinSub = PubSub.subscribe("PLAYER_JOINED", (_, { joined }) => {
+      console.log("🙌 Yeni oyuncular:", joined);
+    });
+
+    const leftSub = PubSub.subscribe("PLAYER_LEFT", (_, { left }) => {
+      console.log("👋 Ayrılan oyuncular:", left);
+    });
+
+    const fullState = PubSub.subscribe("PRESENCE_STATE", (_, { players }) => {
+      console.log("📋 Güncel liste:", players);
+    });
+
+    return () => {
+      PubSub.unsubscribe(joinSub);
+      PubSub.unsubscribe(leftSub);
+      PubSub.unsubscribe(fullState);
+    };
+  }, []);
 
   if (loading) {
     return (

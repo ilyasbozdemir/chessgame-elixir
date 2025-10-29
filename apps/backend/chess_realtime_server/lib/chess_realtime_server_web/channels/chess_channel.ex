@@ -18,6 +18,11 @@ defmodule ChessRealtimeServerWeb.ChessChannel do
     {:ok, socket}
   end
 
+  def handle_in("table_created", payload, socket) do
+    broadcast!(socket, "table_created", payload)
+    {:noreply, socket}
+  end
+
   # 🔹 Oyuncu ismini güncelleme
   def handle_in("update_player", %{"name" => name}, socket) do
     IO.puts("📢 Oyuncu ismi güncellendi: #{name}")
