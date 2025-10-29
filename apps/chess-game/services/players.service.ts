@@ -1,24 +1,45 @@
 // services/players.service.ts
-import type { Player } from "@/lib/chess-types";
-import { BaseService } from "./base.service";
+import { PlayerDoc } from "@/models/player";
 
-export class PlayerService extends BaseService {
-  async fetchCurrent(): Promise<Player | null> {
+export class PlayerService {
+  constructor() {
+    //
+  }
+
+  async fetchCurrent(): Promise<{ player: PlayerDoc | null }> {
     try {
-      const res = await this.request<{ player: Player }>("/api/me", {
-        credentials: "include",
-      });
-      return res.player;
-    } catch {
-      return null;
+      const res = await fetch("/api/me", { credentials: "include" });
+
+      if (!res.ok) {
+        return { player: null };
+      }
+
+      const data = await res.json();
+      return { player: data?.player ?? null };
+    } catch (err) {
+      console.error("Failed to fetch current player:", err);
+      return { player: null };
     }
   }
 
-  async create(name: string): Promise<Player> {
-    const res = await this.request<{ player: Player }>("/api/player", {
+  async create(name: string): Promise<PlayerDoc> {
+    console.log("🌐 [Service] create() çağrıldı:", name);
+
+    const res = await fetch("/api/player", {
       method: "POST",
       body: JSON.stringify({ name }),
+      headers: { "Content-Type": "application/json" },
     });
-    return res.player;
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("❌ [Service] /api/player hatası:", text);
+      throw new Error("Oyuncu oluşturulamadı: " + text);
+    }
+
+    const data = await res.json();
+    console.log("✅ [Service] /api/player yanıtı:", data);
+
+    return data;
   }
 }

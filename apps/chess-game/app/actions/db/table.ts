@@ -8,7 +8,6 @@ export async function createTable(data: {
   name: string;
   ownerId?: string;
   ownerName?: string;
-  maxPlayers?: number;
 }) {
   await connectToDatabase();
   const doc = await Table.create({
@@ -16,7 +15,6 @@ export async function createTable(data: {
     name: data.name.trim(),
     ownerId: data.ownerId,
     ownerName: data.ownerName,
-    maxPlayers: data.maxPlayers ?? 2,
     status: "waiting",
     players: [],
   });
@@ -35,7 +33,7 @@ export async function joinTable(
 ) {
   await connectToDatabase();
   await Table.updateOne(
-    { id: tableId, $expr: { $lt: [{ $size: "$players" }, "$maxPlayers"] } },
+    { id: tableId, $expr: { $lt: [{ $size: "$players" }, 2] } },
     { $addToSet: { players: { ...player, color: null, isReady: false } } }
   );
   return { ok: true };

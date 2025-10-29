@@ -5,6 +5,9 @@ import { initializeBoard, isValidMove, movePiece } from "./chess-logic";
 import type { PlayerDoc } from "@/models/player";
 import type { TableDoc } from "@/models/table";
 import mongoose from "mongoose";
+import { PlayerService } from "@/services/players.service";
+import { TableService } from "@/services/tables.service";
+import { Logger } from "./utils";
 
 interface ChessStore {
   // Player state
@@ -27,7 +30,7 @@ interface ChessStore {
   makeMove: (to: Position) => void;
   resetGame: () => void;
 
-  createTable: (name: string, owner: PlayerDoc) => string;
+  createTable: (name: string, owner: PlayerDoc) => Promise<string>;
   joinTable: (tableId: string, player: PlayerDoc) => void;
   leaveTable: () => void;
 }
@@ -52,24 +55,15 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     winner: null,
   },
 
-  addPlayer: (name: string) => {
+  addPlayer: async (name: string) => {
+    const playerService = new PlayerService();
+    const createdPlayer = await playerService.create(name);
+
     const { players } = get();
-    if (players.length >= 2) return;
 
-    const id = new mongoose.Types.ObjectId();
+    set({ players: [...players, createdPlayer] });
 
-    const newPlayer: PlayerDoc = {
-      _id: id,
-      name,
-      color: "white",
-      createdAt: new Date(),
-    };
-
-    set({ players: [...players, newPlayer] });
-
-    if (players.length === 0) {
-      set({ currentPlayer: newPlayer });
-    }
+    set({ currentPlayer: createdPlayer });
   },
 
   setCurrentPlayer: (player: PlayerDoc | null) => {
@@ -220,31 +214,57 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     });
   },
 
-  createTable: (name: string, owner: PlayerDoc) => {
-    const id = new mongoose.Types.ObjectId();
-    const tableId = id.toString();
-    const newTable: TableDoc = {
-      _id: id,
-      name,
-      maxPlayers: 2,
-      status: "waiting",
-      createdAt: new Date(),
-      ownerId: owner._id,
-      ownerName: owner.name,
-    };
+  createTable: async (name: string, owner: PlayerDoc): Promise<string> => {
+    const tableService = new TableService();
 
-    set((state) => ({
-      tables: [...state.tables, newTable],
-    }));
+    const logger = new Logger("Zustand-TableService");
 
-    return tableId;
+    logger.group("[Zustand: createTable]");
+
+    try {
+      logger.info("🧩 Masa oluşturma başlatıldı:", { name, owner });
+
+      // 🔹 API üzerinden masa oluştur
+      const createdTable = await tableService.create(name, owner);
+
+      logger.success("✅ API'den dönen masa:", createdTable);
+
+      // 🔹 MongoDB'den dönen gerçek ID kullanılsın
+      const tableId =
+        createdTable._id?.toString() ??
+        new mongoose.Types.ObjectId().toString();
+
+      // 🔹 Zustand state'ini güncelle
+      const newTable: TableDoc = {
+        _id: new mongoose.Types.ObjectId(tableId),
+        name: createdTable.name,
+        status: createdTable.status ?? "waiting",
+        createdAt: new Date(createdTable.createdAt ?? Date.now()),
+        ownerId: owner._id,
+        ownerName: owner.name,
+        players: createdTable.players ?? [],
+      };
+
+      set((state) => ({
+        tables: [...state.tables, newTable],
+        currentTable: newTable,
+      }));
+
+      logger.success("🧱 Zustand state güncellendi:", newTable);
+      logger.groupEnd();
+      return tableId;
+    } catch (error: any) {
+      logger.error("❌ Masa oluşturulamadı:", error.message);
+      logger.groupEnd();
+      throw error;
+    }
   },
 
   joinTable: (tableId: string, player: PlayerDoc): void => {
     const { tables } = get();
 
     const table = tables.find((t) => t._id?.toString() === tableId);
-    if (!table || (table.players?.length ?? 0) >= table.maxPlayers) return;
+    if (!table || (table.players?.length ?? 0) >= 2) return;
 
     // 🧩 normalize + yeni player ekle
     const normalizedPlayers = (table.players ?? []).map((p) => ({

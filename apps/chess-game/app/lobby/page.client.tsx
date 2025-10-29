@@ -40,22 +40,21 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { usePlayer } from "@/context/player-context";
-import { Player } from "@/lib/chess-types";
 
 import {
   createTable as createTableDB,
   joinTable as joinTableDB,
 } from "@/app/actions/db/table";
-import { formatTime } from "@/lib/utils";
+import { formatTime, Logger } from "@/lib/utils";
 import mongoose from "mongoose";
+import { PlayerDoc } from "@/models/player";
 
 interface PageClientProps {
   //
 }
 
 const PageClient: React.FC<PageClientProps> = ({}) => {
-  const { player, channel, setPlayer, presenceCount, loading, refresh } =
-    usePlayer();
+  const { player, channel, setPlayer, loading, refresh } = usePlayer();
 
   const router = useRouter();
 
@@ -72,6 +71,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     tables,
     currentTable,
     players,
+    addPlayer,
     createTable,
     joinTable,
     leaveTable,
@@ -88,21 +88,17 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   };
 
   const handleSetPlayerName = async () => {
-    if (playerName.trim()) {
-      const res = await fetch("/api/player", {
-        method: "POST",
-        body: JSON.stringify({ name: playerName }),
-        headers: { "Content-Type": "application/json" },
-      });
+    const logger = new Logger("ChessGame-LOBBY");
 
-      const data = await res.json();
-      console.log("📦 Player API response:", JSON.stringify(data, null, 2));
+    logger.group("👤 [Player Setup]");
+    logger.info("🟢 handleSetPlayerName çağrıldı.");
 
-      await refresh();
+    await addPlayer(playerName);
+    logger.success("✅ Oyuncu eklendi:", playerName);
 
-      if (!res.ok) console.warn("player kaydı hatası", await res.text());
-      else console.log("player server'a kaydedildi ve cookie atıldı");
-    }
+    await refresh();
+    logger.info("🌐 refresh() tamamlandı.");
+    logger.groupEnd();
   };
 
   const handleCreateTable = async () => {
@@ -124,15 +120,14 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
           name: newTableName.trim(),
           ownerId: player._id?.toString(),
           ownerName: player.name,
-          maxPlayers: 2,
         });
 
         console.log("✅ MongoDB'de masa oluşturuldu:", newTable);
 
-        const tableId = createTable(newTableName.trim(), {
+        const tableId = await createTable(newTableName.trim(), {
           ...player,
           _id: player?._id.toString(),
-        } as unknown as Player);
+        } as unknown as PlayerDoc);
 
         console.log("✅ createTable dönen ID:", tableId);
 
@@ -295,9 +290,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Users className="w-4 h-4" />
-                <span>
-                  Oyuncular ({players.length}/{currentTable.maxPlayers})
-                </span>
+                <span>Oyuncular ({players.length}/ 2)</span>
               </div>
 
               <div className="grid gap-2 sm:gap-3">
@@ -361,7 +354,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                   );
                 })}
 
-                {players.length < currentTable.maxPlayers && (
+                {players.length < 2 && (
                   <Card className="border-dashed">
                     <CardContent className="flex items-center justify-center p-6 sm:p-8 text-muted-foreground">
                       <p className="text-xs sm:text-sm">Oyuncu bekleniyor...</p>
@@ -507,7 +500,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                                   {player && player.name}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                  Oyuncu ID: {player?._id}
+                                  Oyuncu ID: {player?._id?.toString()}
                                 </p>
                               </div>
                             </div>
@@ -863,25 +856,23 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                             <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50">
                               <Users className="w-4 h-4 text-muted-foreground" />
                               <span className="text-sm font-semibold text-foreground">
-                                {table.players && table.players.length}/
-                                {table.maxPlayers} Oyuncu
+                                {table.players && table.players.length}/ 2
+                                Oyuncu
                               </span>
                               <div className="flex-1" />
                               <div className="flex gap-1">
-                                {Array.from({ length: table.maxPlayers }).map(
-                                  (_, i) => (
-                                    <div
-                                      key={i}
-                                      className={`text-sm ${
-                                        i < (table.players?.length ?? 0)
-                                          ? "opacity-100"
-                                          : "opacity-20"
-                                      }`}
-                                    >
-                                      {i % 2 === 0 ? "♟" : "♙"}
-                                    </div>
-                                  )
-                                )}
+                                {Array.from({ length: 2 }).map((_, i) => (
+                                  <div
+                                    key={i}
+                                    className={`text-sm ${
+                                      i < (table.players?.length ?? 0)
+                                        ? "opacity-100"
+                                        : "opacity-20"
+                                    }`}
+                                  >
+                                    {i % 2 === 0 ? "♟" : "♙"}
+                                  </div>
+                                ))}
                               </div>
                             </div>
 
@@ -903,17 +894,14 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                               onClick={() =>
                                 handleJoinTable(table._id?.toString() ?? "")
                               }
-                              disabled={
-                                (table.players?.length ?? 0) >= table.maxPlayers
-                              }
+                              disabled={(table.players?.length ?? 0) >= 2}
                               className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                               size="lg"
                             >
                               {table.ownerId?.toString() ===
                               player?._id?.toString()
                                 ? "Oyunu Başlat"
-                                : (table.players?.length ?? 0) >=
-                                  table.maxPlayers
+                                : (table.players?.length ?? 0) >= 2
                                 ? "Masa Dolu"
                                 : "Masaya Katıl"}
                             </Button>
@@ -971,8 +959,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                             <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/30">
                               <Users className="w-4 h-4 text-muted-foreground" />
                               <span className="text-sm font-semibold text-foreground">
-                                {table.players?.length ?? 0}/{table.maxPlayers}{" "}
-                                Oyuncu
+                                {table.players?.length ?? 0}/ 2 Oyuncu
                               </span>
                             </div>
 

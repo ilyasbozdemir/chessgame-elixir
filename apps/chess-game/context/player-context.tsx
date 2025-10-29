@@ -80,7 +80,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     ch.push("update_player", { name });
 
     ch.on("player_joined", (msg) => {
-      console.log("➕ Yeni oyuncu katıldı:", msg.name);
+      console.log("➕ Oyuncu katıldı:", msg.name);
     });
 
     ch.on("player_left", (msg) => console.log("🚪 Oyuncu ayrıldı:", msg.name));

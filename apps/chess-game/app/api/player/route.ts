@@ -21,11 +21,14 @@ export async function POST(req: Request) {
       return res;
     }
 
+
     // 🔹 Yeni oyuncu oluştur
     const newPlayer = await Player.create({
       name: name.trim(),
       color: null,
-      isReady: false,
+      createdAt: new Date(),
+    
+
     });
 
     const playerObj = JSON.parse(JSON.stringify(newPlayer));

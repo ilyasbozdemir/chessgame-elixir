@@ -9,7 +9,6 @@ export async function createPlayer(data: { id: string; name: string }) {
     id: data.id,
     name: data.name.trim(),
     color: null,
-    isReady: false,
   });
   return JSON.parse(JSON.stringify(doc));
 }

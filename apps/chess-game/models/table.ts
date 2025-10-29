@@ -11,7 +11,6 @@ const TableSchema = new Schema(
     _id: { type: Schema.Types.ObjectId, auto: true },
     name: { type: String, required: true },
     players: { type: [TablePlayerSchema], default: [] },
-    maxPlayers: { type: Number, default: 2 },
     status: {
       type: String,
       enum: ["waiting", "playing", "finished"],
