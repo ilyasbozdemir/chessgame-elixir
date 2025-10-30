@@ -18,18 +18,6 @@ defmodule ChessRealtimeServerWeb.ChessChannel do
     {:ok, socket}
   end
 
-  def handle_in("table_created", payload, socket) do
-    broadcast!(socket, "table_created", payload)
-    {:noreply, socket}
-  end
-
-  # 🔹 Oyuncu ismini güncelleme
-  def handle_in("update_player", %{"name" => name}, socket) do
-    IO.puts("📢 Oyuncu ismi güncellendi: #{name}")
-    broadcast!(socket, "player_joined", %{name: name})
-    {:noreply, assign(socket, :player_name, name)}
-  end
-
   # 🔹 join sonrası presence & count bilgisi
   def handle_info(:after_join, socket) do
     player = socket.assigns[:player_name]
@@ -53,6 +41,38 @@ defmodule ChessRealtimeServerWeb.ChessChannel do
     {:noreply, socket}
   end
 
+  # 🔹 Ayrılık sonrası count'u yeniden hesapla
+  def handle_info(:update_count, socket) do
+    count = Presence.list(socket.topic) |> map_size()
+    broadcast!(socket, "presence_count", %{count: count})
+    {:noreply, socket}
+  end
+
+  def handle_in("table_created", payload, socket) do
+    broadcast!(socket, "table_created", payload)
+    {:noreply, socket}
+  end
+
+  # 🔹 Oyuncu ismini güncelleme
+  def handle_in("update_player", %{"name" => name}, socket) do
+    IO.puts("📢 Oyuncu ismi güncellendi: #{name}")
+    broadcast!(socket, "player_joined", %{name: name})
+    {:noreply, assign(socket, :player_name, name)}
+  end
+
+  def handle_in("refresh_state", _payload, socket) do
+    IO.puts("🔄 #{socket.assigns[:player_name]} için state yenileniyor...")
+
+    state = Presence.list(socket.topic)
+    count = map_size(state)
+
+    # 🔸 Sadece o kullanıcıya push et (broadcast değil)
+    push(socket, "presence_state", state)
+    push(socket, "presence_count", %{count: count})
+
+    {:noreply, socket}
+  end
+
   # 🔹 Oyuncu ayrıldığında
   def terminate(_reason, socket) do
     player = socket.assigns[:player_name]
@@ -63,12 +83,5 @@ defmodule ChessRealtimeServerWeb.ChessChannel do
     IO.puts("❌ #{player} kanaldan ayrıldı.")
     broadcast!(socket, "player_left", %{name: player})
     :ok
-  end
-
-  # 🔹 Ayrılık sonrası count'u yeniden hesapla
-  def handle_info(:update_count, socket) do
-    count = Presence.list(socket.topic) |> map_size()
-    broadcast!(socket, "presence_count", %{count: count})
-    {:noreply, socket}
   end
 end

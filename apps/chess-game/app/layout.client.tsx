@@ -15,9 +15,15 @@ export default function ClientLayout({
 
   const { tables } = useChessStore();
 
-  const waitingTables = tables.filter((t) => t.status === "waiting");
-  const activeTables = tables.filter((t) => t.status === "playing");
+  const waitingTables =
+    Array.isArray(tables) && tables.length > 0
+      ? tables.filter((t) => t.status === "waiting")
+      : [];
 
+  const activeTables =
+    Array.isArray(tables) && tables.length > 0
+      ? tables.filter((t) => t.status === "playing")
+      : [];
   return (
     <React.Fragment>
       <Navbar />

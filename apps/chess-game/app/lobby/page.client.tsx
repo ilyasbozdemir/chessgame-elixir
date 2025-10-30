@@ -48,6 +48,7 @@ import {
 import { formatTime, Logger } from "@/lib/utils";
 import mongoose from "mongoose";
 import { PlayerDoc } from "@/models/player";
+import { RealtimeListener } from "@/components/realtime-listener";
 
 interface PageClientProps {
   //
@@ -80,8 +81,15 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     gameState,
   } = useChessStore();
 
-  const waitingTables = tables.filter((t) => t.status === "waiting");
-  const activeTables = tables.filter((t) => t.status === "playing");
+  const waitingTables =
+    Array.isArray(tables) && tables.length > 0
+      ? tables.filter((t) => t.status === "waiting")
+      : [];
+
+  const activeTables =
+    Array.isArray(tables) && tables.length > 0
+      ? tables.filter((t) => t.status === "playing")
+      : [];
 
   const handleWatchGame = (tableId: string) => {
     console.log("Oyun izleniyor:", tableId);
@@ -405,6 +413,8 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
       <div className="w-full max-w-5xl space-y-6">
+        <RealtimeListener channel={channel} />
+
         {!player ? (
           <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
             <Card className="border-primary shadow-lg w-full max-w-md">

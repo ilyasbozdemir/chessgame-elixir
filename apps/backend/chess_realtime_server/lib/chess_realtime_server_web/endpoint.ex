@@ -12,7 +12,11 @@ defmodule ChessRealtimeServerWeb.Endpoint do
   ]
 
   socket("/socket", ChessRealtimeServerWeb.UserSocket,
-    websocket: true,
+    websocket: [
+      timeout: 180_000,
+      check_origin: false,
+      compress: true
+    ],
     longpoll: false
   )
 

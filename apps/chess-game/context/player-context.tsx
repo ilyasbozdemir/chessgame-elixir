@@ -105,6 +105,14 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
       }));
     });
 
+    channel.on("presence_state", (state: any) => {
+      console.log("📦 Güncel state:", state);
+    });
+
+    channel.on("presence_count", (data: any) => {
+      console.log("👥 Toplam oyuncu:", data.count);
+    });
+
     // 🔹 Başlangıç listesi
     channel.on("presence_state", (state: Record<string, any>) => {
       const playerNames = Object.keys(state);
