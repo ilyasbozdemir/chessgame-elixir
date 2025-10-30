@@ -30,7 +30,16 @@ interface ChessStore {
   makeMove: (to: Position) => void;
   resetGame: () => void;
 
-  createTable: (name: string, owner: PlayerDoc) => Promise<string>;
+  createTable: (
+    name: string,
+    owner: PlayerDoc,
+    channel?: any
+  ) => Promise<string>;
+  deleteTable: (
+    tableId: string,
+    player: PlayerDoc,
+    channel?: any
+  ) => Promise<void>;
   joinTable: (tableId: string, player: PlayerDoc) => void;
   leaveTable: () => void;
 }
@@ -214,7 +223,11 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     });
   },
 
-  createTable: async (name: string, owner: PlayerDoc): Promise<string> => {
+  createTable: async (
+    name: string,
+    owner: PlayerDoc,
+    channel?: any
+  ): Promise<string> => {
     const tableService = new TableService();
 
     const logger = new Logger("Zustand-TableService");
@@ -245,10 +258,19 @@ export const useChessStore = create<ChessStore>((set, get) => ({
         players: createdTable.players ?? [],
       };
 
-      set((state) => ({
-        tables: [...state.tables, newTable],
-        currentTable: newTable,
-      }));
+      set((state) => {
+        const exists = state.tables.some(
+          (t) => t._id?.toString() === newTable._id?.toString()
+        );
+        if (exists) return state;
+
+        return {
+          tables: [...state.tables, newTable],
+          currentTable: newTable,
+        };
+      });
+
+      channel?.push("table_created", { table: newTable });
 
       logger.success("🧱 Zustand state güncellendi:", newTable);
       logger.groupEnd();
@@ -258,6 +280,15 @@ export const useChessStore = create<ChessStore>((set, get) => ({
       logger.groupEnd();
       throw error;
     }
+  },
+
+  deleteTable: async (
+    tableId: string,
+    player: PlayerDoc,
+    channel?: any
+  ): Promise<void> => {
+    //
+    //
   },
 
   joinTable: (tableId: string, player: PlayerDoc): void => {

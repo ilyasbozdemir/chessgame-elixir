@@ -98,11 +98,25 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (!channel) return;
 
-    channel.on("table_created", (newTable: TableDoc) => {
-      console.log("📡 Yeni masa geldi:", newTable);
-      useChessStore.setState((state: any) => ({
-        tables: [...state.tables, newTable],
-      }));
+    channel.on("table_created", (payload: any) => {
+      console.log("📡 Yeni masa geldi:", payload);
+
+      const table = payload.table ?? payload; // güvenli çözüm
+
+      useChessStore.setState((state: any) => {
+        const exists = state.tables.some(
+          (t: any) => t._id?.toString() === table._id?.toString()
+        );
+        if (exists) {
+          console.warn("⚠️ Masa zaten mevcut, eklenmedi:", table._id);
+          return state;
+        }
+
+        const updatedTables = [...state.tables, table];
+        console.log("✅ Zustand güncellendi:", updatedTables);
+
+        return { tables: updatedTables };
+      });
     });
 
     channel.on("presence_state", (state: any) => {

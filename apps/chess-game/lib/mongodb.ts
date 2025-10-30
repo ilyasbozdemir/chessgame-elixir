@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://admin:secret@localhost:27017/chess";
+const MONGODB_URI = "mongodb://admin:secret@localhost:27017/chess";
 
 let cached = (global as any).mongoose;
 
@@ -9,14 +9,28 @@ if (!cached) {
 }
 
 export async function connectToDatabase() {
-  if (cached.conn) return cached.conn;
+  if (cached.conn) {
+    console.log("🟢 [MongoDB] Mevcut bağlantı kullanılıyor");
+    return cached.conn;
+  }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
-      dbName: "chess",
-      bufferCommands: false,
-      authSource: "admin",
-    });
+    console.log("🟡 [MongoDB] Yeni bağlantı başlatılıyor:", MONGODB_URI);
+
+    cached.promise = mongoose
+      .connect(MONGODB_URI, {
+        dbName: "chess",
+        bufferCommands: false,
+        authSource: "admin",
+      })
+      .then((mongooseInstance) => {
+        console.log("✅ [MongoDB] Bağlantı başarılı!");
+        return mongooseInstance;
+      })
+      .catch((err) => {
+        console.error("❌ [MongoDB] Bağlantı hatası:", err.message);
+        throw err; // önemli: hatayı fırlatmazsak route catch edemez
+      });
   }
 
   cached.conn = await cached.promise;

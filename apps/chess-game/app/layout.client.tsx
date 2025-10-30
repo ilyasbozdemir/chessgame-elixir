@@ -4,7 +4,7 @@ import { Navbar } from "@/components/navbar";
 import { usePlayer } from "@/context/player-context";
 import { useChessStore } from "@/lib/chess-store";
 import { PlayCircle, Trophy, Users } from "lucide-react";
-import React from "react";
+import React, { useMemo } from "react";
 
 export default function ClientLayout({
   children,
@@ -15,15 +15,30 @@ export default function ClientLayout({
 
   const { tables } = useChessStore();
 
-  const waitingTables =
-    Array.isArray(tables) && tables.length > 0
-      ? tables.filter((t) => t.status === "waiting")
-      : [];
+  // contextten alırız bunu olmadı ,
+  const sortedTables = useMemo(() => {
+    if (!Array.isArray(tables)) return [];
 
-  const activeTables =
-    Array.isArray(tables) && tables.length > 0
-      ? tables.filter((t) => t.status === "playing")
-      : [];
+    return [...tables].sort((a, b) => {
+      const timeA = new Date(a.createdAt ?? 0).getTime() || 0;
+      const timeB = new Date(b.createdAt ?? 0).getTime() || 0;
+      return timeB - timeA; 
+    });
+  }, [tables]);
+
+  const waitingTables = useMemo(
+    () => sortedTables.filter((t) => t.status === "waiting"),
+    [sortedTables]
+  );
+
+  const activeTables = useMemo(
+    () => sortedTables.filter((t) => t.status === "playing"),
+    [sortedTables]
+  );
+
+
+
+
   return (
     <React.Fragment>
       <Navbar />

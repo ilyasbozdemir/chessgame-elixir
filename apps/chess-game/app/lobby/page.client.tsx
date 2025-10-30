@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useChessStore } from "@/lib/chess-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,15 +81,25 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     gameState,
   } = useChessStore();
 
-  const waitingTables =
-    Array.isArray(tables) && tables.length > 0
-      ? tables.filter((t) => t.status === "waiting")
-      : [];
+  const sortedTables = useMemo(() => {
+    if (!Array.isArray(tables)) return [];
 
-  const activeTables =
-    Array.isArray(tables) && tables.length > 0
-      ? tables.filter((t) => t.status === "playing")
-      : [];
+    return [...tables].sort((a, b) => {
+      const timeA = new Date(a.createdAt ?? 0).getTime() || 0;
+      const timeB = new Date(b.createdAt ?? 0).getTime() || 0;
+      return timeB - timeA; 
+    });
+  }, [tables]);
+
+  const waitingTables = useMemo(
+    () => sortedTables.filter((t) => t.status === "waiting"),
+    [sortedTables]
+  );
+
+  const activeTables = useMemo(
+    () => sortedTables.filter((t) => t.status === "playing"),
+    [sortedTables]
+  );
 
   const handleWatchGame = (tableId: string) => {
     console.log("Oyun izleniyor:", tableId);
@@ -114,75 +124,29 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       console.warn("Oyuncunun _id değeri yok, tablo oluşturulamadı.");
       return;
     }
-
     if (newTableName.trim() && player) {
       console.log("🧩 Masa oluşturma başlatıldı:", {
         tableName: newTableName,
         playerName,
         player,
       });
-
       try {
-        const newTable = await createTableDB({
-          id: Math.random().toString(36).substr(2, 9),
-          name: newTableName.trim(),
-          ownerId: player._id?.toString(),
-          ownerName: player.name,
-        });
-
-        console.log("✅ MongoDB'de masa oluşturuldu:", newTable);
-
-        const tableId = await createTable(newTableName.trim(), {
-          ...player,
-          _id: player?._id.toString(),
-        } as unknown as PlayerDoc);
-
+        const tableId = await createTable(newTableName.trim(), player, channel);
         console.log("✅ createTable dönen ID:", tableId);
-
         if (tableId) {
-          joinTable(tableId, player);
-
-          await joinTableDB(newTable.id, {
-            id: player._id.toString(),
-            name: player.name,
-          });
-          console.log("🎮 Oyuncu masaya eklendi:", player.name);
-
-          // 3️⃣ Lokal store'u güncelle
-
           console.log("🎮 Oyuncu masaya katıldı:", { tableId, playerName });
-
           setNewTableName("");
-
-          const normalizedPlayer = {
-            ...player,
-            color:
-              player.color === "white" || player.color === "black"
-                ? player.color
-                : null,
-          } as any;
-
-          if (channel) {
-            channel.push("table_created", newTable);
-            console.log(
-              "📡 Kanal üzerinden masa yayını gönderildi:",
-              newTable.name
-            );
-          } else {
-            console.warn("⚠️ Kanal tanımsız, push atılamadı!");
-          }
-
-          useChessStore.getState().createTable(newTable.name, normalizedPlayer);
-          useChessStore.getState().joinTable(newTable.id, player);
         } else {
           console.warn("⚠️ createTable bir ID döndürmedi!");
         }
-      } catch {}
+      } catch (error: any) {
+        console.error("❌ Masa oluşturma hatası:", {
+          message: error.message || error,
+          stack: error.stack,
+        });
+      }
     } else {
-      console.warn("🚫 Eksik bilgi:", {
-        newTableName,
-        player,
-      });
+      console.warn("🚫 Eksik bilgi:", { newTableName, player });
     }
   };
 
@@ -231,14 +195,37 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     gameState.gameStatus === "ready";
 
   const deleteTable = (tableId: string) => {
-    const { tables, currentPlayer } = useChessStore.getState();
+    const { tables } = useChessStore.getState();
+
+    console.group("🗑️ [Zustand-DeleteTable]");
+    console.log("🎯 Silme isteği geldi:", { tableId, player });
+
     const table = tables.find((t) => t._id?.toString() === tableId);
 
-    if (table && table.ownerId === currentPlayer?._id) {
-      useChessStore.setState((state) => ({
-        tables: state.tables.filter((t) => t._id?.toString() === tableId),
-      }));
+    if (!table) {
+      console.warn("⚠️ Tablo bulunamadı:", tableId);
+      console.groupEnd();
+      return;
     }
+
+    console.log("📋 Bulunan tablo:", table);
+
+    if (table.ownerId?.toString() !== player?._id?.toString()) {
+      console.warn("⛔ Silme yetkisi yok! Sahip:", table.ownerId?.toString());
+      console.groupEnd();
+      return;
+    }
+
+    useChessStore.setState((state) => {
+      const updatedTables = state.tables.filter(
+        (t) => t._id?.toString() !== tableId
+      );
+
+      console.log("✅ Güncel tablo listesi:", updatedTables);
+      console.groupEnd();
+
+      return { tables: updatedTables };
+    });
   };
 
   if (loading) {

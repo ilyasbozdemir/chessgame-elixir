@@ -16,7 +16,7 @@ const mongoImage = new docker.Image("chess_mongodb", {
     context: "../apps/backend/mongodb",
     platform: "linux/amd64",
   },
-  imageName: "docker.io/library/chess_mongodb:latest",
+  imageName: `chess_mongodb_${stack}`,
   skipPush: envConfig.skipPush,
 });
 
@@ -32,7 +32,7 @@ const postgresImage = new docker.Image("chess_postgres", {
     context: "../apps/backend/postgres",
     platform: "linux/amd64",
   },
-  imageName: "docker.io/library/chess_postgres:latest",
+  imageName: `chess_postgres_${stack}`,
   skipPush: envConfig.skipPush,
 });
 
@@ -46,9 +46,6 @@ const postgresContainer = new docker.Container("chess_postgres_container", {
     "POSTGRES_DB=chess_game",
   ],
 });
-
-
-
 
 // 🔹 Output
 export const urls = {
