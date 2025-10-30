@@ -21,14 +21,14 @@ interface ChessStore {
   gameState: GameState;
 
   // Actions
-  addPlayer: (name: string) => void;
-  setCurrentPlayer: (player: PlayerDoc | null) => void;
-  setPlayerReady: (id: string, ready: boolean) => void;
-  assignColors: () => void;
-  startGame: () => void;
-  selectPiece: (position: Position) => void;
-  makeMove: (to: Position) => void;
-  resetGame: () => void;
+  addPlayer: (name: string, channel?: any) => void;
+  setCurrentPlayer: (player: PlayerDoc | null, channel?: any) => void;
+  setPlayerReady: (id: string, ready: boolean, channel?: any) => void;
+  assignColors: (channel?: any) => void;
+  startGame: (channel?: any) => void;
+  selectPiece: (position: Position, channel?: any) => void;
+  makeMove: (to: Position, channel?: any) => void;
+  resetGame: (channel?: any) => void;
 
   createTable: (
     name: string,
@@ -40,8 +40,8 @@ interface ChessStore {
     player: PlayerDoc,
     channel?: any
   ) => Promise<void>;
-  joinTable: (tableId: string, player: PlayerDoc) => void;
-  leaveTable: () => void;
+  joinTable: (tableId: string, player: PlayerDoc, channel?: any) => void;
+  leaveTable: (channel?: any) => void;
 }
 
 export const useChessStore = create<ChessStore>((set, get) => ({
