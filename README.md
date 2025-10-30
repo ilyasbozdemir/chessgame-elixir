@@ -12,16 +12,16 @@ Ayrıca izleyiciler (spectator) devam eden maçları canlı olarak takip edebili
 [![Elixir CI](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/elixir.yml/badge.svg)](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/elixir.yml)
 [![Next.js Deploy](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/deploy.yml/badge.svg)](https://github.com/ilyasbozdemir/chessgame-elixir/actions/workflows/nextjs.yml)
 
-
-
 ## 🧱 Mimari Genel Bakış
 
 ```
 chessgame-elixir/
 ├── apps/
-│   └── chess-game/              # Next.js 15 (frontend, client)
-├── server/
-│   └── chess_realtime_server/   # Elixir Phoenix (backend, realtime)
+│   ├── chess-game/              # 🧩 Next.js 15 (frontend)
+│   ├── backend/                 # ⚙️ backend tarafı
+│   │   ├── chess_realtime_server/   # Elixir Phoenix (realtime backend)
+│   │   ├── mongodb/                 # MongoDB servisi/config
+│   │   └── postgres/                # PostgreSQL servisi/config
 └── README.md
 ```
 
@@ -34,7 +34,6 @@ chessgame-elixir/
 - 🐳 **Docker / Postgres** – Geliştirme ortamı ve veritabanı altyapısı
 - 🔁 **WebSocket Event Bridge** – Elixir ↔ Next.js arasında veri akışı
 - ☁️ **Pulumi** – Kodla tanımlanabilir altyapı (IaC) yönetimi
-
 
 ---
 
