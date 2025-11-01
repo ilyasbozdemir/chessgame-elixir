@@ -11,7 +11,7 @@ import { Logger } from "./utils";
 
 interface ChessStore {
   // Player state
-  players: PlayerDoc[]; // bu stet içindir bunu da guncelleyeceğiz, mongdbye gecerken daha fazla guncellenecektir buralarda da ,
+  //players: PlayerDoc[]; // bu stet içindir bunu da guncelleyeceğiz, mongdbye gecerken daha fazla guncellenecektir buralarda da ,
   currentPlayer: PlayerDoc | null;
 
   tables: TableDoc[];
@@ -68,9 +68,9 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     const playerService = new PlayerService();
     const createdPlayer = await playerService.create(name);
 
-    const { players } = get();
+   // const { players } = get();
 
-    set({ players: [...players, createdPlayer] });
+   // set({ players: [...players, createdPlayer] });
 
     set({ currentPlayer: createdPlayer });
   },
@@ -105,17 +105,17 @@ export const useChessStore = create<ChessStore>((set, get) => ({
   },
 
   assignColors: () => {
-    const { players } = get();
-    if (players.length !== 2) return;
+   // const { players } = get();
+    //if (players.length !== 2) return;
 
     const colors: ("white" | "black")[] =
       Math.random() > 0.5 ? ["white", "black"] : ["black", "white"];
 
     set((state) => ({
-      players: state.players.map((p, i) => ({
+     /* players: state.players.map((p, i) => ({
         ...p,
         color: colors[i],
-      })),
+      })),*/
       gameState: {
         ...state.gameState,
         gameStatus: "ready",
@@ -133,7 +133,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
   },
 
   selectPiece: (position: Position) => {
-    const { gameState, players, currentPlayer } = get();
+    const { gameState, /*players,*/ currentPlayer } = get();
     const { board, currentTurn } = gameState;
 
     const piece = board[position.row][position.col];
@@ -149,14 +149,15 @@ export const useChessStore = create<ChessStore>((set, get) => ({
       return;
     }
 
-    // Check if it's the current player's turn
+    /*
     const playerColor = players.find(
       (p) => p._id === currentPlayer?._id
     )?.color;
+    
     if (piece.color !== currentTurn || piece.color !== playerColor) {
       return;
     }
-
+*/
     const validMoves = isValidMove(board, position);
 
     set((state) => ({
@@ -205,7 +206,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
 
   resetGame: () => {
     set({
-      players: [],
+      //players: [],
       currentPlayer: null,
       currentTable: null,
       gameState: {
