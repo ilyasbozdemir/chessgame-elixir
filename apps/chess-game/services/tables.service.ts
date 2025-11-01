@@ -42,4 +42,27 @@ export class TableService {
 
     return table;
   }
+
+  async delete(tableId: string, player: PlayerDoc) {
+    this.logger.group(`[ChessGame-TableService] delete(${tableId})`);
+    this.logger.info("🌐 delete() çağrıldı:", {
+      tableId,
+      playerId: player._id,
+    });
+    const res = await fetch(`/api/table/${tableId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ playerId: player._id?.toString() }),
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      this.logger.error("❌ /api/table/[id] hatası:", err);
+      this.logger.groupEnd();
+      throw new Error(`Masa silinemedi: ${err}`);
+    }
+    const result = await res.json();
+    this.logger.success("✅ /api/table/[id] yanıtı:", result);
+    this.logger.groupEnd();
+    return result;
+  }
 }

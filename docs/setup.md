@@ -3,8 +3,8 @@
 Bu doküman, **Elixir Phoenix** tabanlı gerçek zamanlı satranç projesinin kurulumu, altyapısı ve çalıştırma adımlarını anlatır.  
 Proje üç ana bileşenden oluşur:
 
-- **Frontend:** Next.js (apps/chess-game)  
-- **Backend:** Elixir Phoenix (apps/backend/chess_realtime_server)  
+- **Frontend:** Next.js (apps/chess-game)
+- **Backend:** Elixir Phoenix (apps/backend/chess_realtime_server)
 - **Infrastructure:** Pulumi (infra/)
 
 ---
@@ -34,19 +34,23 @@ cd chessgame-elixir
 ## 🧠 3. Kurulum
 
 ### 🧱 Backend (Elixir Phoenix)
+
 ```bash
 cd apps/backend/chess_realtime_server
 mix deps.get
 mix phx.server
 ```
+
 ➡️ Backend `http://localhost:4000` adresinde çalışır.
 
 ### 💻 Frontend (Next.js)
+
 ```bash
 cd apps/chess-game
 pnpm install
 pnpm dev
 ```
+
 ➡️ Frontend `http://localhost:3000` adresinde açılır.
 
 ---
@@ -56,34 +60,42 @@ pnpm dev
 Proje, altyapı kaynaklarını **Pulumi** ile yönetir. Pulumi, Postgres, MongoDB ve gelecekteki servisleri otomatik olarak oluşturmak için kullanılır.
 
 ### Pulumi'yi kontrol et
+
 ```bash
 pulumi version
 ```
+
 Eğer yüklü değilse:
+
 ```bash
 npm install -g pulumi
 ```
 
 ### Pulumi stack’lerini görüntüle
+
 ```bash
 cd infra
 pulumi stack ls
 ```
 
 ### Stack yoksa oluştur
+
 ```bash
 pulumi stack init dev
 ```
 
 ### Altyapıyı ayağa kaldır
+
 ```bash
 pulumi up
 ```
+
 Bu komut, tanımlı tüm servisleri (Docker network, Postgres, MongoDB, API gateway vb.) otomatik oluşturur.
 
 > 💡 Not: MongoDB bu altyapıya bağlıdır. Pulumi `infra/` altında hem Postgres hem MongoDB container’larını yönetir.
 
 ### Durdurmak için
+
 ```bash
 pulumi destroy
 ```
@@ -120,36 +132,41 @@ chessgame-elixir/
 
 ## 🧠 6. Geliştirme Notları
 
-- **MongoDB** veritabanı Pulumi aracılığıyla otomatik olarak bağlanır.  
-- **useIdentityStore** kaldırılmıştır, kimlik yönetimi artık tek bir **Zustand store** içinde yürütülmektedir.  
-- **useChessStore** oyun mantığı, oyuncu state’i ve Phoenix Channel eventlerini yönetir.  
-- Phoenix tarafında `Presence` ve `PubSub` aktif durumdadır.  
+- **MongoDB** veritabanı Pulumi aracılığıyla otomatik olarak bağlanır.
+- **useIdentityStore** kaldırılmıştır, kimlik yönetimi artık tek bir **Zustand store** içinde yürütülmektedir.
+- **useChessStore** oyun mantığı, oyuncu state’i ve Phoenix Channel eventlerini yönetir.
+- Phoenix tarafında `Presence` ve `PubSub` aktif durumdadır.
 - Altyapı düzenlemeleri için `infra/` altındaki Pulumi script’leri kullanılmalıdır.
 
 ---
 
 ## 🧩 7. Yararlı Komutlar
 
-| Komut | Açıklama |
-|-------|-----------|
-| `mix phx.server` | Backend'i başlat |
-| `pnpm dev` | Frontend'i başlat |
-| `pulumi up` | Altyapıyı oluştur |
-| `pulumi destroy` | Altyapıyı kaldır |
-| `mix ecto.reset` | Veritabanını sıfırla |
-| `pnpm build` | Frontend production build |
+| Komut               | Açıklama                                                                |
+| ------------------- | ----------------------------------------------------------------------- |
+| `pnpm dev`          | Frontend'i başlat                                                       |
+| `pulumi up`         | Altyapıyı oluştur                                                       |
+| `pulumi destroy`    | Altyapıyı kaldır                                                        |
+| `mix ecto.reset`    | Veritabanını sıfırla                                                    |
+| `pnpm build`        | Frontend production build                                               |
+| `mix phx.server`    | Backend'i başlat                                                        |
+| `mix ecto.create`   | Veritabanını oluşturur. (`config/dev.exs`’teki ayarlarla)               |
+| `mix ecto.drop`     | Var olan veritabanını tamamen siler.                                    |
+| `mix ecto.migrate`  | `priv/repo/migrations/` klasöründeki migration dosyalarını çalıştırır.  |
+| `mix ecto.rollback` | Son migration’ı geri alır. (`--step 2` dersen 2 tanesini birden alır)   |
+| `mix ecto.reset`    | Drop → Create → Migrate işlemlerini sırayla yapar (yani “sıfırla”).     |
+| `mix ecto.seed`     | `priv/repo/seeds.exs` dosyasını çalıştırır, başlangıç verilerini ekler. |
 
 ---
 
 ## ✨ 8. Sonraki Adımlar
 
-- [ ] Pulumi stack’lerini CI/CD entegrasyonuna dahil et  
-- [ ] Realtime event testlerini tamamla  
-- [ ] Dockerfile & docker-compose ekle  
-- [ ] README’ye görsel ve demo linki ekle  
+- [ ] Pulumi stack’lerini CI/CD entegrasyonuna dahil et
+- [ ] Realtime event testlerini tamamla
+- [ ] Dockerfile & docker-compose ekle
+- [ ] README’ye görsel ve demo linki ekle
 
 ---
 
 🧠 **Hazırlayan:** [İlyas Bozdemir](https://github.com/ilyasbozdemir)  
-🎯 *Full-Stack Developer — Elixir, Next.js, Pulumi, Docker, CI/CD*
-
+🎯 _Full-Stack Developer — Elixir, Next.js, Pulumi, Docker, CI/CD_

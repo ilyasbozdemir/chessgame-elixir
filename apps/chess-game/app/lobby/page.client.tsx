@@ -49,6 +49,7 @@ import { formatTime, Logger } from "@/lib/utils";
 import mongoose from "mongoose";
 import { PlayerDoc } from "@/models/player";
 import { RealtimeListener } from "@/components/realtime-listener";
+import { useTableButtonResolver } from "@/hooks/get-table-button-state";
 
 interface PageClientProps {
   //
@@ -87,7 +88,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     return [...tables].sort((a, b) => {
       const timeA = new Date(a.createdAt ?? 0).getTime() || 0;
       const timeB = new Date(b.createdAt ?? 0).getTime() || 0;
-      return timeB - timeA; 
+      return timeB - timeA;
     });
   }, [tables]);
 
@@ -168,6 +169,11 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       player,
     });
 
+    useChessStore.setState({
+      currentTable: null,
+      players: [],
+    });
+
     leaveTable();
   };
 
@@ -227,6 +233,26 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       return { tables: updatedTables };
     });
   };
+
+  const handleGoToTable = (_tableId?: string) => {
+    // TODO: masaya git yönlendirmesi
+  };
+
+  const resolveTableButton = useTableButtonResolver(player, {
+    onPreview: (id) => console.log("Masa önizlemesi:", id),
+    onJoin: handleJoinTable,
+    onGoToTable: (id) => {
+      const t = useChessStore
+        .getState()
+        .tables.find((tt) => tt._id?.toString() === id);
+      if (t) useChessStore.setState({ currentTable: t });
+    },
+    onWatch: handleWatchGame,
+  });
+
+  useEffect(() => {
+    console.log(waitingTables);
+  }, [tables]);
 
   if (loading) {
     return (
@@ -800,111 +826,109 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                       </Badge>
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                      {waitingTables.map((table, index) => (
-                        <Card
-                          key={table._id?.toString()}
-                          className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 relative overflow-hidden"
-                        >
-                          <div className="absolute top-2 right-2 text-4xl opacity-10 pointer-events-none">
-                            {table.status === "waiting"
-                              ? "♙"
-                              : table.status === "playing"
-                              ? "♔"
-                              : "♕"}
-                          </div>
-                          <CardContent className="p-5 space-y-4 relative z-10">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="space-y-1 min-w-0 flex-1">
-                                <h3 className="font-bold text-lg text-foreground truncate">
-                                  {table.name}
-                                </h3>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                  <Clock className="w-3.5 h-3.5 shrink-0" />
-                                  <span>{formatTime(table.createdAt)}</span>
-                                </div>
-                                {table.ownerName && (
-                                  <p className="text-xs text-muted-foreground">
-                                    Sahibi: {table.ownerName}
-                                  </p>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2 shrink-0">
-                                <Badge
-                                  variant="default"
-                                  className="shrink-0 bg-chart-2 text-chart-2-foreground"
-                                >
-                                  Bekliyor
-                                </Badge>
-                                {table.ownerId === player?._id && (
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 shrink-0 hover:bg-destructive/10 hover:text-destructive"
-                                    onClick={() =>
-                                      deleteTable(table._id?.toString() ?? "")
-                                    }
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </Button>
-                                )}
-                              </div>
+                      {waitingTables.map((table, index) => {
+                        const { label, disabled, action } = resolveTableButton(
+                          table._id?.toString()
+                        );
+                        return (
+                          <Card
+                            key={table._id?.toString()}
+                            className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 relative overflow-hidden"
+                          >
+                            <div className="absolute top-2 right-2 text-4xl opacity-10 pointer-events-none">
+                              {table.status === "waiting"
+                                ? "♙"
+                                : table.status === "playing"
+                                ? "♔"
+                                : "♕"}
                             </div>
-
-                            <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50">
-                              <Users className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-sm font-semibold text-foreground">
-                                {table.players && table.players.length}/ 2
-                                Oyuncu
-                              </span>
-                              <div className="flex-1" />
-                              <div className="flex gap-1">
-                                {Array.from({ length: 2 }).map((_, i) => (
-                                  <div
-                                    key={i}
-                                    className={`text-sm ${
-                                      i < (table.players?.length ?? 0)
-                                        ? "opacity-100"
-                                        : "opacity-20"
-                                    }`}
-                                  >
-                                    {i % 2 === 0 ? "♟" : "♙"}
+                            <CardContent className="p-5 space-y-4 relative z-10">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="space-y-1 min-w-0 flex-1">
+                                  <h3 className="font-bold text-lg text-foreground truncate">
+                                    {table.name}
+                                  </h3>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Clock className="w-3.5 h-3.5 shrink-0" />
+                                    <span>{formatTime(table.createdAt)}</span>
                                   </div>
-                                ))}
-                              </div>
-                            </div>
-
-                            {(table.players?.length ?? 0) > 0 && (
-                              <div className="flex gap-2 flex-wrap">
-                                {table.players?.map((player, index) => (
+                                  {table.ownerName && (
+                                    <p className="text-xs text-muted-foreground">
+                                      Sahibi: {table.ownerName}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
                                   <Badge
-                                    key={index}
-                                    variant="outline"
-                                    className="text-xs"
+                                    variant="default"
+                                    className="shrink-0 bg-chart-2 text-chart-2-foreground"
                                   >
-                                    {player.name}
+                                    Bekliyor
                                   </Badge>
-                                ))}
+                                  {table.ownerId === player?._id && (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-6 w-6 shrink-0 hover:bg-destructive/10 hover:text-destructive"
+                                      onClick={() =>
+                                        deleteTable(table._id?.toString() ?? "")
+                                      }
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                </div>
                               </div>
-                            )}
 
-                            <Button
-                              onClick={() =>
-                                handleJoinTable(table._id?.toString() ?? "")
-                              }
-                              disabled={(table.players?.length ?? 0) >= 2}
-                              className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                              size="lg"
-                            >
-                              {table.ownerId?.toString() ===
-                              player?._id?.toString()
-                                ? "Oyunu Başlat"
-                                : (table.players?.length ?? 0) >= 2
-                                ? "Masa Dolu"
-                                : "Masaya Katıl"}
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      ))}
+                              <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50">
+                                <Users className="w-4 h-4 text-muted-foreground" />
+                                <span className="text-sm font-semibold text-foreground">
+                                  {table.players && table.players.length}/ 2
+                                  Oyuncu
+                                </span>
+                                <div className="flex-1" />
+                                <div className="flex gap-1">
+                                  {Array.from({ length: 2 }).map((_, i) => (
+                                    <div
+                                      key={i}
+                                      className={`text-sm ${
+                                        i < (table.players?.length ?? 0)
+                                          ? "opacity-100"
+                                          : "opacity-20"
+                                      }`}
+                                    >
+                                      {i % 2 === 0 ? "♟" : "♙"}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {(table.players?.length ?? 0) > 0 && (
+                                <div className="flex gap-2 flex-wrap">
+                                  {table.players?.map((player, index) => (
+                                    <Badge
+                                      key={index}
+                                      variant="outline"
+                                      className="text-xs"
+                                    >
+                                      {player.name}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+
+                              <Button
+                                onClick={action}
+                                disabled={disabled}
+                                className="w-full"
+                                size="lg"
+                              >
+                                {label}
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
                     </div>
                   </section>
                 )}

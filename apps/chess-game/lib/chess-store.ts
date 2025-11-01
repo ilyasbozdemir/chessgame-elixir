@@ -11,7 +11,7 @@ import { Logger } from "./utils";
 
 interface ChessStore {
   // Player state
-  players: PlayerDoc[];
+  players: PlayerDoc[]; // bu stet içindir bunu da guncelleyeceğiz, mongdbye gecerken daha fazla guncellenecektir buralarda da ,
   currentPlayer: PlayerDoc | null;
 
   tables: TableDoc[];
