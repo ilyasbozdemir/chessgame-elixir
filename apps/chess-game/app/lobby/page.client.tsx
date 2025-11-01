@@ -41,9 +41,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { usePlayer } from "@/context/player-context";
 
-import {
-  joinTable as joinTableDB,
-} from "@/app/actions/db/table";
+import { joinTable as joinTableDB } from "@/app/actions/db/table";
 import { formatTime, Logger } from "@/lib/utils";
 import mongoose from "mongoose";
 import { RealtimeListener } from "@/components/realtime-listener";
@@ -67,8 +65,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     "main" | "edit" | "settings" | "stats"
   >("main");
   const [editName, setEditName] = useState("");
-
-  const [previewTable, setPreviewTable] = useState<TableDoc | null>(null);
 
   const {
     tables,
@@ -94,12 +90,12 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
   const waitingTables = useMemo(
     () => sortedTables.filter((t) => t.status === "waiting"),
-    [sortedTables]
+    [sortedTables],
   );
 
   const activeTables = useMemo(
     () => sortedTables.filter((t) => t.status === "playing"),
-    [sortedTables]
+    [sortedTables],
   );
 
   const handleWatchGame = (tableId: string) => {
@@ -169,13 +165,9 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       player,
     });
 
-    /*
     useChessStore.setState({
       currentTable: null,
     });
-    */
-
-    setPreviewTable(null);
 
     leaveTable();
   };
@@ -185,7 +177,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     if (player?._id && currentTable?.players) {
       const playerInTable = currentTable.players.find(
         (p: { id: mongoose.Types.ObjectId | null; isReady: boolean }) =>
-          p.id?.toString() === player._id?.toString()
+          p.id?.toString() === player._id?.toString(),
       );
 
       setPlayerReady(player._id.toString(), !playerInTable?.isReady);
@@ -197,8 +189,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     router.push("/game");
   };
 
-  const canStartGame =
-    currentTable &&
+  const canStartGame = currentTable &&
     currentTable.players?.length === 2 &&
     currentTable.players.every((p) => p.isReady) &&
     gameState.gameStatus === "ready";
@@ -227,7 +218,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
     useChessStore.setState((state) => {
       const updatedTables = state.tables.filter(
-        (t) => t._id?.toString() !== tableId
+        (t) => t._id?.toString() !== tableId,
       );
 
       console.log("✅ Güncel tablo listesi:", updatedTables);
@@ -253,10 +244,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     onWatch: handleWatchGame,
   });
 
-  useEffect(() => {
-    console.log(waitingTables);
-  }, [tables]);
-
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center">
@@ -281,7 +268,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     );
   }
 
-  if (previewTable) {
+  if (currentTable) {
     return (
       <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex items-center justify-center p-3 sm:p-4 lg:ml-64">
         <Card className="w-full max-w-2xl">
@@ -299,7 +286,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
               <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                 <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0" />
                 <CardTitle className="text-xl sm:text-3xl font-bold truncate">
-                  {previewTable.name}
+                  {currentTable.name}
                 </CardTitle>
                 <Swords className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0" />
               </div>
@@ -314,21 +301,19 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Users className="w-4 h-4" />
-                <span>Oyuncular {(previewTable.players ?? []).length}/ 2</span>
+                <span>Oyuncular {(currentTable.players ?? []).length}/ 2</span>
               </div>
 
               <div className="grid gap-2 sm:gap-3">
-                {previewTable.players?.map((player, index) => {
+                {currentTable.players?.map((player, index) => {
                   if (!player?.name) return null;
                   return (
                     <Card
                       key={player?.id?.toString()}
-                      className={
-                        player &&
-                        player.id?.toString() === player.id?.toString()
-                          ? "border-primary"
-                          : ""
-                      }
+                      className={player &&
+                          player.id?.toString() === player.id?.toString()
+                        ? "border-primary"
+                        : ""}
                     >
                       <CardContent className="flex items-center justify-between p-3 sm:p-4 gap-2">
                         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -348,7 +333,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                                 </Badge>
                               )}
                               {player?.id?.toString() ===
-                                player.id?.toString() && (
+                                  player.id?.toString() && (
                                 <Badge variant="secondary" className="text-xs">
                                   Siz
                                 </Badge>
@@ -359,26 +344,28 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
                         <div className="flex items-center gap-2 shrink-0">
                           {currentTable?.players?.find(
-                            (p) => p.id?.toString() === player.id?.toString()
-                          )?.isReady ? (
-                            <Badge className="bg-primary text-xs sm:text-sm">
-                              Hazır
-                            </Badge>
-                          ) : (
-                            <Badge
-                              variant="outline"
-                              className="text-xs sm:text-sm"
-                            >
-                              Bekliyor
-                            </Badge>
-                          )}
+                              (p) => p.id?.toString() === player.id?.toString(),
+                            )?.isReady
+                            ? (
+                              <Badge className="bg-primary text-xs sm:text-sm">
+                                Hazır
+                              </Badge>
+                            )
+                            : (
+                              <Badge
+                                variant="outline"
+                                className="text-xs sm:text-sm"
+                              >
+                                Bekliyor
+                              </Badge>
+                            )}
                         </div>
                       </CardContent>
                     </Card>
                   );
                 })}
 
-                {(previewTable?.players ?? []).length < 2 && (
+                {(currentTable?.players ?? []).length < 2 && (
                   <Card className="border-dashed">
                     <CardContent className="flex items-center justify-center p-6 sm:p-8 text-muted-foreground">
                       <p className="text-xs sm:text-sm">Oyuncu bekleniyor...</p>
@@ -393,17 +380,15 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                 onClick={handleReady}
                 className="w-full"
                 size="default"
-                variant={
-                  currentTable.players.find(
-                    (p) => p.id?.toString() === player._id?.toString()
+                variant={currentTable.players.find(
+                    (p) => p.id?.toString() === player._id?.toString(),
                   )?.isReady
-                    ? "outline"
-                    : "default"
-                }
+                  ? "outline"
+                  : "default"}
               >
                 {currentTable.players.find(
-                  (p) => p.id?.toString() === player._id?.toString()
-                )?.isReady
+                    (p) => p.id?.toString() === player._id?.toString(),
+                  )?.isReady
                   ? "Hazır Değilim"
                   : "Hazırım"}
               </Button>
@@ -415,7 +400,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
               </Button>
             )}
 
-            {(previewTable.players ?? []).length === 1 && (
+            {(currentTable.players ?? []).length === 1 && (
               <div className="text-center text-xs sm:text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
                 İkinci oyuncunun katılması bekleniyor...
               </div>
@@ -431,421 +416,546 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       <div className="w-full max-w-5xl space-y-6">
         <RealtimeListener channel={channel} />
 
-        {!player ? (
-          <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-            <Card className="border-primary shadow-lg w-full max-w-md">
-              <CardHeader className="text-center p-6 sm:p-8 space-y-4">
-                <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg">
-                  <Crown className="w-10 h-10 text-primary-foreground" />
-                </div>
-                <div className="space-y-2">
-                  <CardTitle className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                    Hoş Geldiniz
-                  </CardTitle>
-                  <CardDescription className="text-base">
-                    Satranç dünyasına adım atmak için adınızı girin
-                  </CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4 p-6 sm:p-8 pt-0">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Oyuncu Adı</label>
-                  <Input
-                    placeholder="Adınızı girin"
-                    value={playerName}
-                    onChange={(e) => setPlayerName(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" && handleSetPlayerName()
-                    }
-                    className="text-center text-lg h-12"
-                    autoFocus
-                  />
-                </div>
-                <Button
-                  onClick={handleSetPlayerName}
-                  disabled={!playerName.trim()}
-                  className="w-full h-12 text-base"
-                  size="lg"
-                >
-                  <User className="w-5 h-5 mr-2" />
-                  Kaydet
-                </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  Devam ederek kullanım şartlarını kabul etmiş olursunuz
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        ) : (
-          <React.Fragment>
-            <Card>
-              <CardHeader className="p-4 sm:p-6">
-                <div className="flex items-center justify-between gap-4">
-                  {player ? (
-                    <Dialog
-                      onOpenChange={(open) =>
-                        !open && setProfileSection("main")
-                      }
-                    >
-                      <DialogTrigger asChild>
-                        <Button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 transition-colors cursor-pointer">
-                          <UserCircle className="w-5 h-5 text-accent-foreground" />
-                          <span className="font-medium text-accent-foreground">
-                            {player.name}
-                          </span>
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>
-                            {profileSection === "main" && "Oyuncu Profili"}
-                            {profileSection === "edit" && "Profili Düzenle"}
-                            {profileSection === "settings" && "Oyun Ayarları"}
-                            {profileSection === "stats" && "İstatistikler"}
-                          </DialogTitle>
-                          <DialogDescription>
-                            {profileSection === "main" &&
-                              "Hesap ayarlarınızı yönetin"}
-                            {profileSection === "edit" &&
-                              "Profil bilgilerinizi güncelleyin"}
-                            {profileSection === "settings" &&
-                              "Oyun tercihlerinizi ayarlayın"}
-                            {profileSection === "stats" &&
-                              "Oyun performansınızı görüntüleyin"}
-                          </DialogDescription>
-                        </DialogHeader>
+        {!player
+          ? (
+            <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+              <Card className="border-primary shadow-lg w-full max-w-md">
+                <CardHeader className="text-center p-6 sm:p-8 space-y-4">
+                  <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg">
+                    <Crown className="w-10 h-10 text-primary-foreground" />
+                  </div>
+                  <div className="space-y-2">
+                    <CardTitle className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                      Hoş Geldiniz
+                    </CardTitle>
+                    <CardDescription className="text-base">
+                      Satranç dünyasına adım atmak için adınızı girin
+                    </CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4 p-6 sm:p-8 pt-0">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Oyuncu Adı</label>
+                    <Input
+                      placeholder="Adınızı girin"
+                      value={playerName}
+                      onChange={(e) => setPlayerName(e.target.value)}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && handleSetPlayerName()}
+                      className="text-center text-lg h-12"
+                      autoFocus
+                    />
+                  </div>
+                  <Button
+                    onClick={handleSetPlayerName}
+                    disabled={!playerName.trim()}
+                    className="w-full h-12 text-base"
+                    size="lg"
+                  >
+                    <User className="w-5 h-5 mr-2" />
+                    Kaydet
+                  </Button>
+                  <p className="text-xs text-center text-muted-foreground">
+                    Devam ederek kullanım şartlarını kabul etmiş olursunuz
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          )
+          : (
+            <React.Fragment>
+              <Card>
+                <CardHeader className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between gap-4">
+                    {player
+                      ? (
+                        <Dialog
+                          onOpenChange={(open) =>
+                            !open && setProfileSection("main")}
+                        >
+                          <DialogTrigger asChild>
+                            <Button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 transition-colors cursor-pointer">
+                              <UserCircle className="w-5 h-5 text-accent-foreground" />
+                              <span className="font-medium text-accent-foreground">
+                                {player.name}
+                              </span>
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>
+                                {profileSection === "main" && "Oyuncu Profili"}
+                                {profileSection === "edit" && "Profili Düzenle"}
+                                {profileSection === "settings" &&
+                                  "Oyun Ayarları"}
+                                {profileSection === "stats" && "İstatistikler"}
+                              </DialogTitle>
+                              <DialogDescription>
+                                {profileSection === "main" &&
+                                  "Hesap ayarlarınızı yönetin"}
+                                {profileSection === "edit" &&
+                                  "Profil bilgilerinizi güncelleyin"}
+                                {profileSection === "settings" &&
+                                  "Oyun tercihlerinizi ayarlayın"}
+                                {profileSection === "stats" &&
+                                  "Oyun performansınızı görüntüleyin"}
+                              </DialogDescription>
+                            </DialogHeader>
 
-                        {profileSection === "main" && (
-                          <div className="space-y-4 pt-4">
-                            <div className="flex items-center gap-4 p-4 rounded-lg bg-accent/50">
-                              <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center">
-                                <UserCircle className="w-10 h-10 text-primary-foreground" />
+                            {profileSection === "main" && (
+                              <div className="space-y-4 pt-4">
+                                <div className="flex items-center gap-4 p-4 rounded-lg bg-accent/50">
+                                  <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center">
+                                    <UserCircle className="w-10 h-10 text-primary-foreground" />
+                                  </div>
+                                  <div>
+                                    <p className="font-bold text-lg text-foreground">
+                                      {player && player.name}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                      Oyuncu ID: {player?._id?.toString()}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Button
+                                    variant="outline"
+                                    className="w-full justify-start bg-transparent"
+                                    onClick={() => {
+                                      setEditName(player.name);
+                                      setProfileSection("edit");
+                                    }}
+                                  >
+                                    <UserCircle className="w-4 h-4 mr-2" />
+                                    Profili Düzenle
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    className="w-full justify-start bg-transparent"
+                                    onClick={() =>
+                                      setProfileSection("settings")}
+                                  >
+                                    <Settings className="w-4 h-4 mr-2" />
+                                    Oyun Ayarları
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    className="w-full justify-start bg-transparent"
+                                    onClick={() => setProfileSection("stats")}
+                                  >
+                                    <BarChart3 className="w-4 h-4 mr-2" />
+                                    İstatistikler
+                                  </Button>
+                                </div>
+
+                                <div className="pt-4 border-t border-border">
+                                  <Button
+                                    variant="destructive"
+                                    className="w-full"
+                                    onClick={async () => {
+                                      setPlayer(null);
+                                      setProfileSection("main");
+                                      const res = await fetch("/api/logout", {
+                                        method: "POST",
+                                      });
+                                      if (res.ok) {
+                                        console.log("✅ Oyuncu çıkış yaptı");
+                                        setPlayer(null);
+                                      } else {
+                                        console.error("❌ Çıkış hatası");
+                                      }
+                                      await refresh();
+                                    }}
+                                  >
+                                    Çıkış Yap
+                                  </Button>
+                                </div>
                               </div>
-                              <div>
-                                <p className="font-bold text-lg text-foreground">
-                                  {player && player.name}
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                  Oyuncu ID: {player?._id?.toString()}
-                                </p>
+                            )}
+
+                            {profileSection === "edit" && (
+                              <div className="space-y-4 pt-4">
+                                <div className="space-y-2">
+                                  <Label htmlFor="edit-name">Oyuncu İsmi</Label>
+                                  <Input
+                                    id="edit-name"
+                                    placeholder="Yeni isminiz"
+                                    value={editName}
+                                    onChange={(e) =>
+                                      setEditName(e.target.value)}
+                                  />
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button
+                                    variant="outline"
+                                    className="flex-1 bg-transparent"
+                                    onClick={() => setProfileSection("main")}
+                                  >
+                                    İptal
+                                  </Button>
+                                  <Button
+                                    className="flex-1"
+                                    disabled={!editName.trim()}
+                                    onClick={() => {
+                                      setPlayer({
+                                        ...player,
+                                        name: editName,
+                                      });
+                                      setProfileSection("main");
+                                    }}
+                                  >
+                                    Kaydet
+                                  </Button>
+                                </div>
                               </div>
-                            </div>
+                            )}
 
-                            <div className="space-y-2">
-                              <Button
-                                variant="outline"
-                                className="w-full justify-start bg-transparent"
-                                onClick={() => {
-                                  setEditName(player.name);
-                                  setProfileSection("edit");
-                                }}
-                              >
-                                <UserCircle className="w-4 h-4 mr-2" />
-                                Profili Düzenle
-                              </Button>
-                              <Button
-                                variant="outline"
-                                className="w-full justify-start bg-transparent"
-                                onClick={() => setProfileSection("settings")}
-                              >
-                                <Settings className="w-4 h-4 mr-2" />
-                                Oyun Ayarları
-                              </Button>
-                              <Button
-                                variant="outline"
-                                className="w-full justify-start bg-transparent"
-                                onClick={() => setProfileSection("stats")}
-                              >
-                                <BarChart3 className="w-4 h-4 mr-2" />
-                                İstatistikler
-                              </Button>
-                            </div>
+                            {profileSection === "settings" && (
+                              <div className="space-y-4 pt-4">
+                                <div className="space-y-4">
+                                  <div className="flex items-center justify-between p-3 rounded-lg bg-accent/50">
+                                    <div>
+                                      <p className="font-medium text-foreground">
+                                        Ses Efektleri
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        Oyun seslerini aç/kapat
+                                      </p>
+                                    </div>
+                                    <Button variant="outline" size="sm">
+                                      Açık
+                                    </Button>
+                                  </div>
+                                  <div className="flex items-center justify-between p-3 rounded-lg bg-accent/50">
+                                    <div>
+                                      <p className="font-medium text-foreground">
+                                        Bildirimler
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        Masa bildirimleri
+                                      </p>
+                                    </div>
+                                    <Button variant="outline" size="sm">
+                                      Açık
+                                    </Button>
+                                  </div>
+                                  <div className="flex items-center justify-between p-3 rounded-lg bg-accent/50">
+                                    <div>
+                                      <p className="font-medium text-foreground">
+                                        Otomatik Katılım
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        Boş masalara otomatik katıl
+                                      </p>
+                                    </div>
+                                    <Button variant="outline" size="sm">
+                                      Kapalı
+                                    </Button>
+                                  </div>
+                                </div>
+                                <Button
+                                  variant="outline"
+                                  className="w-full bg-transparent"
+                                  onClick={() => setProfileSection("main")}
+                                >
+                                  Geri Dön
+                                </Button>
+                              </div>
+                            )}
 
-                            <div className="pt-4 border-t border-border">
+                            {profileSection === "stats" && (
+                              <div className="space-y-4 pt-4">
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div className="p-4 rounded-lg bg-accent/50 text-center">
+                                    <Trophy className="w-6 h-6 text-chart-2 mx-auto mb-2" />
+                                    <p className="text-2xl font-bold text-foreground">
+                                      24
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      Kazanılan Oyun
+                                    </p>
+                                  </div>
+                                  <div className="p-4 rounded-lg bg-accent/50 text-center">
+                                    <PlayCircle className="w-6 h-6 text-chart-1 mx-auto mb-2" />
+                                    <p className="text-2xl font-bold text-foreground">
+                                      42
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      Toplam Oyun
+                                    </p>
+                                  </div>
+                                  <div className="p-4 rounded-lg bg-accent/50 text-center">
+                                    <BarChart3 className="w-6 h-6 text-primary mx-auto mb-2" />
+                                    <p className="text-2xl font-bold text-foreground">
+                                      57%
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      Kazanma Oranı
+                                    </p>
+                                  </div>
+                                  <div className="p-4 rounded-lg bg-accent/50 text-center">
+                                    <Users className="w-6 h-6 text-chart-3 mx-auto mb-2" />
+                                    <p className="text-2xl font-bold text-foreground">
+                                      156
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      Toplam Hamle
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                                  <p className="text-sm font-medium text-foreground mb-1">
+                                    En İyi Seri
+                                  </p>
+                                  <p className="text-2xl font-bold text-primary">
+                                    7 Galibiyet
+                                  </p>
+                                </div>
+                                <Button
+                                  variant="outline"
+                                  className="w-full bg-transparent"
+                                  onClick={() => setProfileSection("main")}
+                                >
+                                  Geri Dön
+                                </Button>
+                              </div>
+                            )}
+                          </DialogContent>
+                        </Dialog>
+                      )
+                      : (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline">
+                              <UserCircle className="w-4 h-4 mr-2" />
+                              İsim Belirle
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Oyuncu İsmi</DialogTitle>
+                              <DialogDescription>
+                                Lobide görünecek isminizi girin
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 pt-4">
+                              <div className="space-y-2">
+                                <Label htmlFor="player-name">İsim</Label>
+                                <Input
+                                  id="player-name"
+                                  placeholder="Oyuncu isminiz"
+                                  value={playerName}
+                                  onChange={(e) =>
+                                    setPlayerName(e.target.value)}
+                                />
+                              </div>
                               <Button
-                                variant="destructive"
+                                onClick={handleSetPlayerName}
                                 className="w-full"
-                                onClick={async () => {
-                                  setPlayer(null);
-                                  setProfileSection("main");
-                                  const res = await fetch("/api/logout", {
-                                    method: "POST",
-                                  });
-                                  if (res.ok) {
-                                    console.log("✅ Oyuncu çıkış yaptı");
-                                    setPlayer(null);
-                                  } else {
-                                    console.error("❌ Çıkış hatası");
-                                  }
-                                  await refresh();
-                                }}
-                              >
-                                Çıkış Yap
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-
-                        {profileSection === "edit" && (
-                          <div className="space-y-4 pt-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="edit-name">Oyuncu İsmi</Label>
-                              <Input
-                                id="edit-name"
-                                placeholder="Yeni isminiz"
-                                value={editName}
-                                onChange={(e) => setEditName(e.target.value)}
-                              />
-                            </div>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="outline"
-                                className="flex-1 bg-transparent"
-                                onClick={() => setProfileSection("main")}
-                              >
-                                İptal
-                              </Button>
-                              <Button
-                                className="flex-1"
-                                disabled={!editName.trim()}
-                                onClick={() => {
-                                  setPlayer({
-                                    ...player,
-                                    name: editName,
-                                  });
-                                  setProfileSection("main");
-                                }}
+                                disabled={!playerName.trim()}
                               >
                                 Kaydet
                               </Button>
                             </div>
-                          </div>
-                        )}
+                          </DialogContent>
+                        </Dialog>
+                      )}
 
-                        {profileSection === "settings" && (
+                    {player && (
+                      <Dialog
+                        open={isCreateDialogOpen}
+                        onOpenChange={setIsCreateDialogOpen}
+                      >
+                        <DialogTrigger asChild>
+                          <Button className="gap-2">
+                            <Plus className="w-4 h-4" />
+                            Yeni Masa
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Yeni Masa Oluştur</DialogTitle>
+                            <DialogDescription>
+                              Oyun masanızın detaylarını belirleyin
+                            </DialogDescription>
+                          </DialogHeader>
                           <div className="space-y-4 pt-4">
-                            <div className="space-y-4">
-                              <div className="flex items-center justify-between p-3 rounded-lg bg-accent/50">
-                                <div>
-                                  <p className="font-medium text-foreground">
-                                    Ses Efektleri
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    Oyun seslerini aç/kapat
-                                  </p>
-                                </div>
-                                <Button variant="outline" size="sm">
-                                  Açık
-                                </Button>
-                              </div>
-                              <div className="flex items-center justify-between p-3 rounded-lg bg-accent/50">
-                                <div>
-                                  <p className="font-medium text-foreground">
-                                    Bildirimler
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    Masa bildirimleri
-                                  </p>
-                                </div>
-                                <Button variant="outline" size="sm">
-                                  Açık
-                                </Button>
-                              </div>
-                              <div className="flex items-center justify-between p-3 rounded-lg bg-accent/50">
-                                <div>
-                                  <p className="font-medium text-foreground">
-                                    Otomatik Katılım
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    Boş masalara otomatik katıl
-                                  </p>
-                                </div>
-                                <Button variant="outline" size="sm">
-                                  Kapalı
-                                </Button>
-                              </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="table-name">Masa Adı</Label>
+                              <Input
+                                id="table-name"
+                                placeholder="Örn: Hızlı Oyun"
+                                value={newTableName}
+                                onChange={(e) =>
+                                  setNewTableName(e.target.value)}
+                              />
                             </div>
+
                             <Button
-                              variant="outline"
-                              className="w-full bg-transparent"
-                              onClick={() => setProfileSection("main")}
+                              onClick={handleCreateTable}
+                              className="w-full"
+                              disabled={!newTableName.trim()}
                             >
-                              Geri Dön
+                              Masa Oluştur
                             </Button>
                           </div>
-                        )}
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                  </div>
+                </CardHeader>
+              </Card>
 
-                        {profileSection === "stats" && (
-                          <div className="space-y-4 pt-4">
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="p-4 rounded-lg bg-accent/50 text-center">
-                                <Trophy className="w-6 h-6 text-chart-2 mx-auto mb-2" />
-                                <p className="text-2xl font-bold text-foreground">
-                                  24
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  Kazanılan Oyun
-                                </p>
-                              </div>
-                              <div className="p-4 rounded-lg bg-accent/50 text-center">
-                                <PlayCircle className="w-6 h-6 text-chart-1 mx-auto mb-2" />
-                                <p className="text-2xl font-bold text-foreground">
-                                  42
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  Toplam Oyun
-                                </p>
-                              </div>
-                              <div className="p-4 rounded-lg bg-accent/50 text-center">
-                                <BarChart3 className="w-6 h-6 text-primary mx-auto mb-2" />
-                                <p className="text-2xl font-bold text-foreground">
-                                  57%
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  Kazanma Oranı
-                                </p>
-                              </div>
-                              <div className="p-4 rounded-lg bg-accent/50 text-center">
-                                <Users className="w-6 h-6 text-chart-3 mx-auto mb-2" />
-                                <p className="text-2xl font-bold text-foreground">
-                                  156
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  Toplam Hamle
-                                </p>
-                              </div>
-                            </div>
-                            <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-                              <p className="text-sm font-medium text-foreground mb-1">
-                                En İyi Seri
-                              </p>
-                              <p className="text-2xl font-bold text-primary">
-                                7 Galibiyet
-                              </p>
-                            </div>
-                            <Button
-                              variant="outline"
-                              className="w-full bg-transparent"
-                              onClick={() => setProfileSection("main")}
+              <div className="container mx-auto px-4 py-8">
+                <div className="space-y-8">
+                  {/* Waiting Tables */}
+                  {tables.length > 0 && (
+                    <section>
+                      <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-2xl font-bold text-foreground">
+                          Bekleyen Masalar
+                        </h2>
+                        <Badge variant="secondary" className="text-sm">
+                          {waitingTables.length} Masa
+                        </Badge>
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {waitingTables.map((table, index) => {
+                          const { label, disabled, action } =
+                            resolveTableButton(
+                              table._id?.toString(),
+                            );
+
+                          return (
+                            <Card
+                              key={table._id?.toString()}
+                              className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 relative overflow-hidden"
                             >
-                              Geri Dön
-                            </Button>
-                          </div>
-                        )}
-                      </DialogContent>
-                    </Dialog>
-                  ) : (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline">
-                          <UserCircle className="w-4 h-4 mr-2" />
-                          İsim Belirle
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Oyuncu İsmi</DialogTitle>
-                          <DialogDescription>
-                            Lobide görünecek isminizi girin
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 pt-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="player-name">İsim</Label>
-                            <Input
-                              id="player-name"
-                              placeholder="Oyuncu isminiz"
-                              value={playerName}
-                              onChange={(e) => setPlayerName(e.target.value)}
-                            />
-                          </div>
-                          <Button
-                            onClick={handleSetPlayerName}
-                            className="w-full"
-                            disabled={!playerName.trim()}
-                          >
-                            Kaydet
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                              <div className="absolute top-2 right-2 text-4xl opacity-10 pointer-events-none">
+                                {table.status === "waiting"
+                                  ? "♙"
+                                  : table.status === "playing"
+                                  ? "♔"
+                                  : "♕"}
+                              </div>
+                              <CardContent className="p-5 space-y-4 relative z-10">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="space-y-1 min-w-0 flex-1">
+                                    <h3 className="font-bold text-lg text-foreground truncate">
+                                      {table.name}
+                                    </h3>
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                      <Clock className="w-3.5 h-3.5 shrink-0" />
+                                      <span>{formatTime(table.createdAt)}</span>
+                                    </div>
+                                    {table.ownerName && (
+                                      <p className="text-xs text-muted-foreground">
+                                        Sahibi: {table.ownerName}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <Badge
+                                      variant="default"
+                                      className="shrink-0 bg-chart-2 text-chart-2-foreground"
+                                    >
+                                      Bekliyor
+                                    </Badge>
+                                    {table.ownerId === player?._id && (
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-6 w-6 shrink-0 hover:bg-destructive/10 hover:text-destructive"
+                                        onClick={() =>
+                                          deleteTable(
+                                            table._id?.toString() ?? "",
+                                          )}
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50">
+                                  <Users className="w-4 h-4 text-muted-foreground" />
+                                  <span className="text-sm font-semibold text-foreground">
+                                    {table.players && table.players.length}/ 2
+                                    Oyuncu
+                                  </span>
+                                  <div className="flex-1" />
+                                  <div className="flex gap-1">
+                                    {Array.from({ length: 2 }).map((_, i) => (
+                                      <div
+                                        key={i}
+                                        className={`text-sm ${
+                                          i < (table.players?.length ?? 0)
+                                            ? "opacity-100"
+                                            : "opacity-20"
+                                        }`}
+                                      >
+                                        {i % 2 === 0 ? "♟" : "♙"}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                {(table.players?.length ?? 0) > 0 && (
+                                  <div className="flex gap-2 flex-wrap">
+                                    {table.players?.map((player, index) => (
+                                      <Badge
+                                        key={index}
+                                        variant="outline"
+                                        className="text-xs"
+                                      >
+                                        {player.name}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                )}
+
+                                <Button
+                                  onClick={action}
+                                  disabled={disabled}
+                                  className="w-full"
+                                  size="lg"
+                                >
+                                  {label}
+                                </Button>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    </section>
                   )}
 
-                  {player && (
-                    <Dialog
-                      open={isCreateDialogOpen}
-                      onOpenChange={setIsCreateDialogOpen}
-                    >
-                      <DialogTrigger asChild>
-                        <Button className="gap-2">
-                          <Plus className="w-4 h-4" />
-                          Yeni Masa
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Yeni Masa Oluştur</DialogTitle>
-                          <DialogDescription>
-                            Oyun masanızın detaylarını belirleyin
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 pt-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="table-name">Masa Adı</Label>
-                            <Input
-                              id="table-name"
-                              placeholder="Örn: Hızlı Oyun"
-                              value={newTableName}
-                              onChange={(e) => setNewTableName(e.target.value)}
-                            />
-                          </div>
-
-                          <Button
-                            onClick={handleCreateTable}
-                            className="w-full"
-                            disabled={!newTableName.trim()}
-                          >
-                            Masa Oluştur
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  )}
-                </div>
-              </CardHeader>
-            </Card>
-
-            <div className="container mx-auto px-4 py-8">
-              <div className="space-y-8">
-                {/* Waiting Tables */}
-                {tables.length > 0 && (
-                  <section>
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-2xl font-bold text-foreground">
-                        Bekleyen Masalar
-                      </h2>
-                      <Badge variant="secondary" className="text-sm">
-                        {waitingTables.length} Masa
-                      </Badge>
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                      {waitingTables.map((table, index) => {
-                        const { label, disabled, action } = resolveTableButton(
-                          table._id?.toString()
-                        );
-
-                        return (
+                  {/* Active Games */}
+                  {activeTables.length > 0 && (
+                    <section>
+                      <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-2xl font-bold text-foreground">
+                          Devam Eden Oyunlar
+                        </h2>
+                        <Badge variant="secondary" className="text-sm">
+                          {activeTables.length} Oyun
+                        </Badge>
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {activeTables.map((table, index) => (
                           <Card
-                            key={table._id?.toString()}
-                            className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 relative overflow-hidden"
+                            key={index}
+                            className="group hover:shadow-lg transition-all duration-300 border-chart-1/30 relative overflow-hidden"
                           >
                             <div className="absolute top-2 right-2 text-4xl opacity-10 pointer-events-none">
-                              {table.status === "waiting"
+                              {table.status === "playing"
+                                ? "♚"
+                                : table.status === "waiting"
                                 ? "♙"
-                                : table.status === "playing"
-                                ? "♔"
-                                : "♕"}
+                                : "♛"}
                             </div>
+
                             <CardContent className="p-5 space-y-4 relative z-10">
                               <div className="flex items-start justify-between gap-2">
                                 <div className="space-y-1 min-w-0 flex-1">
@@ -856,62 +966,27 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                                     <Clock className="w-3.5 h-3.5 shrink-0" />
                                     <span>{formatTime(table.createdAt)}</span>
                                   </div>
-                                  {table.ownerName && (
-                                    <p className="text-xs text-muted-foreground">
-                                      Sahibi: {table.ownerName}
-                                    </p>
-                                  )}
                                 </div>
-                                <div className="flex items-center gap-2 shrink-0">
-                                  <Badge
-                                    variant="default"
-                                    className="shrink-0 bg-chart-2 text-chart-2-foreground"
-                                  >
-                                    Bekliyor
-                                  </Badge>
-                                  {table.ownerId === player?._id && (
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-6 w-6 shrink-0 hover:bg-destructive/10 hover:text-destructive"
-                                      onClick={() =>
-                                        deleteTable(table._id?.toString() ?? "")
-                                      }
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  )}
-                                </div>
+                                <Badge
+                                  variant="secondary"
+                                  className="shrink-0 bg-chart-1/20 text-chart-1"
+                                >
+                                  Oyunda
+                                </Badge>
                               </div>
 
-                              <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50">
+                              <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/30">
                                 <Users className="w-4 h-4 text-muted-foreground" />
                                 <span className="text-sm font-semibold text-foreground">
-                                  {table.players && table.players.length}/ 2
-                                  Oyuncu
+                                  {table.players?.length ?? 0}/ 2 Oyuncu
                                 </span>
-                                <div className="flex-1" />
-                                <div className="flex gap-1">
-                                  {Array.from({ length: 2 }).map((_, i) => (
-                                    <div
-                                      key={i}
-                                      className={`text-sm ${
-                                        i < (table.players?.length ?? 0)
-                                          ? "opacity-100"
-                                          : "opacity-20"
-                                      }`}
-                                    >
-                                      {i % 2 === 0 ? "♟" : "♙"}
-                                    </div>
-                                  ))}
-                                </div>
                               </div>
 
                               {(table.players?.length ?? 0) > 0 && (
                                 <div className="flex gap-2 flex-wrap">
-                                  {table.players?.map((player, index) => (
+                                  {table.players?.map((player) => (
                                     <Badge
-                                      key={index}
+                                      key={player.id?.toString() ?? player.name}
                                       variant="outline"
                                       className="text-xs"
                                     >
@@ -922,110 +997,25 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
                               )}
 
                               <Button
-                                onClick={() => {
-                                  action();
-                                  setPreviewTable(table);
-                                }}
-                                disabled={disabled}
-                                className="w-full"
+                                onClick={() =>
+                                  handleWatchGame(table._id?.toString() ?? "")}
+                                className="w-full gap-2"
+                                variant="outline"
                                 size="lg"
                               >
-                                {label}
+                                <Eye className="w-4 h-4" />
+                                Oyunu İzle
                               </Button>
                             </CardContent>
                           </Card>
-                        );
-                      })}
-                    </div>
-                  </section>
-                )}
-
-                {/* Active Games */}
-                {activeTables.length > 0 && (
-                  <section>
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-2xl font-bold text-foreground">
-                        Devam Eden Oyunlar
-                      </h2>
-                      <Badge variant="secondary" className="text-sm">
-                        {activeTables.length} Oyun
-                      </Badge>
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                      {activeTables.map((table, index) => (
-                        <Card
-                          key={index}
-                          className="group hover:shadow-lg transition-all duration-300 border-chart-1/30 relative overflow-hidden"
-                        >
-                          <div className="absolute top-2 right-2 text-4xl opacity-10 pointer-events-none">
-                            {table.status === "playing"
-                              ? "♚"
-                              : table.status === "waiting"
-                              ? "♙"
-                              : "♛"}
-                          </div>
-
-                          <CardContent className="p-5 space-y-4 relative z-10">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="space-y-1 min-w-0 flex-1">
-                                <h3 className="font-bold text-lg text-foreground truncate">
-                                  {table.name}
-                                </h3>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                  <Clock className="w-3.5 h-3.5 shrink-0" />
-                                  <span>{formatTime(table.createdAt)}</span>
-                                </div>
-                              </div>
-                              <Badge
-                                variant="secondary"
-                                className="shrink-0 bg-chart-1/20 text-chart-1"
-                              >
-                                Oyunda
-                              </Badge>
-                            </div>
-
-                            <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/30">
-                              <Users className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-sm font-semibold text-foreground">
-                                {table.players?.length ?? 0}/ 2 Oyuncu
-                              </span>
-                            </div>
-
-                            {(table.players?.length ?? 0) > 0 && (
-                              <div className="flex gap-2 flex-wrap">
-                                {table.players?.map((player) => (
-                                  <Badge
-                                    key={player.id?.toString() ?? player.name}
-                                    variant="outline"
-                                    className="text-xs"
-                                  >
-                                    {player.name}
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
-
-                            <Button
-                              onClick={() =>
-                                handleWatchGame(table._id?.toString() ?? "")
-                              }
-                              className="w-full gap-2"
-                              variant="outline"
-                              size="lg"
-                            >
-                              <Eye className="w-4 h-4" />
-                              Oyunu İzle
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </section>
-                )}
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                </div>
               </div>
-            </div>
-          </React.Fragment>
-        )}
+            </React.Fragment>
+          )}
       </div>
     </div>
   );
