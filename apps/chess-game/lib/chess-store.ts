@@ -285,6 +285,11 @@ export const useChessStore = create<ChessStore>((set, get) => ({
 
     if (!table) return;
 
+    const logger = new Logger("Zustand-TableService-deleteTable");
+
+    logger.warn("currentPlayer", currentPlayer);
+    logger.warn("table.ownerId?.toString()", table.ownerId?.toString());
+
     if (table.ownerId?.toString() !== currentPlayer?._id?.toString()) {
       console.warn("⛔ Silme yetkisi yok!");
       return;

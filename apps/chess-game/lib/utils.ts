@@ -17,7 +17,6 @@ export const formatTime = (date: Date | string) => {
 
 const isDev = process.env.NODE_ENV !== "production";
 
-
 //bunlar ilerde tamamne eklenicek app için
 export class Logger {
   private prefix: string;
@@ -34,6 +33,12 @@ export class Logger {
       `color:${color}`,
       ...args
     );
+  }
+
+  log(...args: any[]) {
+    if (!isDev) return;
+
+    console.log(...args);
   }
 
   info(...args: any[]) {
