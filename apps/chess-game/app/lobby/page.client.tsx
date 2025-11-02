@@ -150,46 +150,50 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
         />
 
         {!player ? (
-          <Card className="border-primary shadow-lg w-full max-w-md">
-            <CardHeader className="text-center p-6 sm:p-8 space-y-4">
-              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg">
-                <Crown className="w-10 h-10 text-primary-foreground" />
-              </div>
-              <div className="space-y-2">
-                <CardTitle className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                  Hoş Geldiniz
-                </CardTitle>
-                <CardDescription className="text-base">
-                  Satranç dünyasına adım atmak için adınızı girin
-                </CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4 p-6 sm:p-8 pt-0">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Oyuncu Adı</label>
-                <Input
-                  placeholder="Adınızı girin"
-                  value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSetPlayerName()}
-                  className="text-center text-lg h-12"
-                  autoFocus
-                />
-              </div>
-              <Button
-                onClick={handleSetPlayerName}
-                disabled={!playerName.trim()}
-                className="w-full h-12 text-base"
-                size="lg"
-              >
-                <User className="w-5 h-5 mr-2" />
-                Kaydet
-              </Button>
-              <p className="text-xs text-center text-muted-foreground">
-                Devam ederek kullanım şartlarını kabul etmiş olursunuz
-              </p>
-            </CardContent>
-          </Card>
+          <div className="min-h-screen flex items-center justify-center p-4">
+            <Card className="border-primary shadow-lg w-full max-w-md">
+              <CardHeader className="text-center p-6 sm:p-8 space-y-4">
+                <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg">
+                  <Crown className="w-10 h-10 text-primary-foreground" />
+                </div>
+                <div className="space-y-2">
+                  <CardTitle className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                    Hoş Geldiniz
+                  </CardTitle>
+                  <CardDescription className="text-base">
+                    Satranç dünyasına adım atmak için adınızı girin
+                  </CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4 p-6 sm:p-8 pt-0">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Oyuncu Adı</label>
+                  <Input
+                    placeholder="Adınızı girin"
+                    value={playerName}
+                    onChange={(e) => setPlayerName(e.target.value)}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" && handleSetPlayerName()
+                    }
+                    className="text-center text-lg h-12"
+                    autoFocus
+                  />
+                </div>
+                <Button
+                  onClick={handleSetPlayerName}
+                  disabled={!playerName.trim()}
+                  className="w-full h-12 text-base"
+                  size="lg"
+                >
+                  <User className="w-5 h-5 mr-2" />
+                  Kaydet
+                </Button>
+                <p className="text-xs text-center text-muted-foreground">
+                  Devam ederek kullanım şartlarını kabul etmiş olursunuz
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         ) : (
           <React.Fragment>
             <Card>

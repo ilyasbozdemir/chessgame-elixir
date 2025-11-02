@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = "mongodb://admin:secret@localhost:27017/chess";
+const MONGODB_URI = "mongodb://admin:secret@localhost:27017/chess_db";
 
 let cached = (global as any).mongoose;
 
@@ -19,7 +19,7 @@ export async function connectToDatabase() {
 
     cached.promise = mongoose
       .connect(MONGODB_URI, {
-        dbName: "chess",
+        dbName: "chess_db",
         bufferCommands: false,
         authSource: "admin",
       })

@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -29,7 +30,6 @@ interface DeleteTableDialogProps {
 export function DeleteTableDialog({ table }: DeleteTableDialogProps) {
   const { player, channel, setPlayer, loading, refresh } = usePlayer();
 
-  const currentTable = useChessStore((s) => s.currentTable);
   const deleteTable = useChessStore((s) => s.deleteTable);
 
   const handleDeleteTable = async (tableId: string) => {
@@ -71,13 +71,14 @@ export function DeleteTableDialog({ table }: DeleteTableDialogProps) {
 
         <div className="py-2">
           <p className="text-sm text-muted-foreground">
-            Silinecek masa:{" "}
-            <strong>{currentTable ? currentTable["name"] : ""}</strong>
+            Silinecek masa: <strong>{table ? table["name"] : ""}</strong>
           </p>
         </div>
 
         <DialogFooter>
-          <Button variant="outline">İptal</Button>
+          <DialogClose asChild>
+            <Button variant="outline">İptal</Button>
+          </DialogClose>
 
           <Button
             variant="destructive"

@@ -5,24 +5,22 @@ import { initializeBoard, isValidMove, movePiece } from "./chess-logic";
 import type { PlayerDoc } from "@/models/player";
 import type { TableDoc } from "@/models/table";
 import mongoose from "mongoose";
-import { PlayerService } from "@/services/players.service";
-import { TableService } from "@/services/tables.service";
 import { Logger } from "./utils";
 
 interface ChessStore {
-  // Player state
-  currentPlayer: PlayerDoc | null;
-
   tables: TableDoc[];
-  currentTable: TableDoc | null;
 
   // Game state
   gameState: GameState;
 
   // Actions
   addPlayer: (name: string, channel?: any) => void;
-  setCurrentPlayer: (player: PlayerDoc | null, channel?: any) => void;
-  setPlayerReady: (id: string, ready: boolean, channel?: any) => void;
+  setPlayerReady: (
+    table: TableDoc,
+    playerId: string,
+    ready: boolean,
+    channel?: any
+  ) => void;
   assignColors: (channel?: any) => void;
   startGame: (channel?: any) => void;
   selectPiece: (position: Position, channel?: any) => void;
@@ -35,17 +33,18 @@ interface ChessStore {
     channel?: any
   ) => Promise<string>;
 
-  deleteTable: (tableId: string, channel?: any) => Promise<void>;
+  deleteTable: (
+    tableId: string,
+    player: PlayerDoc,
+    channel?: any
+  ) => Promise<void>;
 
   joinTable: (tableId: string, player: PlayerDoc, channel?: any) => void;
-  leaveTable: (channel?: any) => void;
+  leaveTable: (table: TableDoc, player: PlayerDoc, channel?: any) => void;
 }
 
 export const useChessStore = create<ChessStore>((set, get) => ({
-  currentPlayer: null,
-
   tables: [],
-  currentTable: null,
 
   gameState: {
     board: initializeBoard(),
@@ -61,32 +60,20 @@ export const useChessStore = create<ChessStore>((set, get) => ({
   },
 
   addPlayer: async (name: string) => {
-    const playerService = new PlayerService();
-    const createdPlayer = await playerService.create(name);
-
-    // const { players } = get();
-
-    // set({ players: [...players, createdPlayer] });
-
-    set({ currentPlayer: createdPlayer });
+    //
   },
 
-  setCurrentPlayer: (player: PlayerDoc | null) => {
-    set({ currentPlayer: player });
-  },
-
-  setPlayerReady: (playerId: string, isReady: boolean) => {
-    const { currentTable } = get();
-    if (!currentTable || !currentTable.players) return;
+  setPlayerReady: (table: TableDoc, playerId: string, isReady: boolean) => {
+    if (!table || !table.players) return;
 
     // oyuncu listesini güncelle
-    const updatedPlayers = currentTable.players.map((p) =>
+    const updatedPlayers = table.players.map((p) =>
       p.id?.toString() === playerId ? { ...p, isReady } : p
     );
 
     // masayı güncelle
     const updatedTable = {
-      ...currentTable,
+      ...table,
       players: updatedPlayers,
     };
 
@@ -94,9 +81,8 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     set((state) => ({
       ...state,
       tables: state.tables.map((t) =>
-        t._id?.toString() === currentTable._id?.toString() ? updatedTable : t
+        t._id?.toString() === table._id?.toString() ? updatedTable : t
       ),
-      currentTable: updatedTable,
     }));
   },
 
@@ -129,7 +115,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
   },
 
   selectPiece: (position: Position) => {
-    const { gameState, /*players,*/ currentPlayer } = get();
+    const { gameState } = get();
     const { board, currentTurn } = gameState;
 
     const piece = board[position.row][position.col];
@@ -202,9 +188,6 @@ export const useChessStore = create<ChessStore>((set, get) => ({
 
   resetGame: () => {
     set({
-      //players: [],
-      currentPlayer: null,
-      currentTable: null,
       gameState: {
         board: initializeBoard(),
         currentTurn: "white",
@@ -225,82 +208,31 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     owner: PlayerDoc,
     channel?: any
   ): Promise<string> => {
-    const tableService = new TableService();
-
-    const logger = new Logger("Zustand-TableService");
-
-    logger.group("[Zustand: createTable]");
-
-    try {
-      logger.info("🧩 Masa oluşturma başlatıldı:", { name, owner });
-
-      // 🔹 API üzerinden masa oluştur
-      const createdTable = await tableService.create(name, owner);
-
-      logger.success("✅ API'den dönen masa:", createdTable);
-
-      // 🔹 MongoDB'den dönen gerçek ID kullanılsın
-      const tableId =
-        createdTable._id?.toString() ??
-        new mongoose.Types.ObjectId().toString();
-
-      // 🔹 Zustand state'ini güncelle
-      const newTable: TableDoc = {
-        _id: new mongoose.Types.ObjectId(tableId),
-        name: createdTable.name,
-        status: createdTable.status ?? "waiting",
-        createdAt: new Date(createdTable.createdAt ?? Date.now()),
-        ownerId: owner._id,
-        ownerName: owner.name,
-        players: createdTable.players ?? [],
-      };
-
-      set((state) => {
-        const exists = state.tables.some(
-          (t) => t._id?.toString() === newTable._id?.toString()
-        );
-        if (exists) return state;
-
-        return {
-          tables: [...state.tables, newTable],
-          currentTable: newTable,
-        };
-      });
-
-      channel?.push("table_created", { table: newTable });
-
-      logger.success("🧱 Zustand state güncellendi:", newTable);
-      logger.groupEnd();
-      return tableId;
-    } catch (error: any) {
-      logger.error("❌ Masa oluşturulamadı:", error.message);
-      logger.groupEnd();
-      throw error;
-    }
+    //TODO
+    return "";
   },
 
-  deleteTable: async (tableId: string, channel?: any): Promise<void> => {
-    const { tables, currentPlayer } = get();
+  deleteTable: async (
+    tableId: string,
+    player: PlayerDoc,
+    channel?: any
+  ): Promise<void> => {
+    const { tables } = get();
     const table = tables.find((t) => t._id?.toString() === tableId);
 
     if (!table) return;
 
     const logger = new Logger("Zustand-TableService-deleteTable");
 
-    logger.warn("currentPlayer", currentPlayer);
-    logger.warn("table.ownerId?.toString()", table.ownerId?.toString());
+    logger.log("table.ownerId?.toString()", table.ownerId?.toString());
 
-    if (table.ownerId?.toString() !== currentPlayer?._id?.toString()) {
+    if (table.ownerId?.toString() !== player?._id?.toString()) {
       console.warn("⛔ Silme yetkisi yok!");
       return;
     }
 
     set((state) => ({
       tables: state.tables.filter((t) => t._id?.toString() !== tableId),
-      currentTable:
-        state.currentTable?._id?.toString() === tableId
-          ? null
-          : state.currentTable,
     }));
   },
   joinTable: (tableId: string, player: PlayerDoc): void => {
@@ -329,37 +261,32 @@ export const useChessStore = create<ChessStore>((set, get) => ({
       players: [...normalizedPlayers, tablePlayer],
     };
 
-    // 🧱 state update
     set((state) => ({
       ...state,
       tables: state.tables.map((t) =>
         t._id?.toString() === tableId ? updatedTable : t
       ),
-      currentTable: updatedTable,
       currentPlayer: player,
     }));
   },
 
-  leaveTable: () => {
-    const { currentPlayer, currentTable } = get();
-    if (!currentTable || !currentPlayer) return;
+  leaveTable: (table: TableDoc, player: PlayerDoc, channel?: any) => {
+    if (!table || !player) return;
 
-    const updatedPlayers = (currentTable.players ?? []).filter(
-      (p) => p.id?.toString() !== currentPlayer._id?.toString()
+    const updatedPlayers = (table.players ?? []).filter(
+      (p) => p.id?.toString() !== player._id?.toString()
     );
 
     const updatedTable = {
-      ...currentTable,
+      ...table,
       players: updatedPlayers,
     };
 
     set((state) => ({
       ...state,
       tables: state.tables.map((t) =>
-        t._id?.toString() === currentTable._id?.toString() ? updatedTable : t
+        t._id?.toString() === table._id?.toString() ? updatedTable : t
       ),
-      currentTable: null,
-      players: [],
     }));
   },
 }));
