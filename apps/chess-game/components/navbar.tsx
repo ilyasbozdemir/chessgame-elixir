@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Crown, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { PlayerProfileDialog } from "@/app/lobby/components/dialogs/player-profile-dialog";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -14,7 +15,6 @@ export function Navbar() {
     { href: "/", label: "Ana Sayfa" },
     { href: "/lobby", label: "Lobi" },
     { href: "/how-to-play", label: "Nasıl Oynanır" },
-    //{ href: "/game", label: "Oyun" },
   ];
 
   return (
@@ -44,6 +44,8 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+
+            <PlayerProfileDialog />
           </div>
 
           <Button
@@ -76,6 +78,7 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <PlayerProfileDialog />
           </div>
         )}
       </div>

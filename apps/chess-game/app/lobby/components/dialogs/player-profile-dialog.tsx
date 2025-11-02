@@ -49,6 +49,7 @@ export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
     logger.info("🟢 handleSetPlayerName çağrıldı.");
 
     await addPlayer(playerName);
+    setPlayerName("");
     logger.success("✅ Oyuncu eklendi:", playerName);
 
     await refresh();

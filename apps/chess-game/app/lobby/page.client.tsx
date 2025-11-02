@@ -1,30 +1,21 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useChessStore } from "@/lib/chess-store";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Crown, PlayCircle, Trophy, User, Users, X } from "lucide-react";
+
+import { PlayCircle, Trophy, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { usePlayer } from "@/context/player-context";
 
 import { joinTable as joinTableDB } from "@/app/actions/db/table";
-import { Logger } from "@/lib/utils";
 import { RealtimeListener } from "@/components/realtime-listener";
 import { useTableButtonResolver } from "@/hooks/get-table-button-state";
-import { PlayerProfileDialog } from "./components/dialogs/player-profile-dialog";
 import { CreateTableDialog } from "./components/dialogs/create-table-dialog";
 import { DeleteTableDialog } from "./components/dialogs/delete-table-dialog";
 import { TableList } from "./components/tables/table-list";
 import { StatsWrapper } from "./components/stats/stat-wrapper";
+import { PlayerProfileDialog } from "./components/dialogs/player-profile-dialog";
 
 interface PageClientProps {
   //
@@ -35,10 +26,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
   const router = useRouter();
 
-  const [playerName, setPlayerName] = useState("");
-
   const tables = useChessStore((s) => s.tables);
-  const addPlayer = useChessStore((s) => s.addPlayer);
   const joinTable = useChessStore((s) => s.joinTable);
   const sortedTables = useMemo(() => {
     if (!Array.isArray(tables)) return [];
@@ -60,34 +48,18 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     [sortedTables]
   );
 
-  const handleSetPlayerName = async () => {
-    const logger = new Logger("ChessGame-LOBBY");
-
-    logger.group("👤 [Player Setup]");
-    logger.info("🟢 handleSetPlayerName çağrıldı.");
-
-    await addPlayer(playerName);
-    logger.success("✅ Oyuncu eklendi:", playerName);
-
-    await refresh();
-    logger.info("🌐 refresh() tamamlandı.");
-    logger.groupEnd();
-  };
-
-  const handleJoinTable = async (tableId: string) => {
-    if (player) {
-      joinTable(tableId, player);
-      await joinTableDB(tableId, {
-        id: player._id!.toString(),
-        name: player.name,
-      });
-      console.log("🎮 Oyuncu masaya eklendi:", player.name);
-    }
-  };
-
   const resolveTableButton = useTableButtonResolver(player, {
     onPreview: (id) => console.log("Masa önizlemesi:", id),
-    onJoin: handleJoinTable,
+    onJoin: async (tableId: string) => {
+      if (player) {
+        joinTable(tableId, player);
+        await joinTableDB(tableId, {
+          id: player._id!.toString(),
+          name: player.name,
+        });
+        console.log("🎮 Oyuncu masaya eklendi:", player.name);
+      }
+    },
     onGoToTable: (id) => router.push(`/tables/${id}`),
     onWatch: (id) => router.push(`/spectate/${id}`),
   });
@@ -108,10 +80,30 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
           </div>
         </div>
 
-        {/* Alt açıklama */}
         <p className="mt-6 text-sm text-muted-foreground animate-pulse">
           Oyuncu bilgileri yükleniyor...
         </p>
+      </div>
+    );
+  }
+  if (!player) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
+        <div className="w-full max-w-md text-center space-y-6 p-8 rounded-2xl border border-border bg-card shadow-sm">
+          <div className="w-16 h-16 mx-auto rounded-full bg-accent flex items-center justify-center">
+            <Users className="w-8 h-8 text-accent-foreground" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold text-foreground">
+              Oyuncu Bilgisi Eksik
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Masaları görebilmek ve oyuna katılabilmek için önce bir oyuncu
+              ismi belirlemeniz gerekiyor.
+            </p>
+          </div>
+          <PlayerProfileDialog /> 
+        </div>
       </div>
     );
   }
@@ -149,84 +141,33 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
           ]}
         />
 
-        {!player ? (
-          <div className="min-h-screen flex items-center justify-center p-4">
-            <Card className="border-primary shadow-lg w-full max-w-md">
-              <CardHeader className="text-center p-6 sm:p-8 space-y-4">
-                <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg">
-                  <Crown className="w-10 h-10 text-primary-foreground" />
-                </div>
-                <div className="space-y-2">
-                  <CardTitle className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                    Hoş Geldiniz
-                  </CardTitle>
-                  <CardDescription className="text-base">
-                    Satranç dünyasına adım atmak için adınızı girin
-                  </CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4 p-6 sm:p-8 pt-0">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Oyuncu Adı</label>
-                  <Input
-                    placeholder="Adınızı girin"
-                    value={playerName}
-                    onChange={(e) => setPlayerName(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" && handleSetPlayerName()
-                    }
-                    className="text-center text-lg h-12"
-                    autoFocus
-                  />
-                </div>
-                <Button
-                  onClick={handleSetPlayerName}
-                  disabled={!playerName.trim()}
-                  className="w-full h-12 text-base"
-                  size="lg"
-                >
-                  <User className="w-5 h-5 mr-2" />
-                  Kaydet
-                </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  Devam ederek kullanım şartlarını kabul etmiş olursunuz
-                </p>
-              </CardContent>
-            </Card>
+        <React.Fragment>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Lobi</h2>
+            <CreateTableDialog />
           </div>
-        ) : (
-          <React.Fragment>
-            <Card>
-              <CardHeader className="p-4 sm:p-6">
-                <div className="flex items-center justify-between gap-4">
-                  <PlayerProfileDialog />
-                  <CreateTableDialog />
-                </div>
-              </CardHeader>
-            </Card>
 
-            <div className="container mx-auto px-4 py-8">
-              <TableList
-                title="Bekleyen Masalar"
-                items={waitingTables}
-                badgeLabel={`${waitingTables.length} Masa`}
-                resolve={resolveTableButton}
-                renderDelete={(table) =>
-                  table.ownerId === player?._id ? (
-                    <DeleteTableDialog table={table} />
-                  ) : null
-                }
-              />
+          <div className="container mx-auto px-4 py-8">
+            <TableList
+              title="Bekleyen Masalar"
+              items={waitingTables}
+              badgeLabel={`${waitingTables.length} Masa`}
+              resolve={resolveTableButton}
+              renderDelete={(table) =>
+                table.ownerId === player?._id ? (
+                  <DeleteTableDialog table={table} />
+                ) : null
+              }
+            />
 
-              <TableList
-                title="Devam Eden Oyunlar"
-                items={activeTables}
-                badgeLabel={`${activeTables.length} Oyun`}
-                resolve={resolveTableButton}
-              />
-            </div>
-          </React.Fragment>
-        )}
+            <TableList
+              title="Devam Eden Oyunlar"
+              items={activeTables}
+              badgeLabel={`${activeTables.length} Oyun`}
+              resolve={resolveTableButton}
+            />
+          </div>
+        </React.Fragment>
       </div>
     </div>
   );

@@ -4,7 +4,6 @@ import { initializeBoard, isValidMove, movePiece } from "./chess-logic";
 
 import type { PlayerDoc } from "@/models/player";
 import type { TableDoc } from "@/models/table";
-import mongoose from "mongoose";
 import { Logger } from "./utils";
 
 interface ChessStore {
