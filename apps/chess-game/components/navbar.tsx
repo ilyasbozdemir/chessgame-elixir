@@ -15,6 +15,8 @@ export function Navbar() {
     { href: "/", label: "Ana Sayfa" },
     { href: "/lobby", label: "Lobi" },
     { href: "/how-to-play", label: "Nasıl Oynanır" },
+    { href: "/tournament", label: "Turnuva (Beta)" },
+    { href: "/about", label: "Hakkında" },
   ];
 
   return (
