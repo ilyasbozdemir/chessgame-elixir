@@ -12,11 +12,11 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const links = [
-    { href: "/", label: "Ana Sayfa" },
     { href: "/lobby", label: "Lobi" },
     { href: "/how-to-play", label: "Nasıl Oynanır" },
     { href: "/tournament", label: "Turnuva (Beta)" },
     { href: "/about", label: "Hakkında" },
+    { href: "/leaderboard", label: "Lider Tablosu" },
   ];
 
   return (
