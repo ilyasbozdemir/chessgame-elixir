@@ -32,6 +32,7 @@ export type TableDoc = Omit<
   "players" | "_id" | "ownerId" | "ownerName"
 > & {
   _id?: Types.ObjectId | null;
+  name: string;
   ownerId?: Types.ObjectId | null;
   ownerName?: string | null;
   players?: {

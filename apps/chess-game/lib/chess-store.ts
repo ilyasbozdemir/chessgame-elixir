@@ -11,7 +11,6 @@ import { Logger } from "./utils";
 
 interface ChessStore {
   // Player state
-  //players: PlayerDoc[]; // bu stet içindir bunu da guncelleyeceğiz, mongdbye gecerken daha fazla guncellenecektir buralarda da ,
   currentPlayer: PlayerDoc | null;
 
   tables: TableDoc[];
@@ -35,17 +34,14 @@ interface ChessStore {
     owner: PlayerDoc,
     channel?: any
   ) => Promise<string>;
-  deleteTable: (
-    tableId: string,
-    player: PlayerDoc,
-    channel?: any
-  ) => Promise<void>;
+
+  deleteTable: (tableId: string, channel?: any) => Promise<void>;
+
   joinTable: (tableId: string, player: PlayerDoc, channel?: any) => void;
   leaveTable: (channel?: any) => void;
 }
 
 export const useChessStore = create<ChessStore>((set, get) => ({
-  players: [],
   currentPlayer: null,
 
   tables: [],
@@ -68,9 +64,9 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     const playerService = new PlayerService();
     const createdPlayer = await playerService.create(name);
 
-   // const { players } = get();
+    // const { players } = get();
 
-   // set({ players: [...players, createdPlayer] });
+    // set({ players: [...players, createdPlayer] });
 
     set({ currentPlayer: createdPlayer });
   },
@@ -105,14 +101,14 @@ export const useChessStore = create<ChessStore>((set, get) => ({
   },
 
   assignColors: () => {
-   // const { players } = get();
+    // const { players } = get();
     //if (players.length !== 2) return;
 
     const colors: ("white" | "black")[] =
       Math.random() > 0.5 ? ["white", "black"] : ["black", "white"];
 
     set((state) => ({
-     /* players: state.players.map((p, i) => ({
+      /* players: state.players.map((p, i) => ({
         ...p,
         color: colors[i],
       })),*/
@@ -283,15 +279,25 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     }
   },
 
-  deleteTable: async (
-    tableId: string,
-    player: PlayerDoc,
-    channel?: any
-  ): Promise<void> => {
-    //
-    //
-  },
+  deleteTable: async (tableId: string, channel?: any): Promise<void> => {
+    const { tables, currentPlayer } = get();
+    const table = tables.find((t) => t._id?.toString() === tableId);
 
+    if (!table) return;
+
+    if (table.ownerId?.toString() !== currentPlayer?._id?.toString()) {
+      console.warn("⛔ Silme yetkisi yok!");
+      return;
+    }
+
+    set((state) => ({
+      tables: state.tables.filter((t) => t._id?.toString() !== tableId),
+      currentTable:
+        state.currentTable?._id?.toString() === tableId
+          ? null
+          : state.currentTable,
+    }));
+  },
   joinTable: (tableId: string, player: PlayerDoc): void => {
     const { tables } = get();
 
