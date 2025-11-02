@@ -6,28 +6,35 @@ import type { Position } from "@/lib/chess-types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { RotateCcw } from "lucide-react";
+import { Eye, RotateCcw } from "lucide-react";
 
 interface ChessBoardProps {
   mode?: "play" | "spectate";
   tableId?: string;
+  gameId?: string;
 }
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
-  const {
-    gameState,
-    players,
-    currentPlayer,
-    selectPiece,
-    makeMove,
-    resetGame,
-  } = useChessStore();
+  const { gameState, currentPlayer, selectPiece, makeMove, resetGame } =
+    useChessStore();
   const { board, selectedPiece, validMoves, currentTurn, capturedPieces } =
     gameState;
 
-  const currentPlayerColor = players.find(
-    (p) => p.id === currentPlayer?.id
+  const tables = useChessStore((s) => s.tables);
+  const table = tables.find((t) => t._id?.toString() === tableId);
+
+  if (!table) {
+    return (
+      <div className="h-[70vh] flex items-center justify-center text-muted-foreground">
+        Masa bulunamadı veya yükleniyor...
+      </div>
+    );
+  }
+
+  const currentPlayerColor = table?.players.find(
+    (p) => p.id === currentPlayer?._id
   )?.color;
+
   const isMyTurn = currentPlayerColor === currentTurn;
 
   const handleSquareClick = (row: number, col: number) => {
@@ -52,7 +59,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
         return;
       }
 
-      // Geçersiz hamle - seçimi iptal et
       selectPiece(position);
       return;
     }
@@ -90,26 +96,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
         {mode === "spectate" && (
           <div className="col-span-full flex items-center justify-end text-muted-foreground text-sm mb-2">
             <div className="flex items-center gap-1 bg-muted/40 px-3 py-1 rounded-full">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                />
-              </svg>
+              <Eye className="w-4 h-4" />
+
               <span className="font-medium">1 izleyici</span>
             </div>
           </div>
@@ -119,7 +107,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
           <CardHeader className="p-3 sm:p-4 lg:p-6">
             <CardTitle className="flex items-center justify-between text-sm sm:text-base gap-2">
               <span className="truncate">
-                {players.find((p) => p.color === "white")?.name || "PlayWhite"}
+                {table?.players.find((p) => p.color === "white")?.name ||
+                  "PlayWhite"}
               </span>
               <Badge
                 variant={currentTurn === "white" ? "default" : "outline"}
@@ -205,15 +194,19 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
                 : `Sıra: ${currentTurn === "white" ? "⚪ Beyaz" : "⚫ Siyah"}`}
             </Badge>
 
-            <Button
-              onClick={resetGame}
-              variant="outline"
-              size="sm"
-              className="bg-transparent"
-            >
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Yeni Oyun
-            </Button>
+            {mode === "play" && (
+              <>
+                <Button
+                  onClick={resetGame}
+                  variant="outline"
+                  size="sm"
+                  className="bg-transparent"
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Yeni Oyun
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
@@ -221,7 +214,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
           <CardHeader className="p-3 sm:p-4 lg:p-6">
             <CardTitle className="flex items-center justify-between text-sm sm:text-base gap-2">
               <span className="truncate">
-                {players.find((p) => p.color === "black")?.name || "PlayBlack"}
+                {table?.players.find((p) => p.color === "black")?.name ||
+                  "PlayBlack"}
               </span>
               <Badge
                 variant={currentTurn === "black" ? "default" : "outline"}

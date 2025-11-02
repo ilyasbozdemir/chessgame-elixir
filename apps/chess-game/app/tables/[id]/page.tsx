@@ -2,12 +2,16 @@ import PageClient from "./page.client";
 
 interface PageProps {
   params: {
-    tableId: string;
+    id: string;
   };
 }
 
 export default async function Page({ params }: PageProps) {
-  const { tableId } = await params;
+  const { id } = await params;
 
-  return <PageClient tableId={tableId} />;
+  return (
+    <>
+      <PageClient id={id} />
+    </>
+  );
 }
