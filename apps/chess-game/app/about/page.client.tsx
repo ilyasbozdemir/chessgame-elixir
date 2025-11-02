@@ -44,7 +44,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
         <h2 className="text-2xl font-semibold">Yasal Bilgilendirme</h2>
 
         <p className="text-muted-foreground leading-relaxed">
-          Bu yazılım yalnızca **demo, eğitim ve kişisel kullanım** içindir.  
+          Bu yazılım yalnızca <b>demo, eğitim ve kişisel kullanım</b> içindir.
           <strong className="text-foreground">
             İzin alınmadan ticari amaçla kullanılamaz, satılamaz veya yeniden
             dağıtılamaz.
@@ -59,7 +59,8 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
         <p className="text-muted-foreground leading-relaxed">
           Proje ismi, marka kimliği ve yazılım bütünlüğü geliştirici tarafından
-          korunmaktadır. Ticari kullanım talebiniz varsa iletişime geçebilirsiniz.
+          korunmaktadır. Ticari kullanım talebiniz varsa iletişime
+          geçebilirsiniz.
         </p>
       </div>
 
