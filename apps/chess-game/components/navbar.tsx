@@ -14,7 +14,7 @@ export function Navbar() {
   const links = [
     { href: "/lobby", label: "Lobi" },
     { href: "/how-to-play", label: "Nasıl Oynanır" },
-    { href: "/tournament", label: "Turnuva (Beta)" },
+    { href: "/tournament", label: "Turnuva" },
     { href: "/about", label: "Hakkında" },
     { href: "/leaderboard", label: "Lider Tablosu" },
   ];

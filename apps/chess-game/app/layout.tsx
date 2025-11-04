@@ -1,6 +1,6 @@
-import type React from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import type React from "react";
 import "./globals.css";
 import { PlayerProvider } from "@/context/player-context";
 import ClientLayout from "./layout.client";

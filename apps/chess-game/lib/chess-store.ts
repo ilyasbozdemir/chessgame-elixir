@@ -6,7 +6,7 @@ import type { PlayerDoc } from "@/models/player";
 import type { TableDoc } from "@/models/table";
 import { Logger } from "./utils";
 
-interface ChessStore {
+export interface ChessStore {
   tables: TableDoc[];
 
   // Game state
@@ -43,7 +43,7 @@ interface ChessStore {
 }
 
 export const useChessStore = create<ChessStore>((set, get) => ({
-  tables: [],
+  tables:  get()?.tables ?? [], 
 
   gameState: {
     board: initializeBoard(),
