@@ -1,30 +1,22 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import type React from "react";
 import "./globals.css";
+import type { Metadata } from "next";
 import { PlayerProvider } from "@/context/player-context";
-import ClientLayout from "./layout.client";
-
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+import ClientLayout from "./(root)/layout.client";
 
 export const metadata: Metadata = {
   title: "Chess Game",
   description: "Play chess online against friends or AI.",
-  generator: "Next.js",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased`}>
-        <PlayerProvider>
-          <ClientLayout>{children}</ClientLayout>
-        </PlayerProvider>
+      <body className="font-sans antialiased">
+        <>{children}</>
       </body>
     </html>
   );

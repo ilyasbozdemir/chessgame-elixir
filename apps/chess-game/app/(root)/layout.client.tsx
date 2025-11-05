@@ -12,18 +12,17 @@ export default function ClientLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex flex-col">
-      <Navbar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <div className="min-h-screen flex flex-col">
+       <Navbar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex">
         {/* Sidebar */}
-        <AppSidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        />
+        <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
         {/* Page content */}
-        <main>{children}</main>
+        <main className="flex-1 lg:ml-64 p-4">
+          {children}
+        </main>
       </div>
     </div>
   );
