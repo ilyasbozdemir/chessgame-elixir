@@ -1,88 +1,45 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Crown, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { Crown, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PlayerProfileDialog } from "@/app/lobby/components/dialogs/player-profile-dialog";
 
-export function Navbar() {
-  const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+interface NavbarProps {
+  isOpen: boolean;
+  onClose?: () => void;
+}
 
-  const links = [
-    { href: "/lobby", label: "Lobi" },
-    { href: "/how-to-play", label: "Nasıl Oynanır" },
-    { href: "/tournament", label: "Turnuva" },
-    { href: "/about", label: "Hakkında" },
-    { href: "/leaderboard", label: "Lider Tablosu" },
-  ];
-
+export function Navbar({ isOpen, onClose }: NavbarProps) {
   return (
     <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14 sm:h-16">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-base sm:text-lg font-semibold"
-          >
-            <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-            <span className="hidden xs:inline">Satranç Oyunu</span>
-            <span className="xs:hidden">Satranç</span>
-          </Link>
-
-          <div className="hidden md:flex items-center gap-1">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  pathname === link.href
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-
-            <PlayerProfileDialog />
-          </div>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="lg:hidden"
+            >
               <Menu className="w-5 h-5" />
-            )}
-          </Button>
-        </div>
+            </Button>
 
-        {mobileMenuOpen && (
-          <div className="md:hidden py-3 space-y-1 border-t border-border">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`block px-4 py-2.5 rounded-lg transition-colors ${
-                  pathname === link.href
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <PlayerProfileDialog />
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-base sm:text-lg font-semibold"
+            >
+              <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+              <span className="hidden xs:inline">Satranç Oyunu</span>
+              <span className="xs:hidden">Satranç</span>
+            </Link>
           </div>
-        )}
+
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/login">Giriş Yap</Link>
+            </Button>
+          </div>
+        </div>
       </div>
     </nav>
   );

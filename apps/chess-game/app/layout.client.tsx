@@ -1,18 +1,30 @@
 "use client";
 
 import { Navbar } from "@/components/navbar";
-import React from "react";
+import { AppSidebar } from "@/components/app-sidebar";
+import React, { useState } from "react";
 
 export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <React.Fragment>
-      <Navbar />
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-      {children}
-    </React.Fragment>
+  return (
+    <div className="flex flex-col">
+      <Navbar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      <div className="flex">
+        {/* Sidebar */}
+        <AppSidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
+
+        {/* Page content */}
+        <main>{children}</main>
+      </div>
+    </div>
   );
 }
