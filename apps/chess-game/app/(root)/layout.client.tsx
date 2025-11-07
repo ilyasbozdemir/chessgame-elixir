@@ -3,6 +3,8 @@
 import { Navbar } from "@/components/navbar";
 import { AppSidebar } from "@/components/app-sidebar";
 import React, { useState } from "react";
+import { useBreakpointValue } from "@/hooks/use-breakpoint-value";
+import { PageContainer } from "@/components/page-container";
 
 export default function ClientLayout({
   children,
@@ -11,17 +13,36 @@ export default function ClientLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const sidebarWidth =
+    useBreakpointValue({
+      base: 0,
+      md: 200,
+      lg: 220,
+      xl: 250,
+    }) ?? 0;
+
   return (
     <div className="min-h-screen flex flex-col">
-       <Navbar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Navbar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex">
-        {/* Sidebar */}
-        <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div
+        className="flex"
+        style={{ ["--sidebar-width" as any]: `${sidebarWidth}px` }}
+      >
+        <AppSidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          width={sidebarWidth}
+        />
 
-        {/* Page content */}
-        <main className="flex-1 lg:ml-64 p-4">
+        <main
+          className="flex-1 p-4 transition-all"
+          style={{ marginLeft: "var(--sidebar-width)" }}
+        >
+          <PageContainer>
+
           {children}
+          </PageContainer>
         </main>
       </div>
     </div>

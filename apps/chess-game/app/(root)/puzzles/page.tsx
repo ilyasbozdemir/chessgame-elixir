@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Puzzle, Star, Trophy, Target, Zap, ArrowRight } from "lucide-react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Puzzle, Star, Trophy, Target, Zap, ArrowRight } from "lucide-react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const mockPuzzles = [
   {
@@ -62,34 +68,41 @@ const mockPuzzles = [
     category: "Endgame",
     description: "Lucena pozisyonu",
   },
-]
+];
 
 const difficultyColors = {
   Kolay: "bg-green-500/10 text-green-700 dark:text-green-400",
   Orta: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
   Zor: "bg-red-500/10 text-red-700 dark:text-red-400",
-}
+};
 
 export default function PuzzlesPage() {
-  const [filter, setFilter] = useState<string>("all")
-  const router = useRouter()
+  const [filter, setFilter] = useState<string>("all");
+  const router = useRouter();
 
-  const filteredPuzzles = filter === "all" ? mockPuzzles : mockPuzzles.filter((p) => p.difficulty === filter)
+  const filteredPuzzles =
+    filter === "all"
+      ? mockPuzzles
+      : mockPuzzles.filter((p) => p.difficulty === filter);
 
   const handleSolvePuzzle = (puzzleId: string) => {
-    router.push(`/puzzles/${puzzleId}`)
-  }
+    router.push(`/puzzles/${puzzleId}`);
+  };
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] p-3 sm:p-4 md:p-8 lg:ml-64">
+    <React.Fragment>
       <div className="max-w-6xl mx-auto space-y-6">
         <Card>
           <CardHeader className="text-center">
             <div className="flex items-center justify-center gap-3 mb-2">
               <Puzzle className="w-8 h-8 text-primary" />
-              <CardTitle className="text-3xl font-bold">Satranç Bulmacaları</CardTitle>
+              <CardTitle className="text-3xl font-bold">
+                Satranç Bulmacaları
+              </CardTitle>
             </div>
-            <CardDescription>Satranç becerilerinizi geliştirmek için bulmacaları çözün</CardDescription>
+            <CardDescription>
+              Satranç becerilerinizi geliştirmek için bulmacaları çözün
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -126,30 +139,57 @@ export default function PuzzlesPage() {
         </Card>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <Button variant={filter === "all" ? "default" : "outline"} size="sm" onClick={() => setFilter("all")}>
+          <Button
+            variant={filter === "all" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilter("all")}
+          >
             Tümü
           </Button>
-          <Button variant={filter === "Kolay" ? "default" : "outline"} size="sm" onClick={() => setFilter("Kolay")}>
+          <Button
+            variant={filter === "Kolay" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilter("Kolay")}
+          >
             Kolay
           </Button>
-          <Button variant={filter === "Orta" ? "default" : "outline"} size="sm" onClick={() => setFilter("Orta")}>
+          <Button
+            variant={filter === "Orta" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilter("Orta")}
+          >
             Orta
           </Button>
-          <Button variant={filter === "Zor" ? "default" : "outline"} size="sm" onClick={() => setFilter("Zor")}>
+          <Button
+            variant={filter === "Zor" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilter("Zor")}
+          >
             Zor
           </Button>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filteredPuzzles.map((puzzle) => (
-            <Card key={puzzle.id} className="hover:border-primary transition-colors">
+            <Card
+              key={puzzle.id}
+              className="hover:border-primary transition-colors"
+            >
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="space-y-1">
                     <h4 className="font-semibold">{puzzle.title}</h4>
-                    <p className="text-xs text-muted-foreground">{puzzle.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {puzzle.description}
+                    </p>
                   </div>
-                  <Badge className={difficultyColors[puzzle.difficulty as keyof typeof difficultyColors]}>
+                  <Badge
+                    className={
+                      difficultyColors[
+                        puzzle.difficulty as keyof typeof difficultyColors
+                      ]
+                    }
+                  >
                     {puzzle.difficulty}
                   </Badge>
                 </div>
@@ -169,7 +209,11 @@ export default function PuzzlesPage() {
                   {puzzle.category}
                 </Badge>
 
-                <Button className="w-full" size="sm" onClick={() => handleSolvePuzzle(puzzle.id)}>
+                <Button
+                  className="w-full"
+                  size="sm"
+                  onClick={() => handleSolvePuzzle(puzzle.id)}
+                >
                   <Puzzle className="w-4 h-4 mr-2" />
                   Çöz
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -179,6 +223,6 @@ export default function PuzzlesPage() {
           ))}
         </div>
       </div>
-    </div>
-  )
+    </React.Fragment>
+  );
 }

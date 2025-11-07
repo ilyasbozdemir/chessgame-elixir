@@ -38,6 +38,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-width: 0px;
 }
 
 .dark {
@@ -122,5 +123,23 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --sidebar-width: 200px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --sidebar-width: 220px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --sidebar-width: 250px;
   }
 }

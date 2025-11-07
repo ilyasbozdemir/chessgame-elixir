@@ -8,7 +8,7 @@ interface PageClientProps {
 
 const PageClient: React.FC<PageClientProps> = ({}) => {
   return (
-    <div className="container mx-auto px-4 py-16 max-w-3xl space-y-8">
+    <React.Fragment>
       <h1 className="text-4xl font-bold">Hakkında</h1>
 
       <p className="text-muted-foreground leading-relaxed">
@@ -76,7 +76,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       <p className="pt-6 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} – Eğitim & Deneyim Amaçlı Geliştirilmiştir
       </p>
-    </div>
+    </React.Fragment>
   );
 };
 

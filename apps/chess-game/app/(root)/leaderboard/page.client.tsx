@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Trophy, Medal, Crown, TrendingUp, TrendingDown } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import React from "react"
 
 const mockLeaderboard = [
   {
@@ -103,7 +104,7 @@ const getTrendIcon = (trend: string) => {
 
 export default function LeaderboardPage() {
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] p-3 sm:p-4 md:p-8 lg:ml-64">
+    <React.Fragment>
       <div className="max-w-6xl mx-auto space-y-6">
         <Card>
           <CardHeader className="text-center">
@@ -214,6 +215,6 @@ export default function LeaderboardPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </React.Fragment>
   )
 }

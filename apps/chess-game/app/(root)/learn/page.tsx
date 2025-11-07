@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { GraduationCap, BookOpen, Video, Award, ChevronRight } from "lucide-react"
+import React from "react"
 
 const learningCategories = [
   {
@@ -71,7 +72,7 @@ const recentLessons = [
 
 export default function LearnPage() {
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] p-3 sm:p-4 md:p-8 lg:ml-64">
+    <React.Fragment>
       <div className="max-w-6xl mx-auto space-y-6">
         <Card>
           <CardHeader className="text-center">
@@ -163,6 +164,6 @@ export default function LearnPage() {
           </div>
         </div>
       </div>
-    </div>
+    </React.Fragment>
   )
 }

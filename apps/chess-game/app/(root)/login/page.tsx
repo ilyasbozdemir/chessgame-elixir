@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
@@ -44,7 +44,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-primary/5">
+    <React.Fragment>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
@@ -126,6 +126,6 @@ export default function LoginPage() {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </React.Fragment>
   )
 }

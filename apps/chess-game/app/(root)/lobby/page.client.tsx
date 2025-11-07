@@ -66,7 +66,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+      <React.Fragment>
         <div className="w-80 p-6 rounded-2xl border border-border bg-card shadow-md animate-pulse">
           <div className="flex flex-col items-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-muted" />
@@ -83,7 +83,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
         <p className="mt-6 text-sm text-muted-foreground animate-pulse">
           Oyuncu bilgileri yükleniyor...
         </p>
-      </div>
+      </React.Fragment>
     );
   }
   if (!player) {
@@ -109,7 +109,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
+    <React.Fragment>
       <div className="w-full max-w-5xl space-y-6">
         <RealtimeListener channel={channel} />
         <StatsWrapper
@@ -169,7 +169,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
           </div>
         </React.Fragment>
       </div>
-    </div>
+    </React.Fragment>
   );
 };
 export default PageClient;
