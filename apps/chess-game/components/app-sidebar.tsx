@@ -16,6 +16,7 @@ import {
   HelpCircle,
   Info,
   Award,
+  MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBreakpointValue } from "@/hooks/use-breakpoint-value";
@@ -31,6 +32,7 @@ const sidebarItems = [
   { href: "/tournament", label: "Turnuvalar", icon: Trophy },
   { href: "/watch", label: "İzle", icon: Eye },
   { href: "/news", label: "Haberler", icon: Newspaper },
+    { href: "/chat", label: "Mesajlar", icon: MessageCircle },
   { href: "/social", label: "Sosyal", icon: Users },
   { href: "/leaderboard", label: "Liderlik Tablosu", icon: Award },
   { href: "/about", label: "Hakkında", icon: Info },

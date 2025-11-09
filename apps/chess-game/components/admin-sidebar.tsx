@@ -1,38 +1,59 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Crown, LayoutDashboard, Users, Gamepad2, Flag, Settings, LogOut, Home } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  Crown,
+  LayoutDashboard,
+  Users,
+  Gamepad2,
+  Flag,
+  Settings,
+  LogOut,
+  Home,
+  BookOpen,
+  FileText,
+  GraduationCap
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const adminNavItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/users", label: "Kullanıcılar", icon: Users },
   { href: "/admin/games", label: "Oyunlar", icon: Gamepad2 },
+  { href: "/admin/tournaments", label: "Turnuvalar", icon: Crown },
+  { href: "/admin/puzzles", label: "Bulmacalar", icon: BookOpen },
+  { href: "/admin/news", label: "Haberler", icon: FileText },
+  { href: "/admin/learn", label: "Öğrenme", icon: GraduationCap },
   { href: "/admin/reports", label: "Raporlar", icon: Flag },
   { href: "/admin/settings", label: "Ayarlar", icon: Settings },
-]
+];
 
 interface AdminSidebarProps {
-  isOpen: boolean
-  onClose?: () => void
+  isOpen: boolean;
+  onClose?: () => void;
 }
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <>
       {/* Backdrop for mobile */}
-      {isOpen && <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden" onClick={onClose} />}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
+          onClick={onClose}
+        />
+      )}
 
       {/* Sidebar */}
       <aside
         className={cn(
           "fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-card border-r border-border z-40 transition-transform duration-300 ease-in-out overflow-y-auto",
           isOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0",
+          "lg:translate-x-0"
         )}
       >
         <div className="flex flex-col h-full">
@@ -43,7 +64,9 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                 <Crown className="w-5 h-5 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-foreground truncate">Admin Panel</p>
+                <p className="font-semibold text-sm text-foreground truncate">
+                  Admin Panel
+                </p>
                 <p className="text-xs text-muted-foreground">Yönetici</p>
               </div>
             </div>
@@ -52,8 +75,8 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           {/* Navigation */}
           <nav className="flex-1 p-3 space-y-1">
             {adminNavItems.map((item) => {
-              const Icon = item.icon
-              const isActive = pathname === item.href
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
 
               return (
                 <Link
@@ -64,13 +87,13 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium",
                     isActive
                       ? "bg-primary text-primary-foreground"
-                      : "text-foreground hover:bg-accent hover:text-accent-foreground",
+                      : "text-foreground hover:bg-accent hover:text-accent-foreground"
                   )}
                 >
                   <Icon className="w-5 h-5 shrink-0" />
                   <span>{item.label}</span>
                 </Link>
-              )
+              );
             })}
           </nav>
 
@@ -100,5 +123,5 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         </div>
       </aside>
     </>
-  )
+  );
 }
