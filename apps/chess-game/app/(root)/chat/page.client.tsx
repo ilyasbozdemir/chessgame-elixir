@@ -390,7 +390,7 @@ export default function ChatPageClient() {
                         <div className="relative">
                           <Avatar>
                             <AvatarImage
-                              src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${conv.username}`}
+                              src={`https://ui-avatars.com/api/?name=Ilyas+Bozdemir&background=0D8ABC&color=fff`}
                             />
                             <AvatarFallback>
                               {conv.username.slice(0, 2).toUpperCase()}
@@ -446,7 +446,7 @@ export default function ChatPageClient() {
                   <div className="flex items-center gap-3">
                     <Avatar>
                       <AvatarImage
-                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedConversation}`}
+                        src={`https://ui-avatars.com/api/?name=Ilyas+Bozdemir&background=0D8ABC&color=fff`}
                       />
                       <AvatarFallback>
                         {selectedConversation.slice(0, 2).toUpperCase()}

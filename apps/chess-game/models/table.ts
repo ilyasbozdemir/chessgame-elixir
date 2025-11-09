@@ -20,7 +20,7 @@ const TableSchema = new Schema(
     ownerId: { type: Schema.Types.ObjectId, ref: "Player", required: false },
     ownerName: { type: String, required: false },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 export const Table = models.Table || mongoose.model("Table", TableSchema);

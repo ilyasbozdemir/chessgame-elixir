@@ -17,41 +17,56 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Crown, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AuthService } from "@/services/auth.service";
+import { Logger } from "@/lib/utils";
+
+const logger = new Logger("ChessGame-RegisterPage");
+
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     username: "",
+    displayName: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    try {
+      setLoading(true);
 
-    if (formData.password !== formData.confirmPassword) {
+      const auth = new AuthService();
+      const { user, token } = await auth.register({
+        name: formData.displayName,
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      logger.log("✅ Kayıt başarılı:", user, token);
+
+      router.push("/lobby");
+
       toast({
-        title: "Hata",
-        description: "Şifreler eşleşmiyor",
+        title: "Kayıt başarılı ✅",
+        description: "Hesabın oluşturuldu, yönlendiriliyorsun...",
+      });
+
+    } catch (err: any) {
+      toast({
+        title: "Kayıt başarısız ❌",
+        description: err.message ?? "Bilinmeyen hata",
         variant: "destructive",
       });
-      setIsLoading(false);
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    setTimeout(() => {
-      toast({
-        title: "Kayıt Başarılı",
-        description: "Hesabınız oluşturuldu. Giriş yapabilirsiniz.",
-      });
-      router.push("/login");
-      setIsLoading(false);
-    }, 1000);
   };
 
   return (
@@ -83,6 +98,21 @@ export default function RegisterPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleRegister} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="displayName">Görünen İsim</Label>
+              <Input
+                id="displayName"
+                type="text"
+                placeholder="Ad Soyad veya Takma İsim"
+                value={formData.displayName}
+                onChange={(e) =>
+                  setFormData({ ...formData, displayName: e.target.value })
+                }
+                className="pl-10"
+                required
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="username">Kullanıcı Adı</Label>
               <div className="relative">
@@ -169,8 +199,8 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Kayıt Yapılıyor..." : "Kayıt Ol"}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Kayıt Yapılıyor..." : "Kayıt Ol"}
             </Button>
 
             <div className="text-center text-sm">

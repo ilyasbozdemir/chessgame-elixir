@@ -1,21 +1,35 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
-import { Player } from "@/models/player";
+import { verifyToken } from "@/utils/jwt";
+import { User } from "@/models/user";
+import { Player, PlayerDoc } from "@/models/player";
 
 export async function GET(req: Request) {
   const cookie = req.headers.get("cookie") || "";
-  const match = cookie.match(/playerId=([^;]+)/);
-  const playerId = match ? decodeURIComponent(match[1]) : null;
+  const token = cookie.match(/token=([^;]+)/)?.[1];
 
-  if (!playerId) return NextResponse.json({ player: null });
+  if (!token) return NextResponse.json({ user: null, player: null });
+
+  const decoded = verifyToken<{ userId: string }>(token);
+  if (!decoded) return NextResponse.json({ user: null, player: null });
 
   await connectToDatabase();
 
   try {
-    const player = await Player.findById(playerId).lean();
-    return NextResponse.json({ player: player ?? null });
+    const user = await User.findById(decoded.userId)
+    if (!user) return NextResponse.json({ user: null, player: null });
+
+   const player = await Player.findOne({ userId: user._id }).lean<PlayerDoc>().exec();
+
+    return NextResponse.json({
+      user,
+      player: player ?? null,
+    });
   } catch (err: any) {
     console.error("❌ /api/me error:", err.message);
-    return NextResponse.json({ player: null }, { status: 500 });
+    return NextResponse.json(
+      { user: null, player: null },
+      { status: 500 }
+    );
   }
 }

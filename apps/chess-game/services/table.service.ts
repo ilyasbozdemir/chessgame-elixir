@@ -15,7 +15,7 @@ export class TableService {
 
     const data = {
       id: Math.random().toString(36).substring(2, 9),
-      name: name.trim(),
+      name: name,
       ownerId: owner._id?.toString() || "",
       ownerName: owner.name,
       maxPlayers: 2,

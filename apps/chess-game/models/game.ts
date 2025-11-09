@@ -3,9 +3,9 @@ import { Schema, model, Types, models } from "mongoose";
 const MoveSchema = new Schema(
   {
     from: { type: String, required: true }, // "e2"
-    to: { type: String, required: true },   // "e4"
+    to: { type: String, required: true }, // "e4"
     piece: { type: String, required: true }, // "pawn", "knight" vs
-    fen: { type: String, required: true },   // position after move
+    fen: { type: String, required: true }, // position after move
     playedAt: { type: Date, default: Date.now },
   },
   { _id: false }
@@ -37,7 +37,10 @@ const GameSchema = new Schema(
     startedAt: { type: Date, default: Date.now },
     finishedAt: { type: Date, default: null },
   },
-  { versionKey: false }
+  {
+    versionKey: false,
+    timestamps: true,
+  }
 );
 
 export const Game = models.Game || model("Game", GameSchema);

@@ -14,5 +14,8 @@ export const TablePlayerSchema = new Schema(
     color: { type: String, enum: ["white", "black", null], default: null },
     isReady: { type: Boolean, default: false },
   },
-  { _id: false } // her oyuncuya ekstra _id verme
+  { _id: false,
+    versionKey: false ,timestamps: true
+
+   } // her oyuncuya ekstra _id verme
 );

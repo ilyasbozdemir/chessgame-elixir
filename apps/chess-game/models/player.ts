@@ -6,8 +6,6 @@ const PlayerSchema = new Schema(
 
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
 
-    name: { type: String, required: true },
-    email: { type: String, required: true },
     color: {
       type: String,
       enum: ["white", "black", null],
@@ -15,7 +13,7 @@ const PlayerSchema = new Schema(
     },
     createdAt: { type: Date, default: Date.now },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 export const Player = models.Player || mongoose.model("Player", PlayerSchema);

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Crown,
   Gamepad2,
@@ -19,20 +19,25 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useBreakpointValue } from "@/hooks/use-breakpoint-value";
-import { Button } from "./ui/button";
 import { usePlayer } from "@/context/player-context";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const sidebarItems = [
   { href: "/", label: "Ana Sayfa", icon: Home },
   { href: "/lobby", label: "Oyna", icon: Gamepad2 },
+  { href: "/watch", label: "İzle", icon: Eye },
+  { href: "/chat", label: "Mesajlar", icon: MessageCircle },
   { href: "/puzzles", label: "Bulmacalar", icon: Puzzle },
   { href: "/learn", label: "Öğren", icon: GraduationCap },
   { href: "/how-to-play", label: "Nasıl Oynanır?", icon: HelpCircle },
   { href: "/tournament", label: "Turnuvalar", icon: Trophy },
-  { href: "/watch", label: "İzle", icon: Eye },
   { href: "/news", label: "Haberler", icon: Newspaper },
-    { href: "/chat", label: "Mesajlar", icon: MessageCircle },
   { href: "/social", label: "Sosyal", icon: Users },
   { href: "/leaderboard", label: "Liderlik Tablosu", icon: Award },
   { href: "/about", label: "Hakkında", icon: Info },
@@ -45,9 +50,10 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ isOpen, onClose, width }: AppSidebarProps) {
-  const { player, logout } = usePlayer();
+  const { user, logout } = usePlayer();
 
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <>
@@ -72,27 +78,49 @@ export function AppSidebar({ isOpen, onClose, width }: AppSidebarProps) {
           {/* User section */}
           <div className="p-4 border-b border-sidebar-border">
             <div className="flex items-center gap-3">
-              {player ? (
+              {user ? (
                 <div className="p-4 border-b border-sidebar-border">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      {player.name?.[0]?.toUpperCase() ?? "?"}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-sidebar-foreground truncate">
-                        {player.name}
-                      </p>
-                      <p className="text-xs text-sidebar-foreground/60 truncate">
-                        {player.email}
-                      </p>
-                    </div>
-                    <button
-                      onClick={logout}
-                      className="text-xs text-red-500 hover:underline"
-                    >
-                      Çıkış
-                    </button>
-                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="flex flex-col items-center text-center gap-2 w-full focus:outline-none">
+                        <Avatar>
+                          <AvatarImage
+                            src={`https://ui-avatars.com/api/?name=Ilyas+Bozdemir&background=0D8ABC&color=fff`}
+                          />
+                          <AvatarFallback>
+                            {user.username.slice(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-semibold text-sm text-sidebar-foreground truncate">
+                            {user.displayName}
+                          </p>
+                          <p className="text-xs text-sidebar-foreground/60 truncate">
+                            {user.email}
+                          </p>
+                        </div>
+                      </button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent className="w-40">
+                      <DropdownMenuItem
+                        onClick={() => router.push(`/profile/${user.username}`)}
+                      >
+                        Profil
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/settings")}
+                      >
+                        Ayarlar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={logout}
+                        className="text-red-500"
+                      >
+                        Çıkış
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               ) : (
                 <div className="p-4 border-b border-sidebar-border">

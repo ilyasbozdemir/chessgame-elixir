@@ -1,3 +1,6 @@
+# burası dinamik kanal vs desteği alıcak sornaki sürümlerde
+
+
 defmodule ChessRealtimeServerWeb.ChessChannel do
   use Phoenix.Channel
   alias ChessRealtimeServerWeb.Presence

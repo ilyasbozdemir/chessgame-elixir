@@ -23,7 +23,15 @@ interface PageClientProps {
 }
 
 const PageClient: React.FC<PageClientProps> = ({}) => {
-  const { player, channel, loading, presenceCount, refresh } = usePlayer();
+  const {
+    user,
+    player,
+
+    channel,
+    loading,
+    presenceCount,
+    refresh,
+  } = usePlayer();
 
   const router = useRouter();
 
@@ -52,13 +60,13 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   const resolveTableButton = useTableButtonResolver(player, {
     onPreview: (id) => console.log("Masa önizlemesi:", id),
     onJoin: async (tableId: string) => {
-      if (player) {
+      if (player && user) {
         joinTable(tableId, player);
         await joinTableDB(tableId, {
           id: player._id!.toString(),
-          name: player.name,
+          name: user?.displayName || "Anonim",
         });
-        console.log("🎮 Oyuncu masaya eklendi:", player.name);
+        console.log("🎮 Oyuncu masaya eklendi:", user?.displayName);
       }
     },
     onGoToTable: (id) => router.push(`/tables/${id}`),

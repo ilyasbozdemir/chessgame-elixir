@@ -1,7 +1,6 @@
 // services/players.service.ts
 import { useChessStore } from "@/lib/chess-store";
 import { Logger } from "@/lib/utils";
-import { PlayerDoc } from "@/models/player";
 
 const isBrowser = typeof window !== "undefined";
 
@@ -13,59 +12,56 @@ export class AuthService {
     this.socketChannel = channel;
   }
 
-  async register(name: string) {
-    this.logger.info("🔐 register() çağrıldı:", name);
+  async register(data: {
+    name: string;
+    username: string;
+    email: string;
+    password: string;
+  }) {
+    this.logger.info("🔐 register() çağrıldı:", data.username);
 
     const res = await fetch("/api/register", {
       method: "POST",
-      body: JSON.stringify({ name }),
+      body: JSON.stringify(data),
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
     });
 
-    if (!res.ok) {
-      throw new Error("Kayıt başarısız");
-    }
+    if (!res.ok) throw new Error("Kayıt başarısız");
 
-    const player = await res.json();
-    this.logger.success("✅ Kayıt başarılı:", player);
+    const result: { user: any; token: string } = await res.json();
 
-    // Phoenix'e haber ver
-    this.socketChannel?.push("player:registered", player);
+    this.logger.success("✅ Kayıt başarılı:", result.user);
 
-    return player;
+    return result;
   }
 
-  async login(name: string) {
-    this.logger.info("🔐 login() çağrıldı:", name);
+  async login(email: string, password: string) {
+    this.logger.info("🔐 login() çağrıldı:", email);
 
     const res = await fetch("/api/login", {
       method: "POST",
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ email, password }),
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
     });
 
     if (!res.ok) {
       throw new Error("Giriş başarısız");
     }
 
-    const player = await res.json();
-    this.logger.success("✅ Giriş başarılı:", player);
+    const data = await res.json();
 
-    // Phoenix'e haber ver
-    this.socketChannel?.push("player:logged_in", player);
+    this.logger.success("✅ Giriş başarılı:", data.user);
 
-    return player;
+    this.socketChannel?.push("user:logged_in", data.user);
+
+    return data;
   }
-
   async logout() {
     this.logger.info("🔐 logout() çağrıldı");
 
-    await fetch("/api/logout", { method: "POST", credentials: "include" });
+    await fetch("/api/logout", { method: "POST" });
 
-    // Phoenix'e haber ver
-    this.socketChannel?.push("player:logged_out", {});
+    this.socketChannel?.push("user:logged_out", {});
 
     this.logger.success("✅ Çıkış başarılı");
   }

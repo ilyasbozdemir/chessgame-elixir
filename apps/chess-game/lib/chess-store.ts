@@ -225,7 +225,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
 
     const tablePlayer = {
       id: player._id ?? null,
-      name: player.name,
+      name: "player.name",
       color: player.color,
       isReady: false,
     };

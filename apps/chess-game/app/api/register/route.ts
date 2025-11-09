@@ -1,74 +1,91 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
+import { User } from "@/models/user";
 import { Player } from "@/models/player";
 import { Table } from "@/models/table";
+import { hashPassword } from "@/utils/password";
+import { Logger } from "@/lib/utils";
+import { signToken } from "@/utils/jwt";
+
+const logger = new Logger("ChessGame-register-api-route");
 
 export async function POST(req: Request) {
-  const { name } = await req.json();
+  const body = await req.json();
+
+  console.log("📩 /api/register body:", body);
+
+  const { name, username, email, password } = body;
   await connectToDatabase();
 
-  let player: any = null;
+  // 1️⃣ Alan kontrolü
+  if (!name || !username || !email || !password) {
+    return NextResponse.json(
+      { error: "Eksik alanlar mevcut" },
+      { status: 400 }
+    );
+  }
 
   try {
-    if (player) {
-      const res = NextResponse.json(player, { status: 200 });
-      res.headers.append(
-        "Set-Cookie",
-        `userId=${player._id.toString()}; Path=/; HttpOnly; Max-Age=${
-          60 * 60 * 24 * 30
-        }; SameSite=Lax${
-          process.env.NODE_ENV === "production" ? "; Secure" : ""
-        }`
+    // 2️⃣ Email kontrolü
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      logger.warn("⚠️ REGISTER BLOCKED: email already exists:", email);
+      return NextResponse.json(
+        { error: "Bu e-posta zaten kayıtlı" },
+        { status: 400 }
       );
-      return res;
     }
 
-    // 🔹 Yeni oyuncu oluştur
+    // 3️⃣ Username kontrolü
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      logger.warn("⚠️ REGISTER BLOCKED: username already taken:", username);
+      return NextResponse.json(
+        { error: "Bu kullanıcı adı zaten alınmış" },
+        { status: 400 }
+      );
+    }
+
+    const passwordHash = await hashPassword(password);
+
+    const newUser = await User.create({
+      username,
+      displayName: name,
+      email,
+      passwordHash,
+    });
+
     const newPlayer = await Player.create({
-      name: name.trim(),
+      userId: newUser._id,
       color: null,
       createdAt: new Date(),
     });
 
-    const playerObj = JSON.parse(JSON.stringify(newPlayer));
-    const res = NextResponse.json(playerObj, { status: 201 });
+    const token = signToken({ userId: newUser._id });
+
+    const res = NextResponse.json(
+      {
+        success: true,
+        user: {
+          _id: newUser._id,
+          username: newUser.username,
+          email: newUser.email,
+        },
+        token,
+      },
+      { status: 201 }
+    );
+
     res.headers.append(
       "Set-Cookie",
-      `userId=${playerObj._id}; Path=/; HttpOnly; Max-Age=${
+      `token=${token}; Path=/; HttpOnly; Max-Age=${
         60 * 60 * 24 * 30
       }; SameSite=Lax${process.env.NODE_ENV === "production" ? "; Secure" : ""}`
     );
+
     return res;
   } catch (err: any) {
-    console.error("❌ /api/player error:", err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
-}
-
-export async function DELETE(req: Request) {
-  const { id } = await req.json();
-  await connectToDatabase();
-
-  try {
-    if (!id) {
-      return NextResponse.json({ error: "Geçersiz ID" }, { status: 400 });
-    }
-
-    const deleted = await Table.findByIdAndDelete(id);
-
-    if (!deleted) {
-      return NextResponse.json(
-        { error: "Masa bulunamadı veya zaten silinmiş." },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(
-      { success: true, message: "Masa başarıyla silindi." },
-      { status: 200 }
-    );
-  } catch (err: any) {
-    console.error("❌ /api/table DELETE hatası:", err.message);
+    console.error("❌ /api/register error:", err.message);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

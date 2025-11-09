@@ -3,17 +3,17 @@
 import { useChessStore } from "@/lib/chess-store";
 import { socket } from "@/lib/socket";
 import { PlayerDoc } from "@/models/player";
-import { TableDoc } from "@/models/table";
+import { UserDoc } from "@/models/user";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface PlayerContextType {
+  user: UserDoc | null;
   player: PlayerDoc | null;
   setPlayer: React.Dispatch<React.SetStateAction<PlayerDoc | null>>;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  isLoggedIn: boolean;
-  isGuest: boolean;
   loading: boolean;
+  isLoggedIn: boolean;
   channel: any;
   refresh: () => Promise<void>;
   presenceList?: string[];
@@ -21,6 +21,7 @@ interface PlayerContextType {
 }
 
 const PlayerContext = createContext<PlayerContextType>({
+  user: null,
   player: null,
   setPlayer: () => {},
   loading: true,
@@ -28,44 +29,45 @@ const PlayerContext = createContext<PlayerContextType>({
   logout: async () => {},
   refresh: async () => {},
   isLoggedIn: false,
-  isGuest: true,
   channel: null,
 });
 
 export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const [user, setUser] = useState<UserDoc | null>(null);
   const [player, setPlayer] = useState<PlayerDoc | null>(null);
   const [channel, setChannel] = useState<any>(null);
 
   const [presenceList, setPresenceList] = useState<string[]>([]);
   const [presenceCount, setPresenceCount] = useState(0);
-
   const [loading, setLoading] = useState(true);
 
-  const loadPlayer = async () => {
+  const loadUserAndPlayer = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/me", { credentials: "include" });
-      const data = await res.json();
-      setPlayer(data.player);
+
+      // 1️⃣ User bilgisini al
+      const resUser = await fetch("/api/me", { credentials: "include" });
+      const dataUser = await resUser.json();
+      setUser(dataUser.user ?? null);
+      setPlayer(dataUser.player ?? null);
+
+
+      if (!dataUser.user?._id) {
+        setPlayer(null);
+        return;
+      }
+
+
     } catch (err) {
-      console.error("❌ PlayerContext load error:", err);
+      console.error("❌ loadUserAndPlayer error:", err);
+      setUser(null);
       setPlayer(null);
     } finally {
       setLoading(false);
     }
   };
-
-  async function fetchTables() {
-    try {
-      const res = await fetch("/api/tables", { cache: "no-store" });
-      const data = await res.json();
-      useChessStore.setState({ tables: data });
-    } catch (err) {
-      console.error("❌ Masalar alınamadı:", err);
-    }
-  }
 
   const login = async (email: string, password: string) => {
     try {
@@ -78,7 +80,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (!res.ok) return false;
 
-      await loadPlayer(); // player state yenilensin
+      await loadUserAndPlayer();
       return true;
     } catch (err) {
       console.error("❌ Login error:", err);
@@ -95,23 +97,24 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (err) {
       console.error("❌ Logout error:", err);
     } finally {
+      setUser(null);
       setPlayer(null);
       socket.disconnect();
       setChannel(null);
     }
   };
 
-  const isLoggedIn = !!player;
-  const isGuest = !player;
+  const isLoggedIn = !!user;
 
   useEffect(() => {
-    loadPlayer();
-    fetchTables();
+    loadUserAndPlayer();
   }, []);
 
+  // 🔌 Socket bağlantısı player'a göre çalışacak (user değil!)
   useEffect(() => {
-    const name = player?.name || "Anonim";
-    const topic = player ? "game:lobby:players" : "game:lobby:guests";
+    if (!player) return;
+
+    const topic = "game:lobby:players";
 
     console.log("🌐 [Socket] Başlatılıyor:", topic, "-", name);
 
@@ -122,94 +125,27 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
       .receive("ok", (resp) => console.log("✅ Kanal bağlandı:", resp))
       .receive("error", (err) => console.error("❌ Kanal hatası:", err));
 
-    ch.push("update_player", { name });
-
-    ch.on("player_joined", (msg) => {
-      console.log("➕ Oyuncu katıldı:", msg.name);
-    });
-
-    ch.on("player_left", (msg) => console.log("🚪 Oyuncu ayrıldı:", msg.name));
-
     setChannel(ch);
 
     return () => {
-      console.log("🔌 [Socket] Kanal kapatılıyor:", topic);
+      console.log("🔌 Kanal kapatıldı");
       ch.leave();
       socket.disconnect();
       setChannel(null);
     };
   }, [player?._id]);
 
-  useEffect(() => {
-    if (!channel) return;
-
-    channel.on("table_created", (payload: any) => {
-      console.log("📡 Yeni masa geldi:", payload);
-
-      const table = payload.table ?? payload; // güvenli çözüm
-
-      useChessStore.setState((state: any) => {
-        const exists = state.tables.some(
-          (t: any) => t._id?.toString() === table._id?.toString()
-        );
-        if (exists) {
-          console.warn("⚠️ Masa zaten mevcut, eklenmedi:", table._id);
-          return state;
-        }
-
-        const updatedTables = [...state.tables, table];
-        console.log("✅ Zustand güncellendi:", updatedTables);
-
-        return { tables: updatedTables };
-      });
-    });
-
-    channel.on("presence_state", (state: any) => {
-      console.log("📦 Güncel state:", state);
-    });
-
-    channel.on("presence_count", (data: any) => {
-      console.log("👥 Toplam oyuncu:", data.count);
-    });
-
-    // 🔹 Başlangıç listesi
-    channel.on("presence_state", (state: Record<string, any>) => {
-      const playerNames = Object.keys(state);
-      setPresenceList(playerNames);
-      setPresenceCount(playerNames.length);
-    });
-
-    // 🔹 Giren-çıkan farkları
-    channel.on("presence_diff", (diff: Record<string, any>) => {
-      setPresenceList((prev) => {
-        const joined = Object.keys(diff.joins || {});
-        const left = Object.keys(diff.leaves || {});
-        let next = Array.from(new Set([...prev, ...joined]));
-        next = next.filter((p) => !left.includes(p));
-        setPresenceCount(next.length);
-
-        return next;
-      });
-    });
-
-    return () => {
-      channel.off("table_created");
-      channel.off("presence_state");
-      channel.off("presence_diff");
-    };
-  }, [channel]);
-
   return (
     <PlayerContext.Provider
       value={{
+        user,
         player,
         setPlayer,
         loading,
         login,
         logout,
-        refresh: loadPlayer,
+        refresh: loadUserAndPlayer,
         isLoggedIn,
-        isGuest,
         channel,
         presenceList,
         presenceCount,

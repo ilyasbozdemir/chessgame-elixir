@@ -185,7 +185,7 @@ export default function ProfilePageClient({ username }: { username: string }) {
           <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
             <Avatar className="w-24 h-24">
               <AvatarImage
-                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`}
+                src={`https://ui-avatars.com/api/?name=Ilyas+Bozdemir&background=0D8ABC&color=fff`}
               />
               {(player?.username ?? username ?? "??").slice(0, 2).toUpperCase()}
             </Avatar>
