@@ -1,7 +1,6 @@
-import "./globals.css";
 import type { Metadata } from "next";
-import { PlayerProvider } from "@/context/player-context";
-import ClientLayout from "./(root)/layout.client";
+
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Chess Game",

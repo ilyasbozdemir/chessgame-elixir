@@ -16,6 +16,8 @@ import { DeleteTableDialog } from "./components/dialogs/delete-table-dialog";
 import { TableList } from "./components/tables/table-list";
 import { StatsWrapper } from "./components/stats/stat-wrapper";
 import { PlayerProfileDialog } from "./components/dialogs/player-profile-dialog";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface PageClientProps {
   //
@@ -102,7 +104,10 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
               ismi belirlemeniz gerekiyor.
             </p>
           </div>
-          <PlayerProfileDialog /> 
+
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/login">Giriş Yap</Link>
+          </Button>
         </div>
       </div>
     );

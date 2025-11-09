@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Crown, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { GithubStarsButton } from "./github-stars-button";
 
 interface NavbarProps {
   isOpen: boolean;
@@ -35,9 +36,7 @@ export function Navbar({ isOpen, onClose }: NavbarProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/login">Giriş Yap</Link>
-            </Button>
+            <GithubStarsButton />
           </div>
         </div>
       </div>
