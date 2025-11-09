@@ -9,6 +9,10 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 interface PlayerContextType {
   player: PlayerDoc | null;
   setPlayer: React.Dispatch<React.SetStateAction<PlayerDoc | null>>;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
+  isLoggedIn: boolean;
+  isGuest: boolean;
   loading: boolean;
   channel: any;
   refresh: () => Promise<void>;
@@ -20,8 +24,12 @@ const PlayerContext = createContext<PlayerContextType>({
   player: null,
   setPlayer: () => {},
   loading: true,
-  channel: null,
+  login: async () => false,
+  logout: async () => {},
   refresh: async () => {},
+  isLoggedIn: false,
+  isGuest: true,
+  channel: null,
 });
 
 export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -58,6 +66,43 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("❌ Masalar alınamadı:", err);
     }
   }
+
+  const login = async (email: string, password: string) => {
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) return false;
+
+      await loadPlayer(); // player state yenilensin
+      return true;
+    } catch (err) {
+      console.error("❌ Login error:", err);
+      return false;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("❌ Logout error:", err);
+    } finally {
+      setPlayer(null);
+      socket.disconnect();
+      setChannel(null);
+    }
+  };
+
+  const isLoggedIn = !!player;
+  const isGuest = !player;
 
   useEffect(() => {
     loadPlayer();
@@ -160,7 +205,11 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
         player,
         setPlayer,
         loading,
+        login,
+        logout,
         refresh: loadPlayer,
+        isLoggedIn,
+        isGuest,
         channel,
         presenceList,
         presenceCount,

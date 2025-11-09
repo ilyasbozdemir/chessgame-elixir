@@ -59,8 +59,19 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <Crown className="w-8 h-8 text-primary" />
+            <div className="flex justify-center">
+              <Link
+                href="/"
+                className="flex items-center gap-2 text-lg font-semibold group"
+              >
+                <div className="p-2 rounded-full bg-primary/15 group-hover:bg-primary/25 transition">
+                  <Crown className="w-6 h-6 text-primary" />
+                </div>
+                <span className="tracking-tight">
+                  <span className="font-bold">Chess</span>
+                  <span className="text-primary font-bold">Game</span>
+                </span>
+              </Link>
             </div>
           </div>
           <div>

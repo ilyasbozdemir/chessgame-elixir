@@ -25,14 +25,20 @@ export function Navbar({ isOpen, onClose }: NavbarProps) {
               <Menu className="w-5 h-5" />
             </Button>
 
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-base sm:text-lg font-semibold"
-            >
-              <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-              <span className="hidden xs:inline">Satranç Oyunu</span>
-              <span className="xs:hidden">Satranç</span>
-            </Link>
+            <div className="flex justify-center">
+              <Link
+                href="/"
+                className="flex items-center gap-2 text-lg font-semibold group"
+              >
+                <div className="p-2 rounded-full bg-primary/15 ">
+                  <Crown className="w-6 h-6 text-primary" />
+                </div>
+                <span className="tracking-tight">
+                  <span className="font-bold">Chess</span>
+                  <span className="text-primary font-bold">Game</span>
+                </span>
+              </Link>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">

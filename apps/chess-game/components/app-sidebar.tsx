@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBreakpointValue } from "@/hooks/use-breakpoint-value";
+import { Button } from "./ui/button";
+import { usePlayer } from "@/context/player-context";
 
 const sidebarItems = [
   { href: "/", label: "Ana Sayfa", icon: Home },
@@ -41,6 +43,8 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ isOpen, onClose, width }: AppSidebarProps) {
+  const { player, logout } = usePlayer();
+
   const pathname = usePathname();
 
   return (
@@ -66,15 +70,47 @@ export function AppSidebar({ isOpen, onClose, width }: AppSidebarProps) {
           {/* User section */}
           <div className="p-4 border-b border-sidebar-border">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Crown className="w-5 h-5 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-sidebar-foreground truncate">
-                  Misafir
-                </p>
-                <p className="text-xs text-sidebar-foreground/60">Giriş Yap</p>
-              </div>
+              {player ? (
+                <div className="p-4 border-b border-sidebar-border">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      {player.name?.[0]?.toUpperCase() ?? "?"}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-sidebar-foreground truncate">
+                        {player.name}
+                      </p>
+                      <p className="text-xs text-sidebar-foreground/60 truncate">
+                        {player.email}
+                      </p>
+                    </div>
+                    <button
+                      onClick={logout}
+                      className="text-xs text-red-500 hover:underline"
+                    >
+                      Çıkış
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 border-b border-sidebar-border">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Crown className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-sidebar-foreground truncate">
+                        Misafir
+                      </p>
+                      <Link href="/login">
+                        <p className="text-xs text-sidebar-foreground/60">
+                          Giriş Yap
+                        </p>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
