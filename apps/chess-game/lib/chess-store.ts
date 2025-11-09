@@ -13,37 +13,24 @@ export interface ChessStore {
   gameState: GameState;
 
   // Actions
-  addPlayer: (name: string, channel?: any) => void;
-  setPlayerReady: (
-    table: TableDoc,
-    playerId: string,
-    ready: boolean,
-    channel?: any
-  ) => void;
-  assignColors: (channel?: any) => void;
-  startGame: (channel?: any) => void;
-  selectPiece: (position: Position, channel?: any) => void;
-  makeMove: (to: Position, channel?: any) => void;
-  resetGame: (channel?: any) => void;
 
-  createTable: (
-    name: string,
-    owner: PlayerDoc,
-    channel?: any
-  ) => Promise<string>;
+  setPlayerReady: (table: TableDoc, playerId: string, ready: boolean) => void;
+  assignColors: () => void;
+  startGame: () => void;
+  selectPiece: (position: Position) => void;
+  makeMove: (to: Position) => void;
+  resetGame: () => void;
 
-  deleteTable: (
-    tableId: string,
-    player: PlayerDoc,
-    channel?: any
-  ) => Promise<void>;
+  createTable: (name: string, owner: PlayerDoc) => Promise<string>;
 
-  joinTable: (tableId: string, player: PlayerDoc, channel?: any) => void;
-  leaveTable: (table: TableDoc, player: PlayerDoc, channel?: any) => void;
+  deleteTable: (tableId: string, player: PlayerDoc) => Promise<void>;
+
+  joinTable: (tableId: string, player: PlayerDoc) => void;
+  leaveTable: (table: TableDoc, player: PlayerDoc) => void;
 }
 
 export const useChessStore = create<ChessStore>((set, get) => ({
-  tables:  get()?.tables ?? [], 
+  tables: get()?.tables ?? [],
 
   gameState: {
     board: initializeBoard(),
@@ -56,10 +43,6 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     },
     gameStatus: "waiting",
     winner: null,
-  },
-
-  addPlayer: async (name: string) => {
-    //
   },
 
   setPlayerReady: (table: TableDoc, playerId: string, isReady: boolean) => {
@@ -202,20 +185,12 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     });
   },
 
-  createTable: async (
-    name: string,
-    owner: PlayerDoc,
-    channel?: any
-  ): Promise<string> => {
+  createTable: async (name: string, owner: PlayerDoc): Promise<string> => {
     //TODO
     return "";
   },
 
-  deleteTable: async (
-    tableId: string,
-    player: PlayerDoc,
-    channel?: any
-  ): Promise<void> => {
+  deleteTable: async (tableId: string, player: PlayerDoc): Promise<void> => {
     const { tables } = get();
     const table = tables.find((t) => t._id?.toString() === tableId);
 
@@ -269,7 +244,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     }));
   },
 
-  leaveTable: (table: TableDoc, player: PlayerDoc, channel?: any) => {
+  leaveTable: (table: TableDoc, player: PlayerDoc) => {
     if (!table || !player) return;
 
     const updatedPlayers = (table.players ?? []).filter(

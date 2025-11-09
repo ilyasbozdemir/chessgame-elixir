@@ -1,12 +1,16 @@
 // services/players.service.ts
 import { useChessStore } from "@/lib/chess-store";
+import { Logger } from "@/lib/utils";
 import { PlayerDoc } from "@/models/player";
 
 const isBrowser = typeof window !== "undefined";
 
 export class PlayerService {
-  constructor() {
-    //
+  private socketChannel?: any;
+  private logger = new Logger("ChessGame-PlayerService");
+
+  constructor(channel?: any) {
+    this.socketChannel = channel;
   }
 
   async fetchCurrent(): Promise<{ player: PlayerDoc | null }> {
@@ -44,9 +48,9 @@ export class PlayerService {
     console.log("✅ [Service] /api/player yanıtı:", data);
 
     if (isBrowser) {
-      useChessStore.getState()
+      // useChessStore.getState().addPlayer(name, this.socketChannel);
 
-      
+      this.socketChannel?.push("player:joined", { name });
     }
 
     return data;

@@ -40,7 +40,7 @@ export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
   >("main");
   const [editName, setEditName] = useState(player?.name ?? "");
 
-  const addPlayer = useChessStore((s) => s.addPlayer);
+  //const addPlayer = useChessStore((s) => s.addPlayer);
 
   const handleSetPlayerName = async () => {
     const logger = new Logger("ChessGame-LOBBY");
@@ -48,7 +48,7 @@ export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
     logger.group("👤 [Player Setup]");
     logger.info("🟢 handleSetPlayerName çağrıldı.");
 
-    await addPlayer(playerName);
+    //await addPlayer(playerName);
     setPlayerName("");
     logger.success("✅ Oyuncu eklendi:", playerName);
 

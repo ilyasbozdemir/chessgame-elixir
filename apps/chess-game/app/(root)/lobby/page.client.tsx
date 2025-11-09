@@ -15,7 +15,6 @@ import { CreateTableDialog } from "./components/dialogs/create-table-dialog";
 import { DeleteTableDialog } from "./components/dialogs/delete-table-dialog";
 import { TableList } from "./components/tables/table-list";
 import { StatsWrapper } from "./components/stats/stat-wrapper";
-import { PlayerProfileDialog } from "./components/dialogs/player-profile-dialog";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
