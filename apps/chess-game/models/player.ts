@@ -3,6 +3,9 @@ import mongoose, { Schema, models } from "mongoose";
 const PlayerSchema = new Schema(
   {
     _id: { type: Schema.Types.ObjectId, auto: true },
+
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+
     name: { type: String, required: true },
     email: { type: String, required: true },
     color: {
@@ -16,7 +19,6 @@ const PlayerSchema = new Schema(
 );
 
 export const Player = models.Player || mongoose.model("Player", PlayerSchema);
-
 
 export type PlayerDoc = mongoose.InferSchemaType<typeof PlayerSchema> & {
   color: "white" | "black" | null;
