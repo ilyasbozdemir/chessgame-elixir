@@ -51,7 +51,50 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
-const getPlayerData = (username: string) => ({
+
+export type PlayerStats = {
+  totalGames: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  winRate: number;
+  currentStreak: number;
+};
+
+export type RecentGame = {
+  id: number;
+  opponent: string;
+  result: "win" | "loss" | "draw";
+  moves: number;
+  date: string;
+  rating: string;
+};
+
+export type Achievement = {
+  id: number;
+  name: string;
+  icon:
+    | typeof Trophy
+    | typeof Target
+    | typeof Clock
+    | typeof Gamepad2
+    | typeof Crown;
+  earned: boolean;
+};
+
+export type PlayerData = {
+  username: string;
+  fullName: string;
+  rating: number;
+  country: string;
+  joined: string;
+  bio: string;
+  stats: PlayerStats;
+  recentGames: RecentGame[];
+  achievements: Achievement[];
+};
+
+const getPlayerData = (username: string): PlayerData => ({
   username: username,
   fullName: "Test User",
   rating: 1850,

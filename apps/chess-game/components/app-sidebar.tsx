@@ -17,6 +17,7 @@ import {
   Info,
   Award,
   MessageCircle,
+  Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePlayer } from "@/context/player-context";
