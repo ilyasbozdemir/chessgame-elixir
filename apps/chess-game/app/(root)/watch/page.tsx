@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Eye, Clock, Trophy } from "lucide-react"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import ChessBoard from "@/components/chess-board"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Eye, Clock, Trophy } from "lucide-react";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import ChessBoard from "@/components/chess-board";
 
 const mockLiveGames = [
   {
@@ -48,34 +54,42 @@ const mockLiveGames = [
     duration: "18:22",
     status: "playing" as const,
   },
-]
+];
 
 export default function WatchPage() {
-  const [selectedGame, setSelectedGame] = useState<string | null>(null)
+  const [selectedGame, setSelectedGame] = useState<string | null>(null);
 
   if (selectedGame) {
     return (
-      <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] lg:ml-64">
+      <React.Fragment>
         <div className="p-3 sm:p-4">
-          <Button variant="outline" onClick={() => setSelectedGame(null)} className="mb-4">
+          <Button
+            variant="outline"
+            onClick={() => setSelectedGame(null)}
+            className="mb-4"
+          >
             ← Geri Dön
           </Button>
         </div>
         <ChessBoard mode="spectate" tableId={selectedGame} />
-      </div>
-    )
+      </React.Fragment>
+    );
   }
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] p-3 sm:p-4 md:p-8 lg:ml-64">
+    <React.Fragment>
       <div className="max-w-6xl mx-auto space-y-6">
         <Card>
           <CardHeader className="text-center">
             <div className="flex items-center justify-center gap-3 mb-2">
               <Eye className="w-8 h-8 text-primary" />
-              <CardTitle className="text-3xl font-bold">Canlı Maçları İzle</CardTitle>
+              <CardTitle className="text-3xl font-bold">
+                Canlı Maçları İzle
+              </CardTitle>
             </div>
-            <CardDescription>Devam eden maçları gerçek zamanlı takip edin</CardDescription>
+            <CardDescription>
+              Devam eden maçları gerçek zamanlı takip edin
+            </CardDescription>
           </CardHeader>
         </Card>
 
@@ -102,7 +116,9 @@ export default function WatchPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Eye className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">{game.viewers} izleyici</span>
+                      <span className="text-sm font-medium">
+                        {game.viewers} izleyici
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock className="w-4 h-4" />
@@ -116,7 +132,9 @@ export default function WatchPage() {
                         <Badge variant="outline" className="text-xs">
                           ⚪
                         </Badge>
-                        <span className="font-semibold text-sm">{game.whitePlayer}</span>
+                        <span className="font-semibold text-sm">
+                          {game.whitePlayer}
+                        </span>
                       </div>
                       <Badge variant="secondary" className="text-xs">
                         {game.whiteRating}
@@ -124,7 +142,9 @@ export default function WatchPage() {
                     </div>
 
                     <div className="flex items-center justify-center">
-                      <span className="text-xs text-muted-foreground font-medium">VS</span>
+                      <span className="text-xs text-muted-foreground font-medium">
+                        VS
+                      </span>
                     </div>
 
                     <div className="flex items-center justify-between p-2 bg-muted/50 rounded">
@@ -132,7 +152,9 @@ export default function WatchPage() {
                         <Badge variant="outline" className="text-xs">
                           ⚫
                         </Badge>
-                        <span className="font-semibold text-sm">{game.blackPlayer}</span>
+                        <span className="font-semibold text-sm">
+                          {game.blackPlayer}
+                        </span>
                       </div>
                       <Badge variant="secondary" className="text-xs">
                         {game.blackRating}
@@ -150,6 +172,6 @@ export default function WatchPage() {
           </div>
         </div>
       </div>
-    </div>
-  )
+    </React.Fragment>
+  );
 }

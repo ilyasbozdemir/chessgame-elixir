@@ -1,16 +1,31 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Newspaper, Clock, TrendingUp, MessageCircle, Eye, Share2, BookmarkPlus } from "lucide-react"
-import { useState } from "react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Newspaper,
+  Clock,
+  TrendingUp,
+  MessageCircle,
+  Eye,
+  Share2,
+  BookmarkPlus,
+} from "lucide-react";
+import React, { useState } from "react";
 
 const mockNews = [
   {
     id: "news-1",
     title: "Dünya Satranç Şampiyonası Başlıyor",
-    excerpt: "2025 Dünya Satranç Şampiyonası yarın Dubai'de başlayacak. 16 ülkeden 32 oyuncu katılacak.",
+    excerpt:
+      "2025 Dünya Satranç Şampiyonası yarın Dubai'de başlayacak. 16 ülkeden 32 oyuncu katılacak.",
     content:
       "Dünyanın en prestijli satranç turnuvası olan Dünya Satranç Şampiyonası, Dubai'de düzenlenecek. Turnuvaya Türkiye'den 3 grandmaster katılacak. Toplam ödül havuzu 2 milyon dolar.",
     category: "Turnuva",
@@ -24,7 +39,8 @@ const mockNews = [
   {
     id: "news-2",
     title: "Yeni Açılış Stratejisi Keşfedildi",
-    excerpt: "Rus Grandmaster Petrov, İtalyan Oyunu'nda yeni bir varyant geliştirdi.",
+    excerpt:
+      "Rus Grandmaster Petrov, İtalyan Oyunu'nda yeni bir varyant geliştirdi.",
     content:
       "Grandmaster Petrov'un geliştirdiği yeni varyant, İtalyan Oyunu'nda beyaz için yeni imkanlar sunuyor. Strateji, 5. hamlede sürpriz bir fil fedası içeriyor.",
     category: "Strateji",
@@ -38,7 +54,8 @@ const mockNews = [
   {
     id: "news-3",
     title: "Türkiye Satranç Ligi Sonuçları",
-    excerpt: "Türkiye Satranç Ligi'nin 5. haftası tamamlandı. İstanbul takımı liderliğini sürdürüyor.",
+    excerpt:
+      "Türkiye Satranç Ligi'nin 5. haftası tamamlandı. İstanbul takımı liderliğini sürdürüyor.",
     content:
       "Türkiye Satranç Ligi'nde heyecan devam ediyor. İstanbul takımı 5. haftayı da galibiyetle kapattı ve liderliğini sürdürdü. Ankara takımı ikinci sırada yer alıyor.",
     category: "Yerel",
@@ -66,7 +83,8 @@ const mockNews = [
   {
     id: "news-5",
     title: "Genç Yetenek Grandmaster Oldu",
-    excerpt: "15 yaşındaki Zeynep Yılmaz, Türkiye'nin en genç kadın Grandmaster'ı oldu.",
+    excerpt:
+      "15 yaşındaki Zeynep Yılmaz, Türkiye'nin en genç kadın Grandmaster'ı oldu.",
     content:
       "Zeynep Yılmaz, 15 yaşında Grandmaster unvanını alarak Türkiye'nin en genç kadın Grandmaster'ı oldu. Zeynep, 8 yaşında satranca başlamış ve kısa sürede büyük başarılar elde etmiş.",
     category: "Başarı",
@@ -80,7 +98,8 @@ const mockNews = [
   {
     id: "news-6",
     title: "Online Satranç Turnuvası Duyurusu",
-    excerpt: "Gelecek hafta başlayacak online turnuvaya kayıtlar açıldı. Ödül havuzu 50.000 TL.",
+    excerpt:
+      "Gelecek hafta başlayacak online turnuvaya kayıtlar açıldı. Ödül havuzu 50.000 TL.",
     content:
       "Gelecek hafta başlayacak online satranç turnuvasına kayıtlar başladı. Turnuva 3 gün sürecek ve toplam ödül havuzu 50.000 TL. Tüm seviyelerden oyuncular katılabilir.",
     category: "Turnuva",
@@ -91,24 +110,39 @@ const mockNews = [
     trending: false,
     author: "Can Yıldız",
   },
-]
+];
 
-const categories = ["Tümü", "Turnuva", "Strateji", "Yerel", "Teknoloji", "Başarı"]
+const categories = [
+  "Tümü",
+  "Turnuva",
+  "Strateji",
+  "Yerel",
+  "Teknoloji",
+  "Başarı",
+];
 
 export default function NewsPage() {
-  const [selectedCategory, setSelectedCategory] = useState("Tümü")
-  const [selectedNews, setSelectedNews] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState("Tümü");
+  const [selectedNews, setSelectedNews] = useState<string | null>(null);
 
   const filteredNews =
-    selectedCategory === "Tümü" ? mockNews : mockNews.filter((news) => news.category === selectedCategory)
+    selectedCategory === "Tümü"
+      ? mockNews
+      : mockNews.filter((news) => news.category === selectedCategory);
 
-  const newsDetail = selectedNews ? mockNews.find((n) => n.id === selectedNews) : null
+  const newsDetail = selectedNews
+    ? mockNews.find((n) => n.id === selectedNews)
+    : null;
 
   if (newsDetail) {
     return (
-      <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] p-3 sm:p-4 md:p-8 lg:ml-64">
+      <React.Fragment>
         <div className="max-w-4xl mx-auto space-y-6">
-          <Button variant="ghost" onClick={() => setSelectedNews(null)} className="mb-4">
+          <Button
+            variant="ghost"
+            onClick={() => setSelectedNews(null)}
+            className="mb-4"
+          >
             ← Geri Dön
           </Button>
 
@@ -153,7 +187,9 @@ export default function NewsPage() {
 
               <div className="prose prose-sm max-w-none">
                 <p className="text-lg leading-relaxed">{newsDetail.content}</p>
-                <p className="text-base leading-relaxed mt-4">{newsDetail.excerpt}</p>
+                <p className="text-base leading-relaxed mt-4">
+                  {newsDetail.excerpt}
+                </p>
               </div>
 
               <div className="flex items-center gap-2 pt-4 border-t">
@@ -170,7 +206,9 @@ export default function NewsPage() {
               <div className="pt-4 border-t">
                 <div className="flex items-center gap-2 mb-4">
                   <MessageCircle className="w-5 h-5 text-muted-foreground" />
-                  <span className="font-semibold">{newsDetail.comments} Yorum</span>
+                  <span className="font-semibold">
+                    {newsDetail.comments} Yorum
+                  </span>
                 </div>
                 <div className="space-y-3">
                   <Card>
@@ -184,7 +222,9 @@ export default function NewsPage() {
                           <p className="text-sm text-muted-foreground mt-1">
                             Harika bir haber! Turnuvayı merakla bekliyorum.
                           </p>
-                          <p className="text-xs text-muted-foreground mt-2">1 saat önce</p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            1 saat önce
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -200,7 +240,9 @@ export default function NewsPage() {
                           <p className="text-sm text-muted-foreground mt-1">
                             Çok güzel bir gelişme. Başarılar dilerim.
                           </p>
-                          <p className="text-xs text-muted-foreground mt-2">3 saat önce</p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            3 saat önce
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -210,20 +252,24 @@ export default function NewsPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
-    )
+      </React.Fragment>
+    );
   }
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] p-3 sm:p-4 md:p-8 lg:ml-64">
+    <React.Fragment>
       <div className="max-w-6xl mx-auto space-y-6">
         <Card>
           <CardHeader className="text-center">
             <div className="flex items-center justify-center gap-3 mb-2">
               <Newspaper className="w-8 h-8 text-primary" />
-              <CardTitle className="text-3xl font-bold">Satranç Haberleri</CardTitle>
+              <CardTitle className="text-3xl font-bold">
+                Satranç Haberleri
+              </CardTitle>
             </div>
-            <CardDescription>Satranç dünyasından son haberler ve gelişmeler</CardDescription>
+            <CardDescription>
+              Satranç dünyasından son haberler ve gelişmeler
+            </CardDescription>
           </CardHeader>
         </Card>
 
@@ -248,7 +294,11 @@ export default function NewsPage() {
               onClick={() => setSelectedNews(news.id)}
             >
               <div className="relative">
-                <img src={news.image || "/placeholder.svg"} alt={news.title} className="w-full h-48 object-cover" />
+                <img
+                  src={news.image || "/placeholder.svg"}
+                  alt={news.title}
+                  className="w-full h-48 object-cover"
+                />
                 {news.trending && (
                   <Badge className="absolute top-3 right-3 bg-red-500">
                     <TrendingUp className="w-3 h-3 mr-1" />
@@ -272,8 +322,12 @@ export default function NewsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-semibold text-lg line-clamp-2">{news.title}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">{news.excerpt}</p>
+                  <h3 className="font-semibold text-lg line-clamp-2">
+                    {news.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {news.excerpt}
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -292,6 +346,6 @@ export default function NewsPage() {
           ))}
         </div>
       </div>
-    </div>
-  )
+    </React.Fragment>
+  );
 }

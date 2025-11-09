@@ -1,11 +1,27 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Users, UserPlus, MessageCircle, Heart, Share2, Trophy, Calendar, Crown } from "lucide-react"
-import Link from "next/link"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Users,
+  UserPlus,
+  MessageCircle,
+  Heart,
+  Share2,
+  Trophy,
+  Calendar,
+  Crown,
+} from "lucide-react";
+import Link from "next/link";
+import React from "react";
 
 const mockFriends = [
   {
@@ -35,7 +51,7 @@ const mockFriends = [
     status: "offline",
     gamesPlayed: 189,
   },
-]
+];
 
 const mockPosts = [
   {
@@ -45,7 +61,8 @@ const mockPosts = [
     avatar: "FS",
     rating: 2050,
     time: "2 saat önce",
-    content: "Bugün harika bir oyun oynadım! Mat in 3 ile kazandım. Satranç ne kadar güzel bir oyun 🎯",
+    content:
+      "Bugün harika bir oyun oynadım! Mat in 3 ile kazandım. Satranç ne kadar güzel bir oyun 🎯",
     likes: 45,
     comments: 12,
     shares: 3,
@@ -57,7 +74,8 @@ const mockPosts = [
     avatar: "AÇ",
     rating: 1650,
     time: "5 saat önce",
-    content: "Yeni açılış stratejisi öğreniyorum. İtalyan Oyunu gerçekten çok etkili! Tavsiye ederim.",
+    content:
+      "Yeni açılış stratejisi öğreniyorum. İtalyan Oyunu gerçekten çok etkili! Tavsiye ederim.",
     likes: 23,
     comments: 8,
     shares: 5,
@@ -74,7 +92,7 @@ const mockPosts = [
     comments: 34,
     shares: 12,
   },
-]
+];
 
 const upcomingTournaments = [
   {
@@ -91,11 +109,11 @@ const upcomingTournaments = [
     participants: 128,
     prize: "5000 Puan",
   },
-]
+];
 
 export default function SocialPage() {
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] p-3 sm:p-4 md:p-8 lg:ml-64">
+    <React.Fragment>
       <div className="max-w-6xl mx-auto space-y-6">
         <Card>
           <CardHeader className="text-center">
@@ -103,7 +121,9 @@ export default function SocialPage() {
               <Users className="w-8 h-8 text-primary" />
               <CardTitle className="text-3xl font-bold">Sosyal</CardTitle>
             </div>
-            <CardDescription>Arkadaşlarınızla bağlantı kurun ve topluluğa katılın</CardDescription>
+            <CardDescription>
+              Arkadaşlarınızla bağlantı kurun ve topluluğa katılın
+            </CardDescription>
           </CardHeader>
         </Card>
 
@@ -141,13 +161,18 @@ export default function SocialPage() {
                           </Link>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <Link href={`/profile/${post.username}`} className="hover:underline">
+                              <Link
+                                href={`/profile/${post.username}`}
+                                className="hover:underline"
+                              >
                                 <h4 className="font-semibold">{post.author}</h4>
                               </Link>
                               <Badge variant="outline" className="text-xs">
                                 {post.rating}
                               </Badge>
-                              <span className="text-xs text-muted-foreground">{post.time}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {post.time}
+                              </span>
                             </div>
                             <p className="text-sm mt-2">{post.content}</p>
                           </div>
@@ -186,21 +211,27 @@ export default function SocialPage() {
                       <div className="text-2xl">🏆</div>
                       <div>
                         <p className="text-sm font-semibold">İlk Zafer</p>
-                        <p className="text-xs text-muted-foreground">İlk oyununu kazan</p>
+                        <p className="text-xs text-muted-foreground">
+                          İlk oyununu kazan
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-muted/50 rounded">
                       <div className="text-2xl">⭐</div>
                       <div>
                         <p className="text-sm font-semibold">Seri Kazanan</p>
-                        <p className="text-xs text-muted-foreground">5 oyun üst üste kazan</p>
+                        <p className="text-xs text-muted-foreground">
+                          5 oyun üst üste kazan
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-muted/50 rounded opacity-50">
                       <div className="text-2xl">🎯</div>
                       <div>
                         <p className="text-sm font-semibold">Bulmaca Ustası</p>
-                        <p className="text-xs text-muted-foreground">100 bulmaca çöz</p>
+                        <p className="text-xs text-muted-foreground">
+                          100 bulmaca çöz
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -237,13 +268,16 @@ export default function SocialPage() {
                                 friend.status === "online"
                                   ? "bg-green-500"
                                   : friend.status === "playing"
-                                    ? "bg-yellow-500"
-                                    : "bg-gray-400"
+                                  ? "bg-yellow-500"
+                                  : "bg-gray-400"
                               }`}
                             />
                           </div>
                           <div className="space-y-1">
-                            <Link href={`/profile/${friend.username}`} className="hover:underline">
+                            <Link
+                              href={`/profile/${friend.username}`}
+                              className="hover:underline"
+                            >
                               <p className="font-semibold">{friend.name}</p>
                             </Link>
                             <div className="flex items-center justify-center gap-2">
@@ -251,10 +285,16 @@ export default function SocialPage() {
                                 {friend.rating}
                               </Badge>
                             </div>
-                            <p className="text-xs text-muted-foreground">{friend.gamesPlayed} oyun</p>
+                            <p className="text-xs text-muted-foreground">
+                              {friend.gamesPlayed} oyun
+                            </p>
                           </div>
                           <div className="flex gap-2 w-full">
-                            <Button size="sm" variant="outline" className="flex-1 bg-transparent">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1 bg-transparent"
+                            >
                               <MessageCircle className="w-4 h-4" />
                             </Button>
                             <Button size="sm" className="flex-1">
@@ -274,7 +314,9 @@ export default function SocialPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Yaklaşan Turnuvalar</CardTitle>
-                <CardDescription>Turnuvalara katılın ve ödüller kazanın</CardDescription>
+                <CardDescription>
+                  Turnuvalara katılın ve ödüller kazanın
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -285,7 +327,9 @@ export default function SocialPage() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <Crown className="w-5 h-5 text-primary" />
-                              <h3 className="font-semibold">{tournament.name}</h3>
+                              <h3 className="font-semibold">
+                                {tournament.name}
+                              </h3>
                             </div>
                             <div className="space-y-1 text-sm text-muted-foreground">
                               <div className="flex items-center gap-2">
@@ -313,6 +357,6 @@ export default function SocialPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
-  )
+    </React.Fragment>
+  );
 }

@@ -5,7 +5,7 @@ import { Trophy, CalendarDays, Users, MonitorPlay, Crown, Medal } from "lucide-r
 
 const PageClient: React.FC = () => {
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
+    <React.Fragment>
       <div className="text-center max-w-xl space-y-6">
         <div className="flex items-center justify-center gap-3 text-primary">
           <Trophy className="w-8 h-8" />
@@ -74,7 +74,7 @@ const PageClient: React.FC = () => {
           Geri bildirim & katkı → GitHub: @ilyasbozdemir
         </p>
       </div>
-    </div>
+    </React.Fragment>
   );
 };
 
