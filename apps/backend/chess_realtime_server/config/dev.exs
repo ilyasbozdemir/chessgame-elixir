@@ -5,7 +5,7 @@ config :chess_realtime_server, ChessRealtimeServer.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "chess_realtime_server_dev",
+  database: "chess_game",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = "mongodb://admin:secret@localhost:27017/chess_db";
+const MONGODB_URI =
+  process.env.MONGO_URL || "mongodb://admin:secret@localhost:27017/chess_db";
 
 let cached = (global as any).mongoose;
 
