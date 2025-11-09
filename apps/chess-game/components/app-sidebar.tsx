@@ -57,7 +57,6 @@ export function AppSidebar({ isOpen, onClose, width }: AppSidebarProps) {
 
   return (
     <>
-      {/* Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
@@ -74,74 +73,66 @@ export function AppSidebar({ isOpen, onClose, width }: AppSidebarProps) {
           "lg:translate-x-0"
         )}
       >
-        <div className="flex flex-col h-full">
-          {/* User section */}
-          <div className="p-4 border-b border-sidebar-border">
-            <div className="flex items-center gap-3">
-              {user ? (
-                <div className="p-4 border-b border-sidebar-border">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="flex flex-col items-center text-center gap-2 w-full focus:outline-none">
-                        <Avatar>
-                          <AvatarImage
-                            src={`https://ui-avatars.com/api/?name=Ilyas+Bozdemir&background=0D8ABC&color=fff`}
-                          />
-                          <AvatarFallback>
-                            {user.username.slice(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-semibold text-sm text-sidebar-foreground truncate">
-                            {user.displayName}
-                          </p>
-                          <p className="text-xs text-sidebar-foreground/60 truncate">
-                            {user.email}
-                          </p>
-                        </div>
-                      </button>
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent className="w-40">
-                      <DropdownMenuItem
-                        onClick={() => router.push(`/profile/${user.username}`)}
-                      >
-                        Profil
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => router.push("/settings")}
-                      >
-                        Ayarlar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={logout}
-                        className="text-red-500"
-                      >
-                        Çıkış
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              ) : (
-                <div className="p-4 border-b border-sidebar-border">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Crown className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-sidebar-foreground truncate">
-                        Misafir
-                      </p>
-                      <Link href="/login">
-                        <p className="text-xs text-sidebar-foreground/60">
-                          Giriş Yap
+        <div className="flex flex-col ">
+          <div className="flex flex-col  items-center">
+            {user ? (
+              <div className="p-4 border-b border-sidebar-border w-full flex justify-center">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex flex-col items-center text-center gap-2 w-full focus:outline-none">
+                      <Avatar>
+                        <AvatarImage
+                          src={`https://ui-avatars.com/api/?name=Ilyas+Bozdemir&background=0D8ABC&color=fff`}
+                        />
+                        <AvatarFallback>
+                          {user.username.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-semibold text-sm text-sidebar-foreground truncate">
+                          {user.displayName}
                         </p>
-                      </Link>
-                    </div>
+                        <p className="text-xs text-sidebar-foreground/60 truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                    </button>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent className="w-40">
+                    <DropdownMenuItem
+                      onClick={() => router.push(`/profile/${user.username}`)}
+                    >
+                      Profil
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push("/settings")}>
+                      Ayarlar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={logout} className="text-red-500">
+                      Çıkış
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ) : (
+              <div className="p-4 border-b border-sidebar-border">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Crown className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-sidebar-foreground truncate">
+                      Misafir
+                    </p>
+                    <Link href="/login">
+                      <p className="text-xs text-sidebar-foreground/60">
+                        Giriş Yap
+                      </p>
+                    </Link>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Navigation */}
