@@ -1,5 +1,8 @@
 // services/players.service.ts
+import { useChessStore } from "@/lib/chess-store";
 import { PlayerDoc } from "@/models/player";
+
+const isBrowser = typeof window !== "undefined";
 
 export class PlayerService {
   constructor() {
@@ -39,6 +42,12 @@ export class PlayerService {
 
     const data = await res.json();
     console.log("✅ [Service] /api/player yanıtı:", data);
+
+    if (isBrowser) {
+      useChessStore.getState()
+
+      
+    }
 
     return data;
   }
