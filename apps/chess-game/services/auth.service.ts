@@ -2,7 +2,7 @@ import {
   loginAction,
   logoutAction,
   registerAction,
-} from "@/app/actions/db/user";
+} from "@/app/actions/db/auth";
 import { Logger } from "@/lib/utils";
 
 const isBrowser = typeof window !== "undefined";
