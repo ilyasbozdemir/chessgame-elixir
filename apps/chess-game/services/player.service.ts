@@ -2,6 +2,7 @@
 import { useChessStore } from "@/lib/chess-store";
 import { Logger } from "@/lib/utils";
 import { PlayerDoc } from "@/models/player";
+import { UserDoc } from "@/models/user";
 
 const isBrowser = typeof window !== "undefined";
 
@@ -13,19 +14,25 @@ export class PlayerService {
     this.socketChannel = channel;
   }
 
-  async fetchCurrent(): Promise<{ player: PlayerDoc | null }> {
+  async fetchCurrentSession(): Promise<{
+    user: UserDoc | null;
+    player: PlayerDoc | null;
+  }> {
     try {
       const res = await fetch("/api/me", { credentials: "include" });
 
       if (!res.ok) {
-        return { player: null };
+        return { user: null, player: null };
       }
 
       const data = await res.json();
-      return { player: data?.player ?? null };
+      return {
+        user: data?.user ?? null,
+        player: data?.player ?? null,
+      };
     } catch (err) {
-      console.error("Failed to fetch current player:", err);
-      return { player: null };
+      console.error("Failed to fetch current session:", err);
+      return { user: null, player: null };
     }
   }
 
