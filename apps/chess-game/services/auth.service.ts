@@ -1,5 +1,8 @@
-// services/players.service.ts
-import { useChessStore } from "@/lib/chess-store";
+import {
+  loginAction,
+  logoutAction,
+  registerAction,
+} from "@/app/actions/db/user";
 import { Logger } from "@/lib/utils";
 
 const isBrowser = typeof window !== "undefined";
@@ -12,6 +15,7 @@ export class AuthService {
     this.socketChannel = channel;
   }
 
+  /** 🧩 Kayıt ol */
   async register(data: {
     name: string;
     username: string;
@@ -20,46 +24,33 @@ export class AuthService {
   }) {
     this.logger.info("🔐 register() çağrıldı:", data.username);
 
-    const res = await fetch("/api/register", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!res.ok) throw new Error("Kayıt başarısız");
-
-    const result: { user: any; token: string } = await res.json();
+    const result = await registerAction(data);
 
     this.logger.success("✅ Kayıt başarılı:", result.user);
+
+    this.socketChannel?.push("user:registered", result.user);
 
     return result;
   }
 
+  /** 🔐 Giriş yap */
   async login(email: string, password: string) {
     this.logger.info("🔐 login() çağrıldı:", email);
 
-    const res = await fetch("/api/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-      headers: { "Content-Type": "application/json" },
-    });
+    const result = await loginAction(email, password);
 
-    if (!res.ok) {
-      throw new Error("Giriş başarısız");
-    }
+    this.logger.success("✅ Giriş başarılı:", result.user);
 
-    const data = await res.json();
+    this.socketChannel?.push("user:logged_in", result.user);
 
-    this.logger.success("✅ Giriş başarılı:", data.user);
-
-    this.socketChannel?.push("user:logged_in", data.user);
-
-    return data;
+    return result;
   }
+
+  /** 🚪 Çıkış yap */
   async logout() {
     this.logger.info("🔐 logout() çağrıldı");
 
-    await fetch("/api/logout", { method: "POST" });
+    await logoutAction();
 
     this.socketChannel?.push("user:logged_out", {});
 
