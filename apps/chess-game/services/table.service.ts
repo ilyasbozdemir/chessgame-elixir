@@ -1,9 +1,9 @@
 // services/table.service.ts
 import { Logger } from "@/lib/utils";
 import { PlayerDoc } from "@/models/player";
-import type { TableDoc } from "@/models/table";
 
-import { createTableAction } from "@/app/actions/db/table";
+import { createTableAction, listTablesAction } from "@/app/actions/db/table";
+
 import { useChessStore } from "@/lib/chess-store";
 
 const isBrowser = typeof window !== "undefined";
@@ -17,10 +17,7 @@ export class TableService {
   }
 
   /** 🧩 Masa oluşturma */
-  async create(data: {
-    name: string;
-    ownerId?: string;
-  }) {
+  async create(data: { name: string; ownerId?: string }) {
     this.logger.info("🎯 create() çağrıldı:", data.name);
 
     const result = await createTableAction(data);
@@ -31,6 +28,7 @@ export class TableService {
     if (isBrowser) {
       try {
         const { tables } = useChessStore.getState();
+
         useChessStore.setState({
           tables: [...(tables ?? []), result],
         });
@@ -46,40 +44,35 @@ export class TableService {
   }
 
   async delete(tableId: string, player: PlayerDoc) {
-    this.logger.group(`[ChessGame-TableService] delete(${tableId})`);
-    this.logger.info("🌐 delete() çağrıldı:", {
-      tableId,
-      playerId: player._id,
-    });
-    const res = await fetch(`/api/table/${tableId}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ playerId: player._id?.toString() }),
-    });
-    if (!res.ok) {
-      const err = await res.text();
-      this.logger.error("❌ /api/table/[id] hatası:", err);
-      this.logger.groupEnd();
-      throw new Error(`Masa silinemedi: ${err}`);
-    }
-    const result = await res.json();
-    this.logger.success("✅ /api/table/[id] yanıtı:", result);
-    this.logger.groupEnd();
-    return result;
+    //
   }
 
   /** 📄 Tüm masaları listele */
-  static async list() {
-    // return await Table.find();
+  async list() {
+    this.logger.info("📄 list() çağrıldı");
+
+    const result = await listTablesAction();
+
+    this.logger.success(`✅ ${result.length} masa listelendi.`);
+
+    // 🧠 Client tarafındaysak Zustand store’u güncelle
+    if (isBrowser) {
+      try {
+        useChessStore.setState({ tables: result });
+        this.logger.info("🧩 Chess-store tablolar güncellendi.");
+      } catch (err) {
+        this.logger.warn("⚠️ Chess store güncellemesi atlandı:", err);
+      }
+    }
+
+    // 🔔 (ileride gerekirse) socket güncellemesi
+    this.socketChannel?.push("tables:list_updated", { count: result.length });
+
+    return result;
   }
 
-  static async getById(tableId: string) {
+  async getById(tableId: string) {
     // return await Table.findById(tableId);
-  }
-
-  /** 🗑️ Masa sil */
-  static async delete(tableId: string, requesterId: string) {
-    // kontrol: sadece kurucu silebilir
   }
 
   // ---------------------------------------------------
@@ -87,30 +80,32 @@ export class TableService {
   // ---------------------------------------------------
 
   /** 👤 Oyuncuyu masaya ata */
-  static async addPlayer(tableId: string, playerId: string) {
+  async addPlayer(tableId: string, playerId: string) {
     // tablo.players.push(playerId)
   }
 
+  /** 🗑️ Masa sil */
+  async deleteTable(tableId: string, requesterId: string) {
+    // kontrol: sadece kurucu silebilir
+  }
+
   /** 🚪 Oyuncuyu masadan çıkar */
-  static async removePlayer(tableId: string, playerId: string) {
+  async removePlayer(tableId: string, playerId: string) {
     // tablo.players = tablo.players.filter(p => p !== playerId)
   }
 
   /** 🟢 Oyuncuyu "hazır" olarak işaretle */
-  static async setReady(tableId: string, playerId: string, ready: boolean) {
+  async setReady(tableId: string, playerId: string, ready: boolean) {
     // tablo.readiness[playerId] = ready
   }
 
   /** 🕹️ Masa dolduysa oyunu başlat */
-  static async startGame(tableId: string) {
+  async startGame(tableId: string) {
     // kontrol: tüm oyuncular hazır mı?
   }
 
   /** 🔄 Masa durumunu değiştir (waiting / playing / finished) */
-  static async setStatus(
-    tableId: string,
-    status: "waiting" | "playing" | "finished"
-  ) {
+  async setStatus(tableId: string, status: "waiting" | "playing" | "finished") {
     // tablo.status = status
   }
 
@@ -119,12 +114,12 @@ export class TableService {
   // ---------------------------------------------------
 
   /** 📡 Masa güncellemesini yayınla */
-  static async broadcastUpdate(tableId: string, event: string, payload: any) {
+  async broadcastUpdate(tableId: string, event: string, payload: any) {
     // phoenix / socket.emit logic burada
   }
 
   /** 🧠 Masa logları (örnek: history veya replay için) */
-  static async logEvent(tableId: string, message: string) {
+  async logEvent(tableId: string, message: string) {
     // tablo.logs.push({ message, date: new Date() })
   }
 }

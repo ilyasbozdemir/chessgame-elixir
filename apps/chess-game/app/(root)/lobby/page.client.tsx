@@ -36,6 +36,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   const router = useRouter();
 
   const tables = useChessStore((s) => s.tables);
+  
   const joinTable = useChessStore((s) => s.joinTable);
   const sortedTables = useMemo(() => {
     if (!Array.isArray(tables)) return [];

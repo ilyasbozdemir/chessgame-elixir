@@ -4,6 +4,7 @@ import { useChessStore } from "@/lib/chess-store";
 import { socket } from "@/lib/socket";
 import { PlayerDoc } from "@/models/player";
 import { UserDoc } from "@/models/user";
+import { TableService } from "@/services/table.service";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface PlayerContextType {
@@ -53,13 +54,10 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(dataUser.user ?? null);
       setPlayer(dataUser.player ?? null);
 
-
       if (!dataUser.user?._id) {
         setPlayer(null);
         return;
       }
-
-
     } catch (err) {
       console.error("❌ loadUserAndPlayer error:", err);
       setUser(null);
@@ -126,6 +124,15 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
       .receive("error", (err) => console.error("❌ Kanal hatası:", err));
 
     setChannel(ch);
+
+    (async () => {
+      try {
+        const tableService = new TableService(channel);
+        await tableService.list();
+      } catch (err) {
+        console.error("❌ Table listesi yüklenemedi:", err);
+      }
+    })();
 
     return () => {
       console.log("🔌 Kanal kapatıldı");
