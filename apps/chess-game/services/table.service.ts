@@ -2,6 +2,12 @@
 import { Logger } from "@/lib/utils";
 import { PlayerDoc } from "@/models/player";
 import type { TableDoc } from "@/models/table";
+
+import { createTableAction } from "@/app/actions/db/table";
+import { useChessStore } from "@/lib/chess-store";
+
+const isBrowser = typeof window !== "undefined";
+
 export class TableService {
   private socketChannel?: any;
   private logger = new Logger("ChessGame-TableService");
@@ -11,37 +17,32 @@ export class TableService {
   }
 
   /** 🧩 Masa oluşturma */
-  async create(name: string, owner: PlayerDoc) {
-    this.logger.group(`[ChessGame-TableService] create()`);
+  async create(data: {
+    name: string;
+    ownerId?: string;
+  }) {
+    this.logger.info("🎯 create() çağrıldı:", data.name);
 
-    const data = {
-      id: Math.random().toString(36).substring(2, 9),
-      name: name,
-      ownerId: owner._id?.toString(),
-      ownerName: owner.userId.toString(),
-      maxPlayers: 2,
-    };
+    const result = await createTableAction(data);
 
-    this.logger.info("🌐 create() çağrıldı:", data);
+    this.logger.success("✅ Masa oluşturuldu:", result.id);
 
-    const res = await fetch("/api/table", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    if (!res.ok) {
-      const err = await res.text();
-      this.logger.error("❌ /api/table hatası:", err);
-      this.logger.groupEnd();
-      throw new Error(`Masa oluşturulamadı: ${err}`);
+    // 🧠 Client tarafındaysak Zustand store’a ekle
+    if (isBrowser) {
+      try {
+        const { tables } = useChessStore.getState();
+        useChessStore.setState({
+          tables: [...(tables ?? []), result],
+        });
+        this.logger.info("🧩 Masa chess-store'a eklendi:", result.name);
+      } catch (err) {
+        this.logger.warn("⚠️ Chess store güncellemesi atlandı:", err);
+      }
     }
 
-    const table = await res.json();
-    this.logger.success("✅ /api/table yanıtı:", table);
-    this.logger.groupEnd();
+    this.socketChannel?.push("table:created", result);
 
-    return table;
+    return result;
   }
 
   async delete(tableId: string, player: PlayerDoc) {

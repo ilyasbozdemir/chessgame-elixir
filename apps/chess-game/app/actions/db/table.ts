@@ -3,31 +3,28 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import { Table } from "@/models/table";
 
-export async function createTable(data: {
-  id: string;
+export async function createTableAction(data: {
   name: string;
   ownerId?: string;
-  ownerName?: string;
 }) {
   await connectToDatabase();
   const doc = await Table.create({
-    id: data.id,
     name: data.name.trim(),
     ownerId: data.ownerId,
-    ownerName: data.ownerName,
     status: "waiting",
     players: [],
   });
+
   return JSON.parse(JSON.stringify(doc));
 }
 
-export async function listTables() {
+export async function listTablesAction() {
   await connectToDatabase();
   const docs = await Table.find().sort({ createdAt: -1 }).lean();
   return JSON.parse(JSON.stringify(docs));
 }
 
-export async function joinTable(
+export async function joinTableAction(
   tableId: string,
   player: { id: string; name: string }
 ) {
@@ -39,7 +36,7 @@ export async function joinTable(
   return { ok: true };
 }
 
-export async function leaveTable(tableId: string, playerId: string) {
+export async function leaveTableAction(tableId: string, playerId: string) {
   await connectToDatabase();
   await Table.updateOne(
     { id: tableId },
@@ -48,7 +45,7 @@ export async function leaveTable(tableId: string, playerId: string) {
   return { ok: true };
 }
 
-export async function setPlayerReady(
+export async function setPlayerReadyAction(
   tableId: string,
   playerId: string,
   isReady: boolean
@@ -61,7 +58,7 @@ export async function setPlayerReady(
   return { ok: true };
 }
 
-export async function setStatus(
+export async function setStatusAction(
   tableId: string,
   status: "waiting" | "playing" | "finished"
 ) {

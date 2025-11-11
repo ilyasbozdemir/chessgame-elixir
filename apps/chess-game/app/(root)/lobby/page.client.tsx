@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 import { usePlayer } from "@/context/player-context";
 
-import { joinTable as joinTableDB } from "@/app/actions/db/table";
+import { joinTableAction as joinTableAction } from "@/app/actions/db/table";
 import { RealtimeListener } from "@/components/realtime-listener";
 import { useTableButtonResolver } from "@/hooks/get-table-button-state";
 import { CreateTableDialog } from "./components/dialogs/create-table-dialog";
@@ -62,7 +62,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     onJoin: async (tableId: string) => {
       if (player && user) {
         joinTable(tableId, player);
-        await joinTableDB(tableId, {
+        await joinTableAction(tableId, {
           id: player._id!.toString(),
           name: user?.displayName || "Anonim",
         });

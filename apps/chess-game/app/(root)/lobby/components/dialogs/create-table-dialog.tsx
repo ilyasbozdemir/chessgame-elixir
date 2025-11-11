@@ -16,19 +16,20 @@ import { Plus } from "lucide-react";
 
 import { useChessStore } from "@/lib/chess-store";
 import { usePlayer } from "@/context/player-context";
+import { TableService } from "@/services/table.service";
 
 interface CreateTableDialogProps {
   //
 }
 
 export function CreateTableDialog({}: CreateTableDialogProps) {
-  const { player, channel, setPlayer, loading, refresh } = usePlayer();
+  const { user, player, channel, setPlayer, loading, refresh } = usePlayer();
+
+  const tableService = new TableService();
 
   const [newTableName, setNewTableName] = useState("");
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-
-  const createTable = useChessStore((s) => s.createTable);
 
   const handleCreateTable = async () => {
     if (!player?._id) {
@@ -41,11 +42,16 @@ export function CreateTableDialog({}: CreateTableDialogProps) {
         player,
       });
       try {
-        const tableId = await createTable(newTableName.trim(), player, channel);
-        console.log("✅ createTable dönen ID:", tableId);
-        if (tableId) {
-          console.log("🎮 Oyuncu masaya katıldı:", { tableId, player });
+        const createdTable = await tableService.create({
+          name: newTableName,
+          ownerId: player.userId.toString(),
+        });
+
+        console.log("✅ createTable dönen ID:", createdTable);
+        if (createdTable) {
+          console.log("🎮 Oyuncu masaya katıldı:", { createdTable, player });
           setNewTableName("");
+          setIsCreateDialogOpen(false);
         } else {
           console.warn("⚠️ createTable bir ID döndürmedi!");
         }
@@ -62,7 +68,7 @@ export function CreateTableDialog({}: CreateTableDialogProps) {
 
   return (
     <>
-      {player ? (
+      {player && user ? (
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button className="gap-2">

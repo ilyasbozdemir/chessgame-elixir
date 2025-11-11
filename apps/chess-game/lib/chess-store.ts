@@ -21,8 +21,7 @@ export interface ChessStore {
   makeMove: (to: Position) => void;
   resetGame: () => void;
 
-  createTable: (name: string, owner: PlayerDoc) => Promise<string>;
-
+ 
   deleteTable: (tableId: string, player: PlayerDoc) => Promise<void>;
 
   joinTable: (tableId: string, player: PlayerDoc) => void;
@@ -185,10 +184,6 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     });
   },
 
-  createTable: async (name: string, owner: PlayerDoc): Promise<string> => {
-    //TODO
-    return "";
-  },
 
   deleteTable: async (tableId: string, player: PlayerDoc): Promise<void> => {
     const { tables } = get();
