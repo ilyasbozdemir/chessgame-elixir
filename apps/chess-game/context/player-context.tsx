@@ -5,6 +5,7 @@ import { PlayerDoc } from "@/models/player";
 import { socket } from "@/lib/socket";
 import { TableService } from "@/services/table.service";
 import { useUser } from "@/context/user-context";
+import { useChannel } from "./channel-context";
 
 interface PlayerContextType {
   player: PlayerDoc | null;
@@ -19,10 +20,15 @@ const PlayerContext = createContext<PlayerContextType>({
   refresh: async () => {},
 });
 
-export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { user } = useUser();
+
   const [player, setPlayer] = useState<PlayerDoc | null>(null);
-  const [channel, setChannel] = useState<any>(null);
+
+  const { channel } = useChannel();
+
   const [presenceCount, setPresenceCount] = useState(0);
 
   const refresh = async () => {
@@ -36,21 +42,10 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     (async () => {
       await refresh();
-      socket.connect();
-      const ch = socket.channel("game:lobby:players", {});
-      ch.join()
-        .receive("ok", () => console.log("✅ Lobby joined"))
-        .receive("error", console.error);
-      setChannel(ch);
 
-      const tableService = new TableService(ch);
+      const tableService = new TableService(channel);
       await tableService.list();
     })();
-
-    return () => {
-      channel?.leave();
-      socket.disconnect();
-    };
   }, [user?._id]);
 
   return (

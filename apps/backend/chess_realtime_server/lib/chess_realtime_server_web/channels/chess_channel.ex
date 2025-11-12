@@ -1,95 +1,104 @@
-# burası dinamik kanal vs desteği alıcak sornaki sürümlerde
-
-
 defmodule ChessRealtimeServerWeb.ChessChannel do
   use Phoenix.Channel
   alias ChessRealtimeServerWeb.Presence
 
-  # 🔹 Kayıtlı oyuncuların bağlandığı kanal
-  def join("game:lobby:players", %{"name" => name}, socket) do
-    IO.puts("✅ [PLAYER] #{name} kanala katıldı.")
-    socket = assign(socket, :player_name, name)
+  @impl true
+  def join(topic, params, socket) do
+    # topic: "game:lobby:players" | "game:table:123" | "game:event"
+    name = Map.get(params, "name", "guest")
+
+    socket =
+      socket
+      |> assign(:player_name, name)
+      |> assign(:topic, topic)
+      |> assign(:params, params)
+
+    IO.puts("✅ [JOIN] #{name} joined #{topic}")
+
     send(self(), :after_join)
-    {:ok, socket}
+    {:ok, %{message: "joined #{topic}"}, socket}
   end
 
-  # 🔹 Anonim oyuncuların bağlandığı kanal
-  def join("game:lobby:guests", %{"name" => name}, socket) do
-    IO.puts("🟡 [GUEST] #{name} kanala katıldı.")
-    socket = assign(socket, :player_name, "[Guest] " <> name)
-    send(self(), :after_join)
-    {:ok, socket}
-  end
-
-  # 🔹 join sonrası presence & count bilgisi
+  # ----------------------------------------
+  # join sonrası presence / state yönetimi
+  # ----------------------------------------
+  @impl true
   def handle_info(:after_join, socket) do
-    player = socket.assigns[:player_name]
+    topic = socket.assigns.topic
+    player = socket.assigns.player_name
 
-    {:ok, _presence} =
-      Presence.track(socket, player, %{
-        online_at: System.system_time(:second)
-      })
+    # sadece lobby veya table için Presence takibi
+    if String.contains?(topic, "lobby") or String.contains?(topic, "table") do
+      {:ok, _} = Presence.track(socket, player, %{online_at: System.system_time(:second)})
+      state = Presence.list(topic)
+      count = map_size(state)
 
-    state = Presence.list(socket.topic)
-    count = map_size(state)
-
-    # 🟢 İlk state gönderimi
-    push(socket, "presence_state", state)
-
-    # 🟢 Güncel toplam sayıyı yayınla
-    broadcast!(socket, "presence_count", %{count: count})
-
-    IO.puts("📢 #{player} eklendi — şu anda #{count} aktif oyuncu var")
+      push(socket, "presence_state", state)
+      broadcast!(socket, "presence_count", %{count: count})
+      IO.puts("📡 [PRESENCE] #{player} in #{topic} (#{count} online)")
+    end
 
     {:noreply, socket}
   end
 
-  # 🔹 Ayrılık sonrası count'u yeniden hesapla
-  def handle_info(:update_count, socket) do
-    count = Presence.list(socket.topic) |> map_size()
-    broadcast!(socket, "presence_count", %{count: count})
+  # ----------------------------------------
+  # tamamen dinamik event yöneticisi
+  # ----------------------------------------
+  @impl true
+  def handle_in(event, payload, socket) do
+    topic = socket.assigns.topic
+    player = socket.assigns.player_name
+
+    IO.puts("🎯 [EVENT] #{topic} :: #{event} from #{player}")
+
+    # 1️⃣ event'i doğrudan broadcast et (tüm topic'e)
+    broadcast!(socket, event, Map.put(payload, "sender", player))
+
+    # 2️⃣ eğer özel bir handler varsa çağır
+    dispatch_custom_handler(topic, event, payload, socket)
+  end
+
+  # özel handler varsa çalıştır (yoksa pas geç)
+  defp dispatch_custom_handler(topic, event, payload, socket) do
+    # örnek: game:table:123  → handler name: "table"
+    type =
+      topic
+      |> String.split(":")
+      |> Enum.at(1, "generic")
+
+    module =
+      Module.concat([ChessRealtimeServerWeb, String.capitalize(type) <> "EventHandler"])
+
+    if Code.ensure_loaded?(module) and function_exported?(module, :handle, 3) do
+      apply(module, :handle, [event, payload, socket])
+    end
+
     {:noreply, socket}
   end
 
-  def handle_in("table_created", payload, socket) do
-    broadcast!(socket, "table_created", payload)
-    {:noreply, socket}
-  end
-
-  def handle_in("table_deleted", %{"tableId" => id}, socket) do
-    broadcast(socket, "table_deleted", %{tableId: id})
-    {:noreply, socket}
-  end
-
-  # 🔹 Oyuncu ismini güncelleme
-  def handle_in("update_player", %{"name" => name}, socket) do
-    IO.puts("📢 Oyuncu ismi güncellendi: #{name}")
-    broadcast!(socket, "player_joined", %{name: name})
-    {:noreply, assign(socket, :player_name, name)}
-  end
-
-  def handle_in("refresh_state", _payload, socket) do
-    IO.puts("🔄 #{socket.assigns[:player_name]} için state yenileniyor...")
-
-    state = Presence.list(socket.topic)
-    count = map_size(state)
-
-    # 🔸 Sadece o kullanıcıya push et (broadcast değil)
-    push(socket, "presence_state", state)
-    push(socket, "presence_count", %{count: count})
-
-    {:noreply, socket}
-  end
-
-  # 🔹 Oyuncu ayrıldığında
+  # ----------------------------------------
+  # ayrılma / temizlik
+  # ----------------------------------------
+  @impl true
   def terminate(_reason, socket) do
-    player = socket.assigns[:player_name]
+    topic = socket.assigns.topic
+    player = socket.assigns.player_name
+    IO.puts("❌ [LEAVE] #{player} left #{topic}")
 
-    # 🔸 Ayrıldıktan sonra count'u güncelle
-    Process.send_after(self(), :update_count, 100)
+    broadcast_from!(socket, "player_left", %{name: player})
 
-    IO.puts("❌ #{player} kanaldan ayrıldı.")
-    broadcast!(socket, "player_left", %{name: player})
+    if String.contains?(topic, "lobby") or String.contains?(topic, "table") do
+      Process.send_after(self(), :update_presence_count, 100)
+    end
+
     :ok
+  end
+
+  @impl true
+  def handle_info(:update_presence_count, socket) do
+    topic = socket.assigns.topic
+    count = Presence.list(topic) |> map_size()
+    broadcast!(socket, "presence_count", %{count: count})
+    {:noreply, socket}
   end
 end

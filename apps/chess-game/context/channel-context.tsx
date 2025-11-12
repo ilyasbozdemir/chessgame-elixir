@@ -24,8 +24,15 @@ export const ChannelProvider: React.FC<{ children: React.ReactNode }> = ({
   const [channel, setChannel] = useState<any>(null);
 
   useEffect(() => {
-    // 🔌 Bağlantı en başta kurulur
     socket.connect();
+
+    const ch = socket.channel("game:lobby:players", {});
+    ch.join()
+      .receive("ok", () => console.log("✅ Lobby joined"))
+      .receive("error", console.error);
+
+    setChannel(ch);
+
     setSocketConnected(true);
 
     console.log("🌐 Socket connected (global ChannelProvider)");
@@ -35,6 +42,9 @@ export const ChannelProvider: React.FC<{ children: React.ReactNode }> = ({
       socket.disconnect();
       setSocketConnected(false);
       setChannel(null);
+
+      channel?.leave();
+      socket.disconnect();
     };
   }, []);
 
@@ -45,8 +55,7 @@ export const ChannelProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     const ch = socket.channel(topic, params);
-    ch
-      .join()
+    ch.join()
       .receive("ok", (resp) =>
         console.log(`✅ Joined channel '${topic}'`, resp)
       )

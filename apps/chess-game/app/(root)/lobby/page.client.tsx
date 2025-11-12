@@ -125,10 +125,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   return (
     <React.Fragment>
       <div className="w-full max-w-5xl space-y-6">
-        {/*
-        <RealtimeListener channel={channel} />
-        */}
-
+ 
         <StatsWrapper
           stats={[
             {
