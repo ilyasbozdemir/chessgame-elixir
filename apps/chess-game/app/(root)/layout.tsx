@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type React from "react";
-import { PlayerProvider } from "@/context/player-context";
 import ClientLayout from "./layout.client";
-import { UserProvider } from "@/context/user-context";
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -14,16 +12,10 @@ export const metadata: Metadata = {
   generator: "ilyasbozdemir.dev",
 };
 
-export default function RootLayout({
+export default function AppRootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <UserProvider>
-      <PlayerProvider>
-        <ClientLayout>{children}</ClientLayout>
-      </PlayerProvider>
-    </UserProvider>
-  );
+  return <ClientLayout>{children}</ClientLayout>;
 }

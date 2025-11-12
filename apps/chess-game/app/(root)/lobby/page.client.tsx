@@ -18,6 +18,7 @@ import { StatsWrapper } from "./components/stats/stat-wrapper";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@/context/user-context";
+import { useChannel } from "@/context/channel-context";
 
 interface PageClientProps {
   //
@@ -26,7 +27,8 @@ interface PageClientProps {
 const PageClient: React.FC<PageClientProps> = ({}) => {
 
   const { user, loading: userLoading, login, logout } = useUser();
-  const { player, channel, presenceCount, refresh } = usePlayer();
+  const { player, presenceCount, refresh } = usePlayer();
+  const {channel} = useChannel();
 
   const router = useRouter();
 

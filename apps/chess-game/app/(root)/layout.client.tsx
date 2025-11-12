@@ -5,6 +5,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import React, { useState } from "react";
 import { useBreakpointValue } from "@/hooks/use-breakpoint-value";
 import { PageContainer } from "@/components/page-container";
+import { RealtimeListener } from "@/components/realtime-listener";
 
 export default function ClientLayout({
   children,
@@ -44,6 +45,7 @@ export default function ClientLayout({
           {children}
           </PageContainer>
         </main>
+        <RealtimeListener />
       </div>
     </div>
   );

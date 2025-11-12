@@ -1,10 +1,11 @@
 "use client";
 
+import { useChannel } from "@/context/channel-context";
 import { Logger } from "@/lib/utils";
 import { useState, useEffect } from "react";
 
 interface RealtimeListenerProps {
-  channel: any;
+  //
 }
 
 /**
@@ -12,8 +13,10 @@ interface RealtimeListenerProps {
  * Kısa süreli pasiflikte `refresh_state` gönderir,
  * uzun süreli pasiflikte (örn. uyku modu) sayfayı yeniler.
  */
-export function RealtimeListener({ channel }: RealtimeListenerProps) {
+export function RealtimeListener({}: RealtimeListenerProps) {
   const logger = new Logger("RealtimeListener-Logger");
+
+  const { channel } = useChannel();
 
   const [loading, setLoading] = useState(false);
 
