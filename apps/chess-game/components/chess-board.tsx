@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, RotateCcw } from "lucide-react";
 import { usePlayer } from "@/context/player-context";
+import { useUser } from "@/context/user-context";
 
 interface ChessBoardProps {
   mode?: "play" | "spectate" | "replay";
@@ -17,16 +18,8 @@ interface ChessBoardProps {
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
 
-    const {
-      user,
-      player,
-  
-      channel,
-      loading,
-      presenceCount,
-      refresh,
-    } = usePlayer();
-
+  const { user, loading: userLoading, login, logout } = useUser();
+  const { player, channel, presenceCount, refresh } = usePlayer();
 
   const { gameState, selectPiece, makeMove, resetGame } =
     useChessStore();
@@ -44,7 +37,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
     );
   }
 
-  const currentPlayerColor = table?.players.find(
+  const currentPlayerColor = table.players.find(
     (p) => p.id === player?._id
   )?.color;
 

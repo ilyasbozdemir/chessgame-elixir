@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useUser } from "@/context/user-context";
 
 const sidebarItems = [
   { href: "/", label: "Ana Sayfa", icon: Home },
@@ -51,8 +52,8 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ isOpen, onClose, width }: AppSidebarProps) {
-  const { user, logout } = usePlayer();
-
+  const { user, loading: userLoading, login, logout } = useUser();
+  const { player, channel, presenceCount, refresh } = usePlayer();
   const pathname = usePathname();
   const router = useRouter();
 

@@ -25,20 +25,21 @@ import { PlayerDoc } from "@/models/player";
 import { useChessStore } from "@/lib/chess-store";
 import { usePlayer } from "@/context/player-context";
 import { Logger } from "@/lib/utils";
+import { useUser } from "@/context/user-context";
 
 interface PlayerProfileDialogProps {
   //
 }
 
 export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
-  const { player, channel, setPlayer, loading, refresh } = usePlayer();
-
+  const { user, loading: userLoading, login, logout } = useUser();
+  const { player, channel, presenceCount, refresh } = usePlayer();
   const [playerName, setPlayerName] = useState("");
 
   const [profileSection, setProfileSection] = useState<
     "main" | "edit" | "settings" | "stats"
   >("main");
-  const [editName, setEditName] = useState(player?.name ?? "");
+  const [editName, setEditName] = useState(user?.displayName ?? "");
 
   //const addPlayer = useChessStore((s) => s.addPlayer);
 
@@ -65,7 +66,7 @@ export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
             <Button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 transition-colors cursor-pointer">
               <UserCircle className="w-5 h-5 text-accent-foreground" />
               <span className="font-medium text-accent-foreground">
-                {player.name}
+                {user?.displayName}
               </span>
             </Button>
           </DialogTrigger>
@@ -96,7 +97,7 @@ export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
                   </div>
                   <div>
                     <p className="font-bold text-lg text-foreground">
-                      {player && player.name}
+                      {user?.displayName}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Oyuncu ID: {player?._id?.toString()}
@@ -109,7 +110,7 @@ export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
                     variant="outline"
                     className="w-full justify-start bg-transparent"
                     onClick={() => {
-                      setEditName(player.name);
+                      setEditName(user?.displayName || "");
                       setProfileSection("edit");
                     }}
                   >
@@ -139,16 +140,13 @@ export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
                     variant="destructive"
                     className="w-full"
                     onClick={async () => {
-                      setPlayer(null);
+
                       setProfileSection("main");
                       const res = await fetch("/api/logout", {
                         method: "POST",
                       });
                       if (res.ok) {
                         console.log("✅ Oyuncu çıkış yaptı");
-                        setPlayer(null);
-                      } else {
-                        console.error("❌ Çıkış hatası");
                       }
                       await refresh();
                     }}
@@ -182,10 +180,8 @@ export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
                     className="flex-1"
                     disabled={!editName.trim()}
                     onClick={() => {
-                      setPlayer({
-                        ...player,
-                        name: editName,
-                      });
+
+                    
                       setProfileSection("main");
                     }}
                   >

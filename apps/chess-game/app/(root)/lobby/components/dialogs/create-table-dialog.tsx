@@ -17,13 +17,17 @@ import { Plus } from "lucide-react";
 import { useChessStore } from "@/lib/chess-store";
 import { usePlayer } from "@/context/player-context";
 import { TableService } from "@/services/table.service";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/context/user-context";
 
 interface CreateTableDialogProps {
   //
 }
 
 export function CreateTableDialog({}: CreateTableDialogProps) {
-  const { user, player, channel, setPlayer, loading, refresh } = usePlayer();
+  const { user, loading: userLoading, login, logout } = useUser();
+  const { player, channel, presenceCount, refresh } = usePlayer();
+  const router = useRouter();
 
   const tableService = new TableService();
 
@@ -52,6 +56,7 @@ export function CreateTableDialog({}: CreateTableDialogProps) {
           console.log("🎮 Oyuncu masaya katıldı:", { createdTable, player });
           setNewTableName("");
           setIsCreateDialogOpen(false);
+          router.push(`/tables/${createdTable._id}`);
         } else {
           console.warn("⚠️ createTable bir ID döndürmedi!");
         }
@@ -68,7 +73,7 @@ export function CreateTableDialog({}: CreateTableDialogProps) {
 
   return (
     <>
-      {player && user ? (
+      {user ? (
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button className="gap-2">

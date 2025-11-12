@@ -17,26 +17,21 @@ import { TableList } from "./components/tables/table-list";
 import { StatsWrapper } from "./components/stats/stat-wrapper";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useUser } from "@/context/user-context";
 
 interface PageClientProps {
   //
 }
 
 const PageClient: React.FC<PageClientProps> = ({}) => {
-  const {
-    user,
-    player,
 
-    channel,
-    loading,
-    presenceCount,
-    refresh,
-  } = usePlayer();
+  const { user, loading: userLoading, login, logout } = useUser();
+  const { player, channel, presenceCount, refresh } = usePlayer();
 
   const router = useRouter();
 
   const tables = useChessStore((s) => s.tables);
-  
+
   const joinTable = useChessStore((s) => s.joinTable);
   const sortedTables = useMemo(() => {
     if (!Array.isArray(tables)) return [];
@@ -59,7 +54,8 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   );
 
   const resolveTableButton = useTableButtonResolver(player, {
-    onPreview: (id) => console.log("Masa önizlemesi:", id),
+    onPreview: (id) => router.push(`/tables/${id}`),
+
     onJoin: async (tableId: string) => {
       if (player && user) {
         joinTable(tableId, player);
@@ -74,7 +70,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     onWatch: (id) => router.push(`/spectate/${id}`),
   });
 
-  if (loading) {
+  if (userLoading) {
     return (
       <React.Fragment>
         <div className="w-80 p-6 rounded-2xl border border-border bg-card shadow-md animate-pulse">
@@ -96,7 +92,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       </React.Fragment>
     );
   }
-  if (!player) {
+  if (!user) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-md text-center space-y-6 p-8 rounded-2xl border border-border bg-card shadow-sm">
@@ -121,10 +117,16 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     );
   }
 
+  console.log(user);
+  console.log(player);
+
   return (
     <React.Fragment>
       <div className="w-full max-w-5xl space-y-6">
+        {/*
         <RealtimeListener channel={channel} />
+        */}
+
         <StatsWrapper
           stats={[
             {

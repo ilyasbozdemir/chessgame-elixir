@@ -22,14 +22,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useUser } from "@/context/user-context";
 
 interface DeleteTableDialogProps {
   table: TableDoc;
 }
 
 export function DeleteTableDialog({ table }: DeleteTableDialogProps) {
-  const { player, channel, setPlayer, loading, refresh } = usePlayer();
-
+  const { user, loading: userLoading, login, logout } = useUser();
+  const { player, channel, presenceCount, refresh } = usePlayer();
   const deleteTable = useChessStore((s) => s.deleteTable);
 
   const handleDeleteTable = async (tableId: string) => {
