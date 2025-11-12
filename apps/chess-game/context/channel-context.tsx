@@ -1,61 +1,61 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { Socket, Channel } from "phoenix";
 import { socket } from "@/lib/socket";
 
 interface ChannelContextType {
   socketConnected: boolean;
-  channel: any;
-  joinChannel: (topic: string, params?: Record<string, any>) => any;
-  leaveChannel: () => void;
+  channels: Record<string, Channel>;
+  joinChannel: (topic: string, params?: Record<string, any>) => Channel | null;
+  leaveChannel: (topic: string) => void;
+  getChannel: (topic: string) => Channel | null;
 }
 
 const ChannelContext = createContext<ChannelContextType>({
   socketConnected: false,
-  channel: null,
-  joinChannel: () => {},
+  channels: {},
+  joinChannel: () => null,
   leaveChannel: () => {},
+  getChannel: () => null,
 });
 
 export const ChannelProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [socketConnected, setSocketConnected] = useState(false);
-  const [channel, setChannel] = useState<any>(null);
+  const [channels, setChannels] = useState<Record<string, Channel>>({});
 
+  // 🔌 Socket bağlantısı tek seferlik açılır
   useEffect(() => {
     socket.connect();
-
-    const ch = socket.channel("game:lobby:players", {});
-    ch.join()
-      .receive("ok", () => console.log("✅ Lobby joined"))
-      .receive("error", console.error);
-
-    setChannel(ch);
-
     setSocketConnected(true);
-
-    console.log("🌐 Socket connected (global ChannelProvider)");
+    console.log("🌐 Socket connected (global)");
 
     return () => {
       console.log("🔌 Socket disconnected (unmount)");
+      Object.values(channels).forEach((ch) => ch.leave());
       socket.disconnect();
+      setChannels({});
       setSocketConnected(false);
-      setChannel(null);
-
-      channel?.leave();
-      socket.disconnect();
     };
   }, []);
 
+  // 🔹 Kanal ekleme
   const joinChannel = (topic: string, params: Record<string, any> = {}) => {
     if (!socketConnected) {
       console.warn("⚠️ Socket not connected yet, delaying join...");
       return null;
     }
 
+    if (channels[topic]) {
+      console.log(`⚪ Already joined '${topic}'`);
+      return channels[topic];
+    }
+
     const ch = socket.channel(topic, params);
-    ch.join()
+    ch
+      .join()
       .receive("ok", (resp) =>
         console.log(`✅ Joined channel '${topic}'`, resp)
       )
@@ -63,21 +63,31 @@ export const ChannelProvider: React.FC<{ children: React.ReactNode }> = ({
         console.error(`❌ Failed to join '${topic}'`, err)
       );
 
-    setChannel(ch);
+    setChannels((prev) => ({ ...prev, [topic]: ch }));
     return ch;
   };
 
-  const leaveChannel = () => {
-    if (channel) {
-      channel.leave();
-      setChannel(null);
-      console.log("👋 Left channel");
-    }
+  // 🔹 Kanal çıkışı
+  const leaveChannel = (topic: string) => {
+    const ch = channels[topic];
+    if (!ch) return;
+
+    console.log(`👋 Leaving channel '${topic}'`);
+    ch.leave();
+
+    setChannels((prev) => {
+      const copy = { ...prev };
+      delete copy[topic];
+      return copy;
+    });
   };
+
+  // 🔹 Kanal alma (örnek: getChannel("game:lobby:players"))
+  const getChannel = (topic: string) => channels[topic] || null;
 
   return (
     <ChannelContext.Provider
-      value={{ socketConnected, channel, joinChannel, leaveChannel }}
+      value={{ socketConnected, channels, joinChannel, leaveChannel, getChannel }}
     >
       {children}
     </ChannelContext.Provider>

@@ -87,7 +87,7 @@ Backend: <http://localhost:4000>
 - [x] Lobby creation and player management
 - [x] Table‑scoped game flow
 - [x] Route guards & state management
-- [x] Spectator (watch) screen
+- [ ] Spectator (watch) screen
 - [ ] Elixir ↔ Next.js WebSocket bridge
 - [ ] Postgres persistence
 - [ ] Authentication

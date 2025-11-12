@@ -4,23 +4,19 @@ import { useChannel } from "@/context/channel-context";
 import { Logger } from "@/lib/utils";
 import { useState, useEffect } from "react";
 
-interface RealtimeListenerProps {
-  //
-}
-
-/**
- * RealtimeListener — sekme focus/blur olaylarını yönetir.
- * Kısa süreli pasiflikte `refresh_state` gönderir,
- * uzun süreli pasiflikte (örn. uyku modu) sayfayı yeniler.
- */
-export function RealtimeListener({}: RealtimeListenerProps) {
+export function RealtimeListener() {
   const logger = new Logger("RealtimeListener-Logger");
-
-  const { channel } = useChannel();
+  const { getChannel } = useChannel();
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const lobby = getChannel("game:lobby:players");
+    if (!lobby) {
+      logger.warn("⚠️ Lobby channel not found — skipping RealtimeListener setup.");
+      return;
+    }
+
     let blurAt: number | null = null;
     let blurTimer: NodeJS.Timeout | null = null;
 
@@ -32,9 +28,9 @@ export function RealtimeListener({}: RealtimeListenerProps) {
 
       // 🔸 1 dakikadan az pasifse => sadece refresh_state push et
       if (diff < 60_000) {
-        logger.log("🟢 Sekme geri geldi — kanalı yeniliyorum");
+        logger.log("🟢 Sekme geri geldi — lobby kanalı yenileniyor");
         setLoading(true);
-        channel.push("refresh_state", {});
+        lobby.push("refresh_state", {});
         setTimeout(() => setLoading(false), 800);
       } else if (blurAt) {
         // 🔸 1 dakikadan fazla pasifse => tam sayfa yenile
@@ -64,11 +60,7 @@ export function RealtimeListener({}: RealtimeListenerProps) {
       window.removeEventListener("blur", handleBlur);
       if (blurTimer) clearTimeout(blurTimer);
     };
-  }, [channel]);
+  }, [getChannel]);
 
-  return (
-    <>
-      <></>
-    </>
-  );
+  return null;
 }

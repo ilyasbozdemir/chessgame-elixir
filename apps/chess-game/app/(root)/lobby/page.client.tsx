@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import { usePlayer } from "@/context/player-context";
 
 import { joinTableAction as joinTableAction } from "@/app/actions/db/table";
-import { RealtimeListener } from "@/components/realtime-listener";
 import { useTableButtonResolver } from "@/hooks/get-table-button-state";
 import { CreateTableDialog } from "./components/dialogs/create-table-dialog";
 import { DeleteTableDialog } from "./components/dialogs/delete-table-dialog";
@@ -25,10 +24,9 @@ interface PageClientProps {
 }
 
 const PageClient: React.FC<PageClientProps> = ({}) => {
-
   const { user, loading: userLoading, login, logout } = useUser();
   const { player, presenceCount, refresh } = usePlayer();
-  const {channel} = useChannel();
+const { channels, joinChannel, leaveChannel, getChannel } = useChannel();
 
   const router = useRouter();
 
@@ -125,7 +123,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
   return (
     <React.Fragment>
       <div className="w-full max-w-5xl space-y-6">
- 
         <StatsWrapper
           stats={[
             {

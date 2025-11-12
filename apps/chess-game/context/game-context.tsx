@@ -7,6 +7,31 @@ import { useChessStore } from "@/lib/chess-store";
 import type { Position } from "@/lib/chess-types";
 import { Logger } from "@/lib/utils";
 
+
+/*
+ example :
+
+ 
+const { joinChannel, getChannel } = useChannel();
+
+useEffect(() => {
+  // 🔹 Lobiye bağlan
+  joinChannel("game:lobby:players", { name: "ilyas" });
+
+  // 🔹 Kanal referansını al
+  const lobby = getChannel("game:lobby:players");
+
+  lobby?.on("presence_state", (state) => {
+    console.log("Lobi oyuncuları:", Object.keys(state));
+  });
+
+  return () => {
+    lobby?.leave();
+  };
+}, []);
+
+
+*/
 interface GameContextType {
   startGame: () => void;
   makeMove: (to: Position) => void;
@@ -23,7 +48,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const logger = new Logger("GameContext");
-  const { channel, joinChannel } = useChannel();
+  const { channels, joinChannel, leaveChannel, getChannel } = useChannel();
   const { player } = usePlayer();
   const { gameState, startGame, makeMove, resetGame } = useChessStore();
 
@@ -57,7 +82,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   // ♟️ Move broadcast helper
   const emitMove = (to: Position) => {
     makeMove(to);
-    channel?.push("game:move", { to });
+   // channel?.push("game:move", { to });
   };
 
   return (
