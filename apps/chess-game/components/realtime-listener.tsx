@@ -1,21 +1,31 @@
 "use client";
 
+import { SOCKET_CHANNELS } from "@/const/elixir-socket-names";
 import { useChannel } from "@/context/channel-context";
 import { Logger } from "@/lib/utils";
 import { useState, useEffect } from "react";
 
 export function RealtimeListener() {
   const logger = new Logger("RealtimeListener-Logger");
-  const { getChannel } = useChannel();
+  const { socketConnected, getChannel } = useChannel();
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const lobby = getChannel("game:lobby:players");
-    if (!lobby) {
-      logger.warn("⚠️ Lobby channel not found — skipping RealtimeListener setup.");
+    // 1️⃣ Socket bağlanmadıysa hiç kurulum yapma
+    if (!socketConnected) {
+      logger.warn("⏳ Socket not connected yet — waiting...");
       return;
     }
+
+    // 2️⃣ Lobby kanalı hazır değilse yine bekle
+    const lobby = getChannel(SOCKET_CHANNELS.GAME.LOBBY.PLAYERS);
+    if (!lobby) {
+      logger.warn("⏳ Lobby channel not ready yet — waiting...");
+      return;
+    }
+
+    logger.log("🟢 Lobby channel ready — RealtimeListener ACTIVE");
 
     let blurAt: number | null = null;
     let blurTimer: NodeJS.Timeout | null = null;
@@ -26,15 +36,13 @@ export function RealtimeListener() {
 
       if (blurTimer) clearTimeout(blurTimer);
 
-      // 🔸 1 dakikadan az pasifse => sadece refresh_state push et
       if (diff < 60_000) {
-        logger.log("🟢 Sekme geri geldi — lobby kanalı yenileniyor");
+        logger.log("🟢 Sekme geri geldi → refresh_state gönderiliyor");
         setLoading(true);
         lobby.push("refresh_state", {});
         setTimeout(() => setLoading(false), 800);
       } else if (blurAt) {
-        // 🔸 1 dakikadan fazla pasifse => tam sayfa yenile
-        logger.warn("⏰ Uzun süre pasif kaldı, sayfa yenileniyor...");
+        logger.warn("⏰ Uzun pasiflik → sayfa yenileniyor");
         window.location.reload();
       }
 
@@ -42,14 +50,13 @@ export function RealtimeListener() {
     };
 
     const handleBlur = () => {
-      logger.log("⚪ Sekme arka plana geçti — eventleri askıya alıyorum");
       blurAt = Date.now();
+      logger.log("⚪ Sekme arka plana geçti");
 
-      // opsiyonel olarak uzun blur süresinde otomatik reload
       blurTimer = setTimeout(() => {
-        logger.warn("💤 Sekme uzun süre pasif kaldı, otomatik refresh!");
+        logger.warn("💤 5 dakika pasiflik → otomatik refresh");
         window.location.reload();
-      }, 5 * 60_000); // 5 dk pasifse garantili refresh
+      }, 5 * 60_000);
     };
 
     window.addEventListener("focus", handleFocus);
@@ -60,7 +67,7 @@ export function RealtimeListener() {
       window.removeEventListener("blur", handleBlur);
       if (blurTimer) clearTimeout(blurTimer);
     };
-  }, [getChannel]);
+  }, [socketConnected, getChannel]);
 
   return null;
 }

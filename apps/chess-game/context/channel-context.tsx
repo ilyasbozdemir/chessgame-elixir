@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Socket, Channel } from "phoenix";
 import { socket } from "@/lib/socket";
+import { SOCKET_CHANNELS } from "@/const/elixir-socket-names";
 
 interface ChannelContextType {
   socketConnected: boolean;
@@ -41,6 +42,14 @@ export const ChannelProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
+  useEffect(() => {
+    if (!socketConnected) return;
+
+    console.log("⚡ Auto-joining lobby channels...");
+    joinChannel(SOCKET_CHANNELS.GAME.LOBBY.PLAYERS);
+    joinChannel(SOCKET_CHANNELS.GAME.LOBBY.GUESTS);
+  }, [socketConnected]);
+
   // 🔹 Kanal ekleme
   const joinChannel = (topic: string, params: Record<string, any> = {}) => {
     if (!socketConnected) {
@@ -54,8 +63,7 @@ export const ChannelProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     const ch = socket.channel(topic, params);
-    ch
-      .join()
+    ch.join()
       .receive("ok", (resp) =>
         console.log(`✅ Joined channel '${topic}'`, resp)
       )
@@ -87,7 +95,13 @@ export const ChannelProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <ChannelContext.Provider
-      value={{ socketConnected, channels, joinChannel, leaveChannel, getChannel }}
+      value={{
+        socketConnected,
+        channels,
+        joinChannel,
+        leaveChannel,
+        getChannel,
+      }}
     >
       {children}
     </ChannelContext.Provider>
