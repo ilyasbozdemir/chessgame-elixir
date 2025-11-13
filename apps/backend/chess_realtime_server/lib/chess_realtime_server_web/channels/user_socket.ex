@@ -3,6 +3,7 @@ defmodule ChessRealtimeServerWeb.UserSocket do
 
   ## Kanallar
   channel "game:*", ChessRealtimeServerWeb.ChessChannel
+  channel "chat:*", ChessRealtimeServerWeb.ChatChannel
 
   @impl true
   def connect(_params, socket, _connect_info), do: {:ok, socket}

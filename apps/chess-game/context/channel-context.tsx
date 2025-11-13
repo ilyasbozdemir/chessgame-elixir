@@ -48,6 +48,7 @@ export const ChannelProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log("⚡ Auto-joining lobby channels...");
     joinChannel(SOCKET_CHANNELS.GAME.LOBBY.PLAYERS);
     joinChannel(SOCKET_CHANNELS.GAME.LOBBY.GUESTS);
+    joinChannel(SOCKET_CHANNELS.CHAT.GLOBAL);
   }, [socketConnected]);
 
   // 🔹 Kanal ekleme

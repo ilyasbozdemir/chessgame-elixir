@@ -24,12 +24,11 @@ export const SOCKET_CHANNELS = {
     GLOBAL: "chat:global",
     PRIVATE: (userId: string) => `chat:private:${userId}`,
   },
-
   PRESENCE: {
-    USER: (userId: string) => `presence:user:${userId}`,
+    STATE: "presence_state",
+    DIFF: "presence_diff",
   },
 } as const;
-
 
 /**
  * EVENT NAMES
