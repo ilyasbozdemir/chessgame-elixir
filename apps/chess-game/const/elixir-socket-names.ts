@@ -24,15 +24,17 @@ export const SOCKET_CHANNELS = {
     GLOBAL: "chat:global",
     PRIVATE: (userId: string) => `chat:private:${userId}`,
   },
+
   PRESENCE: {
     STATE: "presence_state",
     DIFF: "presence_diff",
   },
 } as const;
 
+
 /**
- * EVENT NAMES
- * (Push, Receive, Broadcast names)
+ * EVENT NAMES (Push, Receive, Broadcast)
+ * Her kanalın eventlerini merkezi tutmak için.
  */
 export const SOCKET_EVENTS = {
   // Global Realtime
@@ -51,15 +53,26 @@ export const SOCKET_EVENTS = {
     TABLE_REMOVED: "lobby:table_removed",
   },
 
-  // Match/Game Events
-  GAME: {
-    START: "game:start",
-    MOVE: "game:move",
-    RESET: "game:reset",
-    FINISH: "game:finish",
-    RESIGN: "game:resign",
-    OFFER_DRAW: "game:offer_draw",
-    ACCEPT_DRAW: "game:accept_draw",
+  // Match Events (game:match:<id> kanalı içindir)
+  MATCH: {
+    START: "match:start",
+    MOVE: "match:move",
+    RESET: "match:reset",
+    FINISH: "match:finish",
+    RESIGN: "match:resign",
+    OFFER_DRAW: "match:offer_draw",
+    ACCEPT_DRAW: "match:accept_draw",
+    DECLINE_DRAW: "match:decline_draw",
+    TIMEOUT: "match:timeout",
+  },
+
+  // Masa / oda varsa (game:table:<id>)
+  TABLE: {
+    CREATED: "table:created",
+    UPDATED: "table:updated",
+    PLAYER_JOIN: "table:player_join",
+    PLAYER_LEAVE: "table:player_leave",
+    REMOVED: "table:removed",
   },
 
   // Chat Events

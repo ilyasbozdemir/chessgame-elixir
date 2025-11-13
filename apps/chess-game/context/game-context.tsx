@@ -1,71 +1,80 @@
 "use client";
 
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { SOCKET_CHANNELS, SOCKET_EVENTS } from "@/const/elixir-socket-names";
 import { useChannel } from "@/context/channel-context";
-import { usePlayer } from "@/context/player-context";
 import { useChessStore } from "@/lib/chess-store";
-import type { Position } from "@/lib/chess-types";
+import { usePlayer } from "@/context/player-context";
 import { Logger } from "@/lib/utils";
 
 interface GameContextType {
-  startGame: () => void;
-  makeMove: (to: Position) => void;
-  resetGame: () => void;
+  joinMatch: (matchId: string) => void;
+  leaveMatch: () => void;
+  pushMove: (to: any) => void;
+  pushStart: () => void;
 }
 
 const GameContext = createContext<GameContextType>({
-  startGame: () => {},
-  makeMove: () => {},
-  resetGame: () => {},
+  joinMatch: () => {},
+  leaveMatch: () => {},
+  pushMove: () => {},
+  pushStart: () => {},
 });
 
-export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const GameProvider = ({ children }: { children: React.ReactNode }) => {
   const logger = new Logger("GameContext");
-  const { channels, joinChannel, leaveChannel, getChannel } = useChannel();
+  const { joinChannel, leaveChannel, getChannel } = useChannel();
   const { player } = usePlayer();
-  const { gameState, startGame, makeMove, resetGame } = useChessStore();
+  const {
+    startGame,
+    resetGame,
+    makeMove,
+  } = useChessStore();
 
-  // 🎯 Socket kanalı başlat (örneğin "game:room:<tableId>")
-  useEffect(() => {
-    if (!player) return;
+  const [matchId, setMatchId] = useState<string | null>(null);
 
-    const ch = joinChannel("game:lobby:match", { playerId: player._id });
+  // Channel join
+  const joinMatch = (matchId: string) => {
+    setMatchId(matchId);
+
+    const ch = joinChannel(SOCKET_CHANNELS.GAME.MATCH(matchId), {
+      playerId: player?._id,
+    });
+
     if (!ch) return;
 
-    ch.on("game:move", (payload: any) => {
-      logger.info("♟️ Move received:", payload);
-      makeMove(payload.to);
-    });
+    // incoming events
+    ch.on(SOCKET_EVENTS.MATCH.START, () => startGame());
+    ch.on(SOCKET_EVENTS.MATCH.RESET, () => resetGame());
+    ch.on(SOCKET_EVENTS.MATCH.MOVE, (data) => makeMove(data.to));
+  };
 
-    ch.on("game:start", () => {
-      logger.info("🚀 Game started via socket");
-      startGame();
-    });
+  // leave match
+  const leaveMatch = () => {
+    if (matchId) leaveChannel(SOCKET_CHANNELS.GAME.MATCH(matchId));
+    setMatchId(null);
+  };
 
-    ch.on("game:reset", () => {
-      logger.info("🔄 Game reset via socket");
-      resetGame();
-    });
+  // outgoing events
+  const pushMove = (to: any) => {
+    const ch = matchId ? getChannel(SOCKET_CHANNELS.GAME.MATCH(matchId)) : null;
+    if (!ch) return;
+    ch.push(SOCKET_EVENTS.MATCH.MOVE, { to });
+  };
 
-    return () => {
-      ch.leave();
-    };
-  }, [player?._id]);
-
-  // ♟️ Move broadcast helper
-  const emitMove = (to: Position) => {
-    makeMove(to);
-    // channel?.push("game:move", { to });
+  const pushStart = () => {
+    const ch = matchId ? getChannel(SOCKET_CHANNELS.GAME.MATCH(matchId)) : null;
+    if (!ch) return;
+    ch.push(SOCKET_EVENTS.MATCH.START, {});
   };
 
   return (
     <GameContext.Provider
       value={{
-        startGame,
-        makeMove: emitMove,
-        resetGame,
+        joinMatch,
+        leaveMatch,
+        pushMove,
+        pushStart,
       }}
     >
       {children}
