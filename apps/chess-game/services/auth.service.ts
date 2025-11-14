@@ -8,11 +8,9 @@ import { Logger } from "@/lib/utils";
 const isBrowser = typeof window !== "undefined";
 
 export class AuthService {
-  private socketChannel?: any;
   private logger = new Logger("ChessGame-AuthService");
 
-  constructor(channel?: any) {
-    this.socketChannel = channel;
+  constructor() {
   }
 
   /** 🧩 Kayıt ol */
@@ -26,9 +24,8 @@ export class AuthService {
 
     const result = await registerAction(data);
 
-    this.logger.success("✅ Kayıt başarılı:", result.user);
+    this.logger.success("✅ Kayıt başarılı:", result);
 
-    this.socketChannel?.push("user:registered", result.user);
 
     return result;
   }
@@ -41,7 +38,6 @@ export class AuthService {
 
     this.logger.success("✅ Giriş başarılı:", result.user);
 
-    this.socketChannel?.push("user:logged_in", result.user);
 
     return result;
   }
@@ -52,7 +48,6 @@ export class AuthService {
 
     await logoutAction();
 
-    this.socketChannel?.push("user:logged_out", {});
 
     this.logger.success("✅ Çıkış başarılı");
   }

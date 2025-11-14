@@ -6,24 +6,58 @@ import { hashPassword, verifyPassword } from "@/utils/password";
 import { signToken } from "@/utils/jwt";
 import { cookies } from "next/headers";
 import { Logger } from "@/lib/utils";
+import { Player } from "@/models/player";
 
 const logger = new Logger("ChessGame-AuthActions");
+
+export interface RegisterResult {
+  success: boolean;
+  user: {
+    id: string;
+    username: string;
+    displayName: string;
+    email: string;
+  } | null;
+  player: {
+    id: string;
+    userId: string;
+  } | null;
+  token: string | null;
+  error?: string;
+}
 
 export async function registerAction(data: {
   name: string;
   username: string;
   email: string;
   password: string;
-}) {
+}): Promise<RegisterResult> {
   await connectToDatabase();
 
   const { name, username, email, password } = data;
 
   const existingEmail = await User.findOne({ email });
-  if (existingEmail) throw new Error("Bu e-posta zaten kayıtlı");
+
+  if (existingEmail) {
+    return {
+      success: false,
+      user: null,
+      player: null,
+      token: null,
+      error: "Bu e-posta zaten kayıtlı",
+    };
+  }
 
   const existingUsername = await User.findOne({ username });
-  if (existingUsername) throw new Error("Bu kullanıcı adı zaten alınmış");
+  if (existingUsername) {
+    return {
+      success: false,
+      user: null,
+      player: null,
+      token: null,
+      error: "Bu kullanıcı adı zaten alınmış",
+    };
+  }
 
   const passwordHash = await hashPassword(password);
 
@@ -32,6 +66,13 @@ export async function registerAction(data: {
     displayName: name,
     email,
     passwordHash,
+  });
+
+  const newPlayer = await Player.create({
+    userId: newUser._id,
+    rating: 1200,
+    status: "idle",
+    tableId: null,
   });
 
   const token = signToken({ userId: newUser._id });
@@ -45,9 +86,31 @@ export async function registerAction(data: {
     secure: process.env.NODE_ENV === "production",
   });
 
-  logger.success("✅ Kayıt başarılı:", newUser.username);
+  logger.success("👤 Yeni kullanıcı oluşturuldu:", {
+    id: newUser._id.toString(),
+    username: newUser.username,
+    email: newUser.email,
+  });
 
-  return { user: JSON.parse(JSON.stringify(newUser)), token };
+  logger.success("🎮 Oyuncu profili oluşturuldu:", {
+    playerId: newPlayer._id.toString(),
+    userId: newPlayer.userId.toString(),
+  });
+
+  return {
+    success: true,
+    user: {
+      id: newUser._id.toString(),
+      username: newUser.username,
+      displayName: newUser.displayName,
+      email: newUser.email,
+    },
+    player: {
+      id: newPlayer._id.toString(),
+      userId: newUser._id.toString(),
+    },
+    token,
+  };
 }
 
 export async function loginAction(email: string, password: string) {

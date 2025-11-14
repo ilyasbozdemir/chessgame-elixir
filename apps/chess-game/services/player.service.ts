@@ -7,12 +7,9 @@ import { UserDoc } from "@/models/user";
 const isBrowser = typeof window !== "undefined";
 
 export class PlayerService {
-  private socketChannel?: any;
   private logger = new Logger("ChessGame-PlayerService");
 
-  constructor(channel?: any) {
-    this.socketChannel = channel;
-  }
+  constructor() {}
 
   async fetchCurrentSession(): Promise<{
     user: UserDoc | null;
@@ -57,10 +54,8 @@ export class PlayerService {
     if (isBrowser) {
       // useChessStore.getState().addPlayer(name, this.socketChannel);
 
-      this.socketChannel?.push("player:joined", { name });
     }
 
     return data;
   }
-  
 }

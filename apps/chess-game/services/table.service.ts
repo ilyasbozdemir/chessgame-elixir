@@ -9,12 +9,9 @@ import { useChessStore } from "@/lib/chess-store";
 const isBrowser = typeof window !== "undefined";
 
 export class TableService {
-  private socketChannel?: any;
   private logger = new Logger("ChessGame-TableService");
 
-  constructor(channel?: any) {
-    this.socketChannel = channel;
-  }
+  constructor() {}
 
   /** 🧩 Masa oluşturma */
   async create(data: { name: string; ownerId?: string }) {
@@ -37,8 +34,6 @@ export class TableService {
         this.logger.warn("⚠️ Chess store güncellemesi atlandı:", err);
       }
     }
-
-    this.socketChannel?.push("table:created", result);
 
     return result;
   }
@@ -64,9 +59,6 @@ export class TableService {
         this.logger.warn("⚠️ Chess store güncellemesi atlandı:", err);
       }
     }
-
-    // 🔔 (ileride gerekirse) socket güncellemesi
-    this.socketChannel?.push("tables:list_updated", { count: result.length });
 
     return result;
   }

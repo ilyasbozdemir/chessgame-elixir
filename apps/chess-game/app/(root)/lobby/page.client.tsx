@@ -24,9 +24,8 @@ interface PageClientProps {
 }
 
 const PageClient: React.FC<PageClientProps> = ({}) => {
-  const { user, loading: userLoading, login, logout } = useUser();
-  const { player, presenceCount, refresh } = usePlayer();
-const { channels, joinChannel, leaveChannel, getChannel } = useChannel();
+  const { user, loading: userLoading } = useUser();
+  const { player, presenceCount } = usePlayer();
 
   const router = useRouter();
 
@@ -117,8 +116,23 @@ const { channels, joinChannel, leaveChannel, getChannel } = useChannel();
     );
   }
 
-  console.log(user);
-  console.log(player);
+  console.group("🔍 User & Player Kontrol");
+
+  console.log("👤 User:", {
+    id: user?._id,
+    username: user?.username,
+    displayName: user?.displayName,
+    email: user?.email,
+  });
+
+  console.log(
+    "🧩 Player:",
+    player
+      ?player
+      : "❌ Player kaydı yok"
+  );
+
+  console.groupEnd();
 
   return (
     <React.Fragment>

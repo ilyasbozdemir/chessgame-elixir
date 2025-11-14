@@ -6,11 +6,6 @@ const PlayerSchema = new Schema(
 
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
 
-    color: {
-      type: String,
-      enum: ["white", "black", null],
-      default: null,
-    },
     createdAt: { type: Date, default: Date.now },
   },
   { versionKey: false, timestamps: true }
@@ -18,6 +13,4 @@ const PlayerSchema = new Schema(
 
 export const Player = models.Player || mongoose.model("Player", PlayerSchema);
 
-export type PlayerDoc = mongoose.InferSchemaType<typeof PlayerSchema> & {
-  color: "white" | "black" | null;
-};
+export type PlayerDoc = mongoose.InferSchemaType<typeof PlayerSchema> 

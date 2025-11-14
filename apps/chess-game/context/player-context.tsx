@@ -9,14 +9,12 @@ import { useChannel } from "./channel-context";
 
 interface PlayerContextType {
   player: PlayerDoc | null;
-  channel: any;
   refresh: () => Promise<void>;
   presenceCount?: number;
 }
 
 const PlayerContext = createContext<PlayerContextType>({
   player: null,
-  channel: null,
   refresh: async () => {},
 });
 
@@ -27,12 +25,10 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const [player, setPlayer] = useState<PlayerDoc | null>(null);
 
-  const { channel } = useChannel();
-
   const [presenceCount, setPresenceCount] = useState(0);
 
   const refresh = async () => {
-    const res = await fetch("/api/player/me");
+    const res = await fetch("/api/me");
     const data = await res.json();
     setPlayer(data.player ?? null);
   };
@@ -43,13 +39,13 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     (async () => {
       await refresh();
 
-      const tableService = new TableService(channel);
+      const tableService = new TableService();
       await tableService.list();
     })();
   }, [user?._id]);
 
   return (
-    <PlayerContext.Provider value={{ player, channel, refresh, presenceCount }}>
+    <PlayerContext.Provider value={{ player, refresh, presenceCount }}>
       {children}
     </PlayerContext.Provider>
   );
