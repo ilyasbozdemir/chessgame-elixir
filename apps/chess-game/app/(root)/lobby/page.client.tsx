@@ -14,10 +14,7 @@ import { CreateTableDialog } from "./components/dialogs/create-table-dialog";
 import { DeleteTableDialog } from "./components/dialogs/delete-table-dialog";
 import { TableList } from "./components/tables/table-list";
 import { StatsWrapper } from "./components/stats/stat-wrapper";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useUser } from "@/context/user-context";
-import { useChannel } from "@/context/channel-context";
 
 interface PageClientProps {
   //
@@ -91,30 +88,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       </React.Fragment>
     );
   }
-  if (!user) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
-        <div className="w-full max-w-md text-center space-y-6 p-8 rounded-2xl border border-border bg-card shadow-sm">
-          <div className="w-16 h-16 mx-auto rounded-full bg-accent flex items-center justify-center">
-            <Users className="w-8 h-8 text-accent-foreground" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-xl font-semibold text-foreground">
-              Oyuncu Bilgisi Eksik
-            </h2>
-            <p className="text-muted-foreground text-sm">
-              Masaları görebilmek ve oyuna katılabilmek için önce bir oyuncu
-              ismi belirlemeniz gerekiyor.
-            </p>
-          </div>
-
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/login">Giriş Yap</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   console.group("🔍 User & Player Kontrol");
 
@@ -125,12 +98,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     email: user?.email,
   });
 
-  console.log(
-    "🧩 Player:",
-    player
-      ?player
-      : "❌ Player kaydı yok"
-  );
+  console.log("🧩 Player:", player ? player : "❌ Player kaydı yok");
 
   console.groupEnd();
 

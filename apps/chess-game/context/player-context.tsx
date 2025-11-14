@@ -1,11 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { PlayerDoc } from "@/models/player";
-import { socket } from "@/lib/socket";
-import { TableService } from "@/services/table.service";
 import { useUser } from "@/context/user-context";
-import { useChannel } from "./channel-context";
 
 interface PlayerContextType {
   player: PlayerDoc | null;
@@ -33,16 +30,6 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     setPlayer(data.player ?? null);
   };
 
-  useEffect(() => {
-    if (!user) return;
-
-    (async () => {
-      await refresh();
-
-      const tableService = new TableService();
-      await tableService.list();
-    })();
-  }, [user?._id]);
 
   return (
     <PlayerContext.Provider value={{ player, refresh, presenceCount }}>

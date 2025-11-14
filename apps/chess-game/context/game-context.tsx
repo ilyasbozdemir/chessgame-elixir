@@ -6,6 +6,9 @@ import { useChannel } from "@/context/channel-context";
 import { useChessStore } from "@/lib/chess-store";
 import { usePlayer } from "@/context/player-context";
 import { Logger } from "@/lib/utils";
+import { TableService } from "@/services/table.service";
+import { GameService } from "@/services/game.service";
+import { TournamentService } from "@/services/tournament.service";
 
 interface GameContextType {
   joinMatch: (matchId: string) => void;
@@ -25,13 +28,25 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
   const logger = new Logger("GameContext");
   const { joinChannel, leaveChannel, getChannel } = useChannel();
   const { player } = usePlayer();
-  const {
-    startGame,
-    resetGame,
-    makeMove,
-  } = useChessStore();
+  const { startGame, resetGame, makeMove } = useChessStore();
 
   const [matchId, setMatchId] = useState<string | null>(null);
+
+useEffect(() => {
+  (async () => {
+    const tableService = new TableService();
+    const gameService = new GameService(); 
+    const tournamentService = new TournamentService();
+
+    await Promise.all([
+      tableService.list(),
+      // gameService.list(),        
+      // tournamentService.list(),  
+    ]);
+
+  })();
+}, []);
+
 
   // Channel join
   const joinMatch = (matchId: string) => {

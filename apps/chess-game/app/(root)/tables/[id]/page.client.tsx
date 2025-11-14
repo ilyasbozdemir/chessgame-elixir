@@ -13,13 +13,16 @@ import { Crown, LogOut, Swords, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { usePlayer } from "@/context/player-context";
 import { useRouter } from "next/navigation";
+import { user } from "@/utils";
+import { useUser } from "@/context/user-context";
 
 interface PageClientProps {
   id: string;
 }
 
 export default function PageClient({ id }: PageClientProps) {
-  const { player } = usePlayer();
+  const { player, presenceCount } = usePlayer();
+  const { user, loading: userLoading } = useUser();
   const router = useRouter();
 
   const leaveTable = useChessStore((s) => s.leaveTable);
@@ -51,7 +54,7 @@ export default function PageClient({ id }: PageClientProps) {
 
   const handleJoinTable = async (tableId: string) => {
     if (player) {
-      console.log("🎮 Oyuncu masaya eklendi:", player.name);
+      console.log("🎮 Oyuncu masaya eklendi:", user?.displayName);
     }
   };
 
@@ -65,7 +68,6 @@ export default function PageClient({ id }: PageClientProps) {
 
   return (
     <>
-
       <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex items-center justify-center p-3 sm:p-4 lg:ml-64">
         <Card className="w-full max-w-2xl">
           <CardHeader className="text-center p-4 sm:p-6">
