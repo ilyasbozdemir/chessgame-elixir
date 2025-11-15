@@ -30,14 +30,14 @@ interface DeleteTableDialogProps {
 
 export function DeleteTableDialog({ table }: DeleteTableDialogProps) {
   const { user, loading: userLoading, login, logout } = useUser();
-  const { player, channel, presenceCount, refresh } = usePlayer();
+  const { player, refresh } = usePlayer();
   const deleteTable = useChessStore((s) => s.deleteTable);
 
   const handleDeleteTable = async (tableId: string) => {
     //if (!currentPlayer) return;
 
     try {
-      await deleteTable(tableId, channel);
+      await deleteTable(tableId);
     } catch (err) {
       console.error(err);
     }

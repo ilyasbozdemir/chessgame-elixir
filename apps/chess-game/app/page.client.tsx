@@ -10,7 +10,6 @@ export default function PageClient() {
 
   return (
     <>
-
       <Navbar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="container mx-auto px-4 py-24 text-center">

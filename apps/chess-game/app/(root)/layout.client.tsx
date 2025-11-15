@@ -40,10 +40,7 @@ export default function ClientLayout({
           className="flex-1 p-4 transition-all"
           style={{ marginLeft: "var(--sidebar-width)" }}
         >
-          <PageContainer>
-
-          {children}
-          </PageContainer>
+          <PageContainer>{children}</PageContainer>
         </main>
         <RealtimeListener />
       </div>

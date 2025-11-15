@@ -53,7 +53,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ isOpen, onClose, width }: AppSidebarProps) {
   const { user, loading: userLoading, login, logout } = useUser();
-  const { player, channel, presenceCount, refresh } = usePlayer();
+  const { player,  refresh } = usePlayer();
   const pathname = usePathname();
   const router = useRouter();
 

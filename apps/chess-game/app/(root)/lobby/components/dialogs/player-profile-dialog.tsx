@@ -33,7 +33,7 @@ interface PlayerProfileDialogProps {
 
 export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
   const { user, loading: userLoading, login, logout } = useUser();
-  const { player, channel, presenceCount, refresh } = usePlayer();
+  const { player, presenceCount, refresh } = usePlayer();
   const [playerName, setPlayerName] = useState("");
 
   const [profileSection, setProfileSection] = useState<
@@ -140,7 +140,6 @@ export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
                     variant="destructive"
                     className="w-full"
                     onClick={async () => {
-
                       setProfileSection("main");
                       const res = await fetch("/api/logout", {
                         method: "POST",
@@ -180,8 +179,6 @@ export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
                     className="flex-1"
                     disabled={!editName.trim()}
                     onClick={() => {
-
-                    
                       setProfileSection("main");
                     }}
                   >

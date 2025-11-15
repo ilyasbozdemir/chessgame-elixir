@@ -26,7 +26,7 @@ interface CreateTableDialogProps {
 
 export function CreateTableDialog({}: CreateTableDialogProps) {
   const { user, loading: userLoading, login, logout } = useUser();
-  const { player, channel, presenceCount, refresh } = usePlayer();
+  const { player,  refresh } = usePlayer();
   const router = useRouter();
 
   const tableService = new TableService();

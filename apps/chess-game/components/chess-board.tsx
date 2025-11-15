@@ -19,7 +19,7 @@ interface ChessBoardProps {
 const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
 
   const { user, loading: userLoading, login, logout } = useUser();
-  const { player, channel, presenceCount, refresh } = usePlayer();
+  const { player, presenceCount, refresh } = usePlayer();
 
   const { gameState, selectPiece, makeMove, resetGame } =
     useChessStore();
