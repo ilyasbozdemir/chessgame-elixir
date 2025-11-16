@@ -22,7 +22,6 @@ interface PageClientProps {
 const PageClient: React.FC<PageClientProps> = ({}) => {
   const { user, playerUser, loading: userLoading } = useUser();
 
-
   const { lobbyCount, gameCount, globalCount } = usePresence();
 
   const router = useRouter();
@@ -56,10 +55,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     onJoin: async (tableId: string) => {
       if (playerUser && user) {
         joinTable(tableId, playerUser);
-        await joinTableAction(tableId, {
-          id: playerUser._id!.toString(),
-          name: user?.displayName || "Anonim",
-        });
+
         console.log("🎮 Oyuncu masaya eklendi:", user?.displayName);
       }
     },
@@ -89,19 +85,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
       </React.Fragment>
     );
   }
-
-  console.group("🔍 User & Player Kontrol");
-
-  console.log("👤 User:", {
-    id: user?._id,
-    username: user?.username,
-    displayName: user?.displayName,
-    email: user?.email,
-  });
-
-  console.log("🧩 Player:", playerUser ? playerUser : "❌ Player kaydı yok");
-
-  console.groupEnd();
 
   return (
     <React.Fragment>

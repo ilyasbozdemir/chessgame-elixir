@@ -34,32 +34,28 @@ export function CreateTableDialog({}: CreateTableDialogProps) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const handleCreateTable = async () => {
-    console.group("User Info");
-    console.dir(user, { depth: null });
-    console.groupEnd();
-
-    console.group("Player Info");
-    console.dir(playerUser, { depth: null });
-    console.groupEnd();
-
     if (!playerUser?._id) {
       console.warn("Oyuncunun _id değeri yok, tablo oluşturulamadı.");
       return;
     }
-    if (newTableName.trim() && playerUser) {
-      console.log("🧩 Masa oluşturma başlatıldı:", {
-        tableName: newTableName,
-        playerUser,
-      });
+    if (!user || !user._id) {
+      console.warn("User veya user._id yok, masa oluşturulamadı.");
+      return;
+    }
+
+    if (newTableName.trim() && playerUser && user) {
       try {
         const createdTable = await tableService.create({
           name: newTableName,
-          ownerId: playerUser.userId.toString(),
+          ownerId: user?._id.toString(),
         });
 
         console.log("✅ createTable dönen ID:", createdTable);
         if (createdTable) {
-          console.log("🎮 Oyuncu masaya katıldı:", { createdTable, playerUser });
+          console.log("🎮 Oyuncu masaya katıldı:", {
+            createdTable,
+            playerUser,
+          });
           setNewTableName("");
           setIsCreateDialogOpen(false);
           router.push(`/tables/${createdTable._id}`);

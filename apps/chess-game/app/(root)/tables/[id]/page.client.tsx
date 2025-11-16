@@ -77,7 +77,6 @@ export default function PageClient({ id }: PageClientProps) {
                 className="shrink-0"
               >
                 <LogOut className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Masalara Dön</span>
               </Button>
               <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                 <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0" />

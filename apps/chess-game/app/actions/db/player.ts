@@ -8,7 +8,6 @@ export async function createPlayer(data: { id: string; name: string }) {
   const doc = await Player.create({
     id: data.id,
     name: data.name.trim(),
-    color: null,
   });
   return JSON.parse(JSON.stringify(doc));
 }
