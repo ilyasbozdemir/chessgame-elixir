@@ -3,19 +3,17 @@
 import { useState } from "react";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 
-import { useChessStore } from "@/lib/chess-store";
-import { usePlayer } from "@/context/player-context";
 import { TableService } from "@/services/table.service";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/user-context";
@@ -25,8 +23,8 @@ interface CreateTableDialogProps {
 }
 
 export function CreateTableDialog({}: CreateTableDialogProps) {
-  const { user, loading: userLoading, login, logout } = useUser();
-  const { player,  refresh } = usePlayer();
+  const { user, playerUser, loading: userLoading, login, logout } = useUser();
+
   const router = useRouter();
 
   const tableService = new TableService();
@@ -36,24 +34,32 @@ export function CreateTableDialog({}: CreateTableDialogProps) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const handleCreateTable = async () => {
-    if (!player?._id) {
+    console.group("User Info");
+    console.dir(user, { depth: null });
+    console.groupEnd();
+
+    console.group("Player Info");
+    console.dir(playerUser, { depth: null });
+    console.groupEnd();
+
+    if (!playerUser?._id) {
       console.warn("Oyuncunun _id değeri yok, tablo oluşturulamadı.");
       return;
     }
-    if (newTableName.trim() && player) {
+    if (newTableName.trim() && playerUser) {
       console.log("🧩 Masa oluşturma başlatıldı:", {
         tableName: newTableName,
-        player,
+        playerUser,
       });
       try {
         const createdTable = await tableService.create({
           name: newTableName,
-          ownerId: player.userId.toString(),
+          ownerId: playerUser.userId.toString(),
         });
 
         console.log("✅ createTable dönen ID:", createdTable);
         if (createdTable) {
-          console.log("🎮 Oyuncu masaya katıldı:", { createdTable, player });
+          console.log("🎮 Oyuncu masaya katıldı:", { createdTable, playerUser });
           setNewTableName("");
           setIsCreateDialogOpen(false);
           router.push(`/tables/${createdTable._id}`);
@@ -67,7 +73,7 @@ export function CreateTableDialog({}: CreateTableDialogProps) {
         });
       }
     } else {
-      console.warn("🚫 Eksik bilgi:", { newTableName, player });
+      console.warn("🚫 Eksik bilgi:", { newTableName, playerUser });
     }
   };
 

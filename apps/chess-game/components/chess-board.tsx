@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, RotateCcw } from "lucide-react";
-import { usePlayer } from "@/context/player-context";
 import { useUser } from "@/context/user-context";
 
 interface ChessBoardProps {
@@ -17,12 +16,9 @@ interface ChessBoardProps {
 }
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
+  const { user, playerUser, loading: userLoading, login, logout } = useUser();
 
-  const { user, loading: userLoading, login, logout } = useUser();
-  const { player, presenceCount, refresh } = usePlayer();
-
-  const { gameState, selectPiece, makeMove, resetGame } =
-    useChessStore();
+  const { gameState, selectPiece, makeMove, resetGame } = useChessStore();
   const { board, selectedPiece, validMoves, currentTurn, capturedPieces } =
     gameState;
 
@@ -38,7 +34,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
   }
 
   const currentPlayerColor = table.players.find(
-    (p) => p.id === player?._id
+    (p) => p.id === playerUser?._id
   )?.color;
 
   const isMyTurn = currentPlayerColor === currentTurn;

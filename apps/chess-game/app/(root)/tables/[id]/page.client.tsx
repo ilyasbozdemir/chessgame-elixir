@@ -11,7 +11,6 @@ import {
 import { useChessStore } from "@/lib/chess-store";
 import { Crown, LogOut, Swords, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { usePlayer } from "@/context/player-context";
 import { useRouter } from "next/navigation";
 import { user } from "@/utils";
 import { useUser } from "@/context/user-context";
@@ -21,8 +20,7 @@ interface PageClientProps {
 }
 
 export default function PageClient({ id }: PageClientProps) {
-  const { player, presenceCount } = usePlayer();
-  const { user, loading: userLoading } = useUser();
+  const { user, playerUser, loading: userLoading } = useUser();
   const router = useRouter();
 
   const leaveTable = useChessStore((s) => s.leaveTable);
@@ -53,7 +51,7 @@ export default function PageClient({ id }: PageClientProps) {
   };
 
   const handleJoinTable = async (tableId: string) => {
-    if (player) {
+    if (playerUser) {
       console.log("🎮 Oyuncu masaya eklendi:", user?.displayName);
     }
   };
@@ -173,21 +171,21 @@ export default function PageClient({ id }: PageClientProps) {
               </div>
             </div>
 
-            {player && table?.players?.length === 2 && (
+            {playerUser && table?.players?.length === 2 && (
               <Button
                 onClick={handleReady}
                 className="w-full"
                 size="default"
                 variant={
                   table.players.find(
-                    (p) => p.id?.toString() === player._id?.toString()
+                    (p) => p.id?.toString() === playerUser._id?.toString()
                   )?.isReady
                     ? "outline"
                     : "default"
                 }
               >
                 {table.players.find(
-                  (p) => p.id?.toString() === player._id?.toString()
+                  (p) => p.id?.toString() === playerUser._id?.toString()
                 )?.isReady
                   ? "Hazır Değilim"
                   : "Hazırım"}

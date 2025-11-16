@@ -2,9 +2,11 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { UserDoc } from "@/models/user";
+import { PlayerDoc } from "@/models/player";
 
 interface UserContextType {
   user: UserDoc | null;
+  playerUser: PlayerDoc | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
@@ -13,20 +15,25 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType>({
   user: null,
+  playerUser: null,
   loading: true,
   login: async () => false,
   logout: async () => {},
   refresh: async () => {},
 });
 
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<UserDoc | null>(null);
+  const [playerUser, setPlayerUser] = useState<PlayerDoc | null>(null);
   const [loading, setLoading] = useState(true);
 
   const refresh = async () => {
     const res = await fetch("/api/me", { credentials: "include" });
     const data = await res.json();
     setUser(data.user ?? null);
+    setPlayerUser(data.player ?? null);
     setLoading(false);
   };
 
@@ -54,7 +61,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, loading, login, logout, refresh }}>
+    <UserContext.Provider
+      value={{ user, playerUser, loading, login, logout, refresh }}
+    >
       {children}
     </UserContext.Provider>
   );

@@ -3,14 +3,14 @@
 import React from "react";
 import { ChannelProvider } from "@/context/channel-context";
 import { UserProvider } from "@/context/user-context";
-import { PlayerProvider } from "@/context/player-context";
 import { GameProvider } from "@/context/game-context";
 import { ChatProvider } from "@/context/chat-context";
+import { PresenceProvider } from "@/context/presence-context";
 
 const providers = [
   ChannelProvider,
   UserProvider,
-  PlayerProvider,
+  PresenceProvider,
   ChatProvider,
   GameProvider,
 ];

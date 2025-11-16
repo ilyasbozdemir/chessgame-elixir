@@ -6,8 +6,6 @@ import { useChessStore } from "@/lib/chess-store";
 import { PlayCircle, Trophy, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { usePlayer } from "@/context/player-context";
-
 import { joinTableAction as joinTableAction } from "@/app/actions/db/table";
 import { useTableButtonResolver } from "@/hooks/get-table-button-state";
 import { CreateTableDialog } from "./components/dialogs/create-table-dialog";
@@ -15,14 +13,17 @@ import { DeleteTableDialog } from "./components/dialogs/delete-table-dialog";
 import { TableList } from "./components/tables/table-list";
 import { StatsWrapper } from "./components/stats/stat-wrapper";
 import { useUser } from "@/context/user-context";
+import { usePresence } from "@/context/presence-context";
 
 interface PageClientProps {
   //
 }
 
 const PageClient: React.FC<PageClientProps> = ({}) => {
-  const { user, loading: userLoading } = useUser();
-  const { player, presenceCount } = usePlayer();
+  const { user, playerUser, loading: userLoading } = useUser();
+
+
+  const { lobbyCount, gameCount, globalCount } = usePresence();
 
   const router = useRouter();
 
@@ -49,14 +50,14 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     [sortedTables]
   );
 
-  const resolveTableButton = useTableButtonResolver(player, {
+  const resolveTableButton = useTableButtonResolver(playerUser, {
     onPreview: (id) => router.push(`/tables/${id}`),
 
     onJoin: async (tableId: string) => {
-      if (player && user) {
-        joinTable(tableId, player);
+      if (playerUser && user) {
+        joinTable(tableId, playerUser);
         await joinTableAction(tableId, {
-          id: player._id!.toString(),
+          id: playerUser._id!.toString(),
           name: user?.displayName || "Anonim",
         });
         console.log("🎮 Oyuncu masaya eklendi:", user?.displayName);
@@ -98,7 +99,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
     email: user?.email,
   });
 
-  console.log("🧩 Player:", player ? player : "❌ Player kaydı yok");
+  console.log("🧩 Player:", playerUser ? playerUser : "❌ Player kaydı yok");
 
   console.groupEnd();
 
@@ -109,7 +110,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
           stats={[
             {
               label: "Aktif Oyuncu",
-              value: presenceCount ?? 0,
+              value: lobbyCount ?? 0,
               icon: Users,
               gradient: "from-accent/60 to-accent/20",
               iconBg: "bg-primary/10",
@@ -147,7 +148,7 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
               badgeLabel={`${waitingTables.length} Masa`}
               resolve={resolveTableButton}
               renderDelete={(table) =>
-                table.ownerId === player?._id ? (
+                table.ownerId === playerUser?._id ? (
                   <DeleteTableDialog table={table} />
                 ) : null
               }

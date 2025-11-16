@@ -21,9 +21,6 @@ import {
   Users,
 } from "lucide-react";
 
-import { PlayerDoc } from "@/models/player";
-import { useChessStore } from "@/lib/chess-store";
-import { usePlayer } from "@/context/player-context";
 import { Logger } from "@/lib/utils";
 import { useUser } from "@/context/user-context";
 
@@ -32,8 +29,15 @@ interface PlayerProfileDialogProps {
 }
 
 export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
-  const { user, loading: userLoading, login, logout } = useUser();
-  const { player, presenceCount, refresh } = usePlayer();
+  const {
+    user,
+    playerUser,
+    loading: userLoading,
+    refresh,
+    login,
+    logout,
+  } = useUser();
+
   const [playerName, setPlayerName] = useState("");
 
   const [profileSection, setProfileSection] = useState<
@@ -60,7 +64,7 @@ export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
 
   return (
     <>
-      {player ? (
+      {playerUser ? (
         <Dialog onOpenChange={(open) => !open && setProfileSection("main")}>
           <DialogTrigger asChild>
             <Button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 transition-colors cursor-pointer">
@@ -100,7 +104,7 @@ export function PlayerProfileDialog({}: PlayerProfileDialogProps) {
                       {user?.displayName}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Oyuncu ID: {player?._id?.toString()}
+                      Oyuncu ID: {playerUser?._id?.toString()}
                     </p>
                   </div>
                 </div>

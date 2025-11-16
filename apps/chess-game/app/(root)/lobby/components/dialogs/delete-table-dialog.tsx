@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { useChessStore } from "@/lib/chess-store";
-import { usePlayer } from "@/context/player-context";
 import { TableDoc } from "@/models/table";
 import { Trash2 } from "lucide-react";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
@@ -29,15 +28,15 @@ interface DeleteTableDialogProps {
 }
 
 export function DeleteTableDialog({ table }: DeleteTableDialogProps) {
-  const { user, loading: userLoading, login, logout } = useUser();
-  const { player, refresh } = usePlayer();
+  const { user, playerUser, loading: userLoading, login, logout } = useUser();
+
   const deleteTable = useChessStore((s) => s.deleteTable);
 
   const handleDeleteTable = async (tableId: string) => {
     //if (!currentPlayer) return;
 
     try {
-      await deleteTable(tableId);
+      //await deleteTable(tableId);
     } catch (err) {
       console.error(err);
     }

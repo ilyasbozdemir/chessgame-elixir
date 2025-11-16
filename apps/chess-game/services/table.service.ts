@@ -15,6 +15,7 @@ export class TableService {
 
   /** 🧩 Masa oluşturma */
   async create(data: { name: string; ownerId?: string }) {
+    
     this.logger.info("🎯 create() çağrıldı:", data.name);
 
     const result = await createTableAction(data);

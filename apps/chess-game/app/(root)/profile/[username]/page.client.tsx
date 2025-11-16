@@ -94,6 +94,9 @@ export type PlayerData = {
   achievements: Achievement[];
 };
 
+
+const CURRENT_USER = "ilyas-bozdemir"; 
+
 const getPlayerData = (username: string): PlayerData => ({
   username: username,
   fullName: "Test User",
@@ -173,6 +176,7 @@ export default function ProfilePageClient({ username }: { username: string }) {
   const router = useRouter();
 
   const player = getPlayerData(username);
+  
 
   const handleAddFriend = () => {
     toast({

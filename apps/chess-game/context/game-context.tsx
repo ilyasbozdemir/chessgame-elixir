@@ -4,11 +4,11 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { SOCKET_CHANNELS, SOCKET_EVENTS } from "@/const/elixir-socket-names";
 import { useChannel } from "@/context/channel-context";
 import { useChessStore } from "@/lib/chess-store";
-import { usePlayer } from "@/context/player-context";
 import { Logger } from "@/lib/utils";
 import { TableService } from "@/services/table.service";
 import { GameService } from "@/services/game.service";
 import { TournamentService } from "@/services/tournament.service";
+import { useUser } from "./user-context";
 
 interface GameContextType {
   joinMatch: (matchId: string) => void;
@@ -27,7 +27,10 @@ const GameContext = createContext<GameContextType>({
 export const GameProvider = ({ children }: { children: React.ReactNode }) => {
   const logger = new Logger("GameContext");
   const { joinChannel, leaveChannel, getChannel } = useChannel();
-  const { player } = usePlayer();
+  const { playerUser } = useUser();
+
+
+
   const { startGame, resetGame, makeMove } = useChessStore();
 
   const [matchId, setMatchId] = useState<string | null>(null);
@@ -53,7 +56,7 @@ useEffect(() => {
     setMatchId(matchId);
 
     const ch = joinChannel(SOCKET_CHANNELS.GAME.MATCH(matchId), {
-      playerId: player?._id,
+      playerId: playerUser?._id,
     });
 
     if (!ch) return;

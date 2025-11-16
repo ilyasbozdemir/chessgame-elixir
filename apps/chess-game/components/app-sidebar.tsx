@@ -20,7 +20,7 @@ import {
   Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { usePlayer } from "@/context/player-context";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,7 +53,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ isOpen, onClose, width }: AppSidebarProps) {
   const { user, loading: userLoading, login, logout } = useUser();
-  const { player,  refresh } = usePlayer();
+
   const pathname = usePathname();
   const router = useRouter();
 
@@ -103,9 +103,9 @@ export function AppSidebar({ isOpen, onClose, width }: AppSidebarProps) {
 
                   <DropdownMenuContent className="w-40">
                     <DropdownMenuItem
-                      onClick={() => router.push(`/profile/${user.username}`)}
+                      onClick={() => router.push(`/my-profile`)}
                     >
-                      Profil
+                      Profilim
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => router.push("/settings")}>
                       Ayarlar
