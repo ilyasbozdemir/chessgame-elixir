@@ -27,7 +27,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
   const tables = useChessStore((s) => s.tables);
 
-  const joinTable = useChessStore((s) => s.joinTable);
   const sortedTables = useMemo(() => {
     if (!Array.isArray(tables)) return [];
 
@@ -53,8 +52,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
     onJoin: async (tableId: string) => {
       if (playerUser && user) {
-        joinTable(tableId, playerUser);
-
         console.log("🎮 Oyuncu masaya eklendi:", user?.displayName);
       }
     },

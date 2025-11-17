@@ -17,7 +17,7 @@ import {
   Info,
   Award,
   MessageCircle,
-  Clock,
+  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -40,7 +40,8 @@ const sidebarItems = [
   { href: "/how-to-play", label: "Nasıl Oynanır?", icon: HelpCircle },
   { href: "/tournament", label: "Turnuvalar", icon: Trophy },
   { href: "/news", label: "Haberler", icon: Newspaper },
-  { href: "/social", label: "Sosyal", icon: Users },
+  { href: "/community", label: "Topluluk", icon: Globe },
+  { href: "/friends", label: "Arkadaşlar", icon: Users },
   { href: "/leaderboard", label: "Liderlik Tablosu", icon: Award },
   { href: "/about", label: "Hakkında", icon: Info },
 ];
