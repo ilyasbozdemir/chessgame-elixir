@@ -14,6 +14,7 @@ import { TableList } from "./components/tables/table-list";
 import { StatsWrapper } from "./components/stats/stat-wrapper";
 import { useUser } from "@/context/user-context";
 import { usePresence } from "@/context/presence-context";
+import { DebugBox } from "@/components/debug-box";
 
 interface PageClientProps {
   //
@@ -130,11 +131,11 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
               items={waitingTables}
               badgeLabel={`${waitingTables.length} Masa`}
               resolve={resolveTableButton}
-              renderDelete={(table) =>
-                table.ownerId === playerUser?._id ? (
+              renderDelete={(table) => {
+                return table.ownerId === playerUser?.userId ? (
                   <DeleteTableDialog table={table} />
-                ) : null
-              }
+                ) : null;
+              }}
             />
 
             <TableList

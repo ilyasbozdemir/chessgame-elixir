@@ -10,9 +10,13 @@ export async function createTableAction(data: {
   ownerId?: string;
 }) {
   await connectToDatabase();
+
+  const ownerUser = await User.findById(data.ownerId);
+
   const doc = await Table.create({
     name: data.name.trim(),
     ownerId: data.ownerId,
+    ownerName: ownerUser?.displayName || ownerUser?.username || "Bilinmeyen",
     status: "waiting",
     players: [],
   });

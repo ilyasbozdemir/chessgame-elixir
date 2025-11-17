@@ -18,7 +18,7 @@ const TableSchema = new Schema(
     },
     createdAt: { type: Date, default: Date.now },
     ownerId: { type: Schema.Types.ObjectId, ref: "Player", required: false },
-    ownerName: { type: String, required: false },
+    ownerName: { type: String, required: true },
   },
   { versionKey: false, timestamps: true }
 );

@@ -12,20 +12,33 @@ interface TableCardProps {
   label: string;
   disabled: boolean;
   action: () => void;
-  showDelete?: React.ReactNode; 
+  showDelete?: React.ReactNode;
 }
 
-export function TableCard({ table, label, disabled, action, showDelete }: TableCardProps) {
+export function TableCard({
+  table,
+  label,
+  disabled,
+  action,
+  showDelete,
+}: TableCardProps) {
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 relative overflow-hidden">
       <div className="absolute top-2 right-2 text-4xl opacity-10 pointer-events-none">
-        {table.status === "waiting" ? "♙" : table.status === "playing" ? "♚" : "♛"}
+        {table.status === "waiting"
+          ? "♙"
+          : table.status === "playing"
+          ? "♚"
+          : "♛"}
       </div>
 
       <CardContent className="p-5 space-y-4 relative z-10">
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-1 min-w-0 flex-1">
-            <h3 className="font-bold text-lg text-foreground truncate" title={table.name}>
+            <h3
+              className="font-bold text-lg text-foreground truncate"
+              title={table.name}
+            >
               {table.name}
             </h3>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -34,7 +47,7 @@ export function TableCard({ table, label, disabled, action, showDelete }: TableC
             </div>
             {table.ownerName && (
               <p className="text-xs text-muted-foreground">
-                Sahibi: {table.ownerName}
+                Sahibi: {table.ownerName.toString()}
               </p>
             )}
           </div>
@@ -58,7 +71,7 @@ export function TableCard({ table, label, disabled, action, showDelete }: TableC
         <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50">
           <Users className="w-4 h-4 text-muted-foreground" />
           <span className="text-sm font-semibold text-foreground">
-            {(table.players?.length ?? 0)}/ 2 Oyuncu
+            {table.players?.length ?? 0}/ 2 Oyuncu
           </span>
         </div>
 
@@ -72,7 +85,12 @@ export function TableCard({ table, label, disabled, action, showDelete }: TableC
           </div>
         )}
 
-        <Button onClick={action} disabled={disabled} className="w-full" size="lg">
+        <Button
+          onClick={action}
+          disabled={disabled}
+          className="w-full"
+          size="lg"
+        >
           {label}
         </Button>
       </CardContent>

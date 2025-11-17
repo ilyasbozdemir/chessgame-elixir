@@ -14,14 +14,22 @@ interface TableListProps {
   renderDelete?: (table: TableDoc) => React.ReactNode;
 }
 
-export function TableList({ title, items, badgeLabel, resolve, renderDelete }: TableListProps) {
+export function TableList({
+  title,
+  items,
+  badgeLabel,
+  resolve,
+  renderDelete,
+}: TableListProps) {
   if (!items.length) return null;
 
   return (
     <section>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-foreground">{title}</h2>
-        <Badge variant="secondary" className="text-sm">{badgeLabel}</Badge>
+        <Badge variant="secondary" className="text-sm">
+          {badgeLabel}
+        </Badge>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
