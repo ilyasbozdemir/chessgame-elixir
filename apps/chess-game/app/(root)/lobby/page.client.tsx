@@ -6,7 +6,6 @@ import { useChessStore } from "@/lib/chess-store";
 import { PlayCircle, Trophy, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { joinTableAction as joinTableAction } from "@/app/actions/db/table";
 import { useTableButtonResolver } from "@/hooks/get-table-button-state";
 import { CreateTableDialog } from "./components/dialogs/create-table-dialog";
 import { DeleteTableDialog } from "./components/dialogs/delete-table-dialog";
@@ -14,7 +13,6 @@ import { TableList } from "./components/tables/table-list";
 import { StatsWrapper } from "./components/stats/stat-wrapper";
 import { useUser } from "@/context/user-context";
 import { usePresence } from "@/context/presence-context";
-import { DebugBox } from "@/components/debug-box";
 
 interface PageClientProps {
   //

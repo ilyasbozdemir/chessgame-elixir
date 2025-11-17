@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Clock, Users } from "lucide-react";
 import { formatTime } from "@/lib/utils";
 import type { TableDoc } from "@/models/table";
+import Link from "next/link";
+import { UserService } from "@/services/user.service";
+import { OwnerLink } from "../owner-link";
 
 interface TableCardProps {
   table: TableDoc;
@@ -22,6 +25,12 @@ export function TableCard({
   action,
   showDelete,
 }: TableCardProps) {
+  const userService = new UserService();
+
+  //
+
+  //
+
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 relative overflow-hidden">
       <div className="absolute top-2 right-2 text-4xl opacity-10 pointer-events-none">
@@ -41,13 +50,14 @@ export function TableCard({
             >
               {table.name}
             </h3>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
               <Clock className="w-3.5 h-3.5 shrink-0" />
               <span>{formatTime(table.createdAt)}</span>
             </div>
-            {table.ownerName && (
+
+            {table.ownerId && (
               <p className="text-xs text-muted-foreground">
-                Sahibi: {table.ownerName.toString()}
+                Sahibi: <OwnerLink ownerId={table.ownerId.toString()} />
               </p>
             )}
           </div>
