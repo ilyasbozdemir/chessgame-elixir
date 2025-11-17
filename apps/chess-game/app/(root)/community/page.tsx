@@ -23,37 +23,21 @@ import {
 import Link from "next/link";
 import React from "react";
 
-const mockFriends = [
-  {
-    id: "user-1",
-    username: "ahmetyilmaz",
-    name: "Ahmet Yılmaz",
-    avatar: "AY",
-    rating: 1850,
-    status: "online",
-    gamesPlayed: 234,
-  },
-  {
-    id: "user-2",
-    username: "aysekaya",
-    name: "Ayşe Kaya",
-    avatar: "AK",
-    rating: 2100,
-    status: "playing",
-    gamesPlayed: 567,
-  },
-  {
-    id: "user-3",
-    username: "mehmetdemir",
-    name: "Mehmet Demir",
-    avatar: "MD",
-    rating: 1920,
-    status: "offline",
-    gamesPlayed: 189,
-  },
-];
+type Post = {
+  id: string;
+  author: string;
+  username: string;
+  avatar: string;
+  rating: number;
+  time: string;
+  content: string;
+  likes: number;
+  likedBy?: string[];
+  comments: number;
+  shares: number;
+};
 
-const mockPosts = [
+const mockPosts: Post[] = [
   {
     id: "post-1",
     author: "Fatma Şahin",
@@ -64,6 +48,7 @@ const mockPosts = [
     content:
       "Bugün harika bir oyun oynadım! Mat in 3 ile kazandım. Satranç ne kadar güzel bir oyun 🎯",
     likes: 45,
+    likedBy: [], // burayı ekledik
     comments: 12,
     shares: 3,
   },
@@ -77,6 +62,7 @@ const mockPosts = [
     content:
       "Yeni açılış stratejisi öğreniyorum. İtalyan Oyunu gerçekten çok etkili! Tavsiye ederim.",
     likes: 23,
+    likedBy: [],
     comments: 8,
     shares: 5,
   },
@@ -89,25 +75,9 @@ const mockPosts = [
     time: "1 gün önce",
     content: "Turnuvada 3. oldum! Çok mutluyum 🏆 Herkese teşekkürler!",
     likes: 89,
+    likedBy: [],
     comments: 34,
     shares: 12,
-  },
-];
-
-const upcomingTournaments = [
-  {
-    id: 1,
-    name: "Haftalık Blitz Turnuvası",
-    date: "15 Mayıs 2025",
-    participants: 64,
-    prize: "1000 Puan",
-  },
-  {
-    id: 2,
-    name: "Aylık Rapid Şampiyonası",
-    date: "20 Mayıs 2025",
-    participants: 128,
-    prize: "5000 Puan",
   },
 ];
 
@@ -127,107 +97,65 @@ export default function CommunityPage() {
           </CardHeader>
         </Card>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
-          <div className="space-y-4">
-            <Card>
-              <CardContent className="p-4">
-                <textarea
-                  placeholder="Ne düşünüyorsun?"
-                  className="w-full min-h-[100px] p-3 bg-muted rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <div className="flex items-center justify-end gap-2 mt-3">
-                  <Button size="sm">Paylaş</Button>
-                </div>
-              </CardContent>
-            </Card>
+        <div className="grid gap-6 ">
+          <Card>
+            <CardContent className="p-4">
+              <textarea
+                placeholder="Ne düşünüyorsun?"
+                className="w-full min-h-[100px] p-3 bg-muted rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <div className="flex items-center justify-end gap-2 mt-3">
+                <Button size="sm">Paylaş</Button>
+              </div>
+            </CardContent>
+          </Card>
 
-            <div className="space-y-3">
-              {mockPosts.map((post) => (
-                <Card key={post.id}>
-                  <CardContent className="p-4 space-y-4">
-                    <div className="flex items-start gap-3">
-                      <Link href={`/profile/${post.username}`}>
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary shrink-0 hover:bg-primary/20 transition-colors cursor-pointer">
-                          {post.avatar}
-                        </div>
-                      </Link>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Link
-                            href={`/profile/${post.username}`}
-                            className="hover:underline"
-                          >
-                            <h4 className="font-semibold">{post.author}</h4>
-                          </Link>
-                          <Badge variant="outline" className="text-xs">
-                            {post.rating}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {post.time}
-                          </span>
-                        </div>
-                        <p className="text-sm mt-2">{post.content}</p>
+          <div className="space-y-3">
+            {mockPosts.map((post) => (
+              <Card key={post.id}>
+                <CardContent className="p-4 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <Link href={`/profile/${post.username}`}>
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary shrink-0 hover:bg-primary/20 transition-colors cursor-pointer">
+                        {post.avatar}
                       </div>
+                    </Link>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Link
+                          href={`/profile/${post.username}`}
+                          className="hover:underline"
+                        >
+                          <h4 className="font-semibold">{post.author}</h4>
+                        </Link>
+                        <Badge variant="outline" className="text-xs">
+                          {post.rating}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {post.time}
+                        </span>
+                      </div>
+                      <p className="text-sm mt-2">{post.content}</p>
                     </div>
+                  </div>
 
-                    <div className="flex items-center gap-4 pt-3 border-t">
-                      <Button variant="ghost" size="sm" className="gap-2">
-                        <Heart className="w-4 h-4" />
-                        <span className="text-xs">{post.likes}</span>
-                      </Button>
-                      <Button variant="ghost" size="sm" className="gap-2">
-                        <MessageCircle className="w-4 h-4" />
-                        <span className="text-xs">{post.comments}</span>
-                      </Button>
-                      <Button variant="ghost" size="sm" className="gap-2">
-                        <Share2 className="w-4 h-4" />
-                        <span className="text-xs">{post.shares}</span>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Trophy className="w-5 h-5" />
-                  Başarılar
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex items-center gap-2 p-2 bg-muted/50 rounded">
-                  <div className="text-2xl">🏆</div>
-                  <div>
-                    <p className="text-sm font-semibold">İlk Zafer</p>
-                    <p className="text-xs text-muted-foreground">
-                      İlk oyununu kazan
-                    </p>
+                  <div className="flex items-center gap-4 pt-3 border-t">
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <Heart className="w-4 h-4" />
+                      <span className="text-xs">{post.likes}</span>
+                    </Button>
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <MessageCircle className="w-4 h-4" />
+                      <span className="text-xs">{post.comments}</span>
+                    </Button>
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <Share2 className="w-4 h-4" />
+                      <span className="text-xs">{post.shares}</span>
+                    </Button>
                   </div>
-                </div>
-                <div className="flex items-center gap-2 p-2 bg-muted/50 rounded">
-                  <div className="text-2xl">⭐</div>
-                  <div>
-                    <p className="text-sm font-semibold">Seri Kazanan</p>
-                    <p className="text-xs text-muted-foreground">
-                      5 oyun üst üste kazan
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 p-2 bg-muted/50 rounded opacity-50">
-                  <div className="text-2xl">🎯</div>
-                  <div>
-                    <p className="text-sm font-semibold">Bulmaca Ustası</p>
-                    <p className="text-xs text-muted-foreground">
-                      100 bulmaca çöz
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </div>
