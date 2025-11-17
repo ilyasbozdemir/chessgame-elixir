@@ -33,6 +33,27 @@ export async function createTableAction(data: {
   };
 }
 
+export async function deleteTableAction(tableId: string, requesterId: string) {
+  await connectToDatabase();
+
+  // 1️⃣ Table bulun
+  const table = await Table.findById(tableId);
+  if (!table) {
+    return { ok: false, error: "Table not found" };
+  }
+
+  // 2️⃣ Sahip kontrolü
+  if (table.ownerId.toString() !== requesterId.toString()) {
+    return { ok: false, error: "Only the owner can delete this table" };
+  }
+
+  // 3️⃣ Sil
+  await table.deleteOne();
+
+  // 4️⃣ JSON-safe response
+  return { ok: true, id: tableId };
+}
+
 export async function listTablesAction() {
   await connectToDatabase();
   const docs = await Table.find().sort({ createdAt: -1 }).lean();

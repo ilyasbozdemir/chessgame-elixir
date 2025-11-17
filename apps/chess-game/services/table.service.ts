@@ -4,6 +4,7 @@ import { PlayerDoc } from "@/models/player";
 
 import {
   createTableAction,
+  deleteTableAction,
   joinTableAction,
   listTablesAction,
 } from "@/app/actions/db/table";
@@ -49,10 +50,6 @@ export class TableService {
     }
 
     return result;
-  }
-
-  async delete(tableId: string, player: PlayerDoc) {
-    //
   }
 
   /** 📄 Tüm masaları listele */
@@ -123,7 +120,21 @@ export class TableService {
 
   /** 🗑️ Masa sil */
   async deleteTable(tableId: string, requesterId: string) {
-    // kontrol: sadece kurucu silebilir
+    const result = await deleteTableAction(tableId, requesterId);
+
+    if (!result.ok) throw new Error(result.error || "Delete failed");
+
+    if (isBrowser) {
+      const { tables } = useChessStore.getState();
+      useChessStore.setState({
+        tables: tables.filter((t) => {
+          if (!t._id) return true; 
+          return t._id.toString() !== tableId;
+        }),
+      });
+    }
+
+    return result;
   }
 
   /** 🚪 Oyuncuyu masadan çıkar */

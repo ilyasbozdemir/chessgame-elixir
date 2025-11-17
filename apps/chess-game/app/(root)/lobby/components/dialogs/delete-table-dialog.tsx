@@ -22,23 +22,44 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useUser } from "@/context/user-context";
+import { TableService } from "@/services/table.service";
 
 interface DeleteTableDialogProps {
   table: TableDoc;
 }
 
 export function DeleteTableDialog({ table }: DeleteTableDialogProps) {
-  const { user, playerUser, loading: userLoading, login, logout } = useUser();
+  const { user, playerUser } = useUser();
 
-  const deleteTable = useChessStore((s) => s.deleteTable);
+  const tableService = new TableService();
 
   const handleDeleteTable = async (tableId: string) => {
-    //if (!currentPlayer) return;
+    if (!playerUser?.userId) {
+      console.warn("Oyuncunun userId değeri yok, tablo silinemedi.");
+      return;
+    }
+
+    if (!user || !user._id) {
+      console.warn("User veya user._id yok, tablo silinemedi.");
+      return;
+    }
 
     try {
-      //await deleteTable(tableId);
-    } catch (err) {
-      console.error(err);
+      const result = await tableService.deleteTable(
+        tableId,
+        playerUser?.userId.toString()
+      );
+
+      if (result?.ok) {
+        console.log("✅ Masa silindi:", tableId);
+      } else {
+        console.warn("⚠️ Masa silinemedi, sonuç:", result);
+      }
+    } catch (error: any) {
+      console.error("❌ Masa silme hatası:", {
+        message: error.message || error,
+        stack: error.stack,
+      });
     }
   };
 
