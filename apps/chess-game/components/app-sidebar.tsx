@@ -37,7 +37,6 @@ const sidebarItems = [
   { href: "/chat", label: "Mesajlar", icon: MessageCircle },
   { href: "/puzzles", label: "Bulmacalar", icon: Puzzle },
   { href: "/learn", label: "Öğren", icon: GraduationCap },
-  { href: "/how-to-play", label: "Nasıl Oynanır?", icon: HelpCircle },
   { href: "/tournament", label: "Turnuvalar", icon: Trophy },
   { href: "/news", label: "Haberler", icon: Newspaper },
   { href: "/community", label: "Topluluk", icon: Globe },

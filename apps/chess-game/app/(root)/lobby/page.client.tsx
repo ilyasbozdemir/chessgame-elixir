@@ -39,12 +39,12 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
   const waitingTables = useMemo(
     () => sortedTables.filter((t) => t.status === "waiting"),
-    [sortedTables]
+    [sortedTables],
   );
 
   const activeTables = useMemo(
     () => sortedTables.filter((t) => t.status === "playing"),
-    [sortedTables]
+    [sortedTables],
   );
 
   const resolveTableButton = useTableButtonResolver(playerUser, {
@@ -52,6 +52,9 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
     onJoin: async (tableId: string) => {
       if (playerUser && user) {
+
+        
+
         console.log("🎮 Oyuncu masaya eklendi:", user?.displayName);
       }
     },
@@ -127,9 +130,9 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
               badgeLabel={`${waitingTables.length} Masa`}
               resolve={resolveTableButton}
               renderDelete={(table) => {
-                return table.ownerId === playerUser?.userId ? (
-                  <DeleteTableDialog table={table} />
-                ) : null;
+                return table.ownerId === playerUser?.userId
+                  ? <DeleteTableDialog table={table} />
+                  : null;
               }}
             />
 

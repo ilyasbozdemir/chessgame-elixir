@@ -208,12 +208,12 @@ export default function FriendsPage() {
   }
 
   const handleSendInvite = () => {
-    console.log('[v0] Sending invite to', selectedFriend?.name, 'with time control', timeControl)
+    console.log('Sending invite to', selectedFriend?.name, 'with time control', timeControl)
     setShowTableCreation(true)
   }
 
   const handleCreateTable = () => {
-    console.log('[v0] Creating table with time control', timeControl)
+    console.log('Creating table with time control', timeControl)
     setInviteDialogOpen(false)
     setShowTableCreation(false)
     setSelectedFriend(null)

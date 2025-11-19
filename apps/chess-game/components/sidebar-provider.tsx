@@ -22,7 +22,6 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
     "/puzzles",
     "/leaderboard",
     "/profile",
-    "/how-to-play",
   ].some((p) => pathname.startsWith(p));
 
   const mode: SidebarMode = isGameMode ? "game" : "root";
