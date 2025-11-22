@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import ChessBoard from "@/components/chess-board";
+import ChessBoardUI from "@/components/chess-board";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
 import Link from "next/link";
@@ -176,7 +176,7 @@ export default function WatchPage() {
             ← Geri Dön
           </Button>
         </div>
-        <ChessBoard mode="spectate" tableId={selectedGame} />
+        <ChessBoardUI mode="spectate" tableId={selectedGame} />
       </React.Fragment>
     );
   }
@@ -291,7 +291,7 @@ export default function WatchPage() {
                 <CardTitle>Oyun Tekrarı</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ChessBoard
+                <ChessBoardUI
                   mode="replay"
                   tableId={selectedGame as "play" | "spectate" | "replay"}
                 />

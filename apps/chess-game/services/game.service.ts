@@ -1,4 +1,5 @@
 // services/game.service.ts
+import { createGameAction } from "@/app/actions/db/game";
 import { Logger } from "@/lib/utils";
 
 export class GameService {
@@ -12,7 +13,7 @@ export class GameService {
 
   /** 🆕 Oyun oluştur */
   async create(data: { tableId?: string; mode?: string }) {
-    // create game in DB
+    const result = await createGameAction(data.tableId!, data.mode || "10+0");
   }
 
   /** 📄 Tüm oyunları listele */
@@ -64,10 +65,7 @@ export class GameService {
   }
 
   /** 🧭 Oyunun durumunu değiştir */
-  async setStatus(
-    gameId: string,
-    status: "waiting" | "playing" | "finished"
-  ) {
+  async setStatus(gameId: string, status: "waiting" | "playing" | "finished") {
     // update game.status
   }
 

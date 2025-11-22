@@ -1,21 +1,20 @@
 "use client";
 
 import { useChessStore } from "@/stores/chess-store";
-import { getPieceSymbol } from "@/lib/chess-logic";
-import type { Position } from "@/lib/chess-types";
+import { getPieceSymbol } from "@/game/chess-logic";
+import type { Position } from "@/game/chess-types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, RotateCcw } from "lucide-react";
 import { useUser } from "@/context/user-context";
-
-interface ChessBoardProps {
+interface ChessBoardUIProps {
   mode?: "play" | "spectate" | "replay";
   tableId?: string;
   gameId?: string;
 }
 
-const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
+const ChessBoardUI: React.FC<ChessBoardUIProps> = ({ mode, tableId }) => {
   const { user, playerUser, loading: userLoading, login, logout } = useUser();
 
   const { gameState, selectPiece, makeMove, resetGame } = useChessStore();
@@ -25,6 +24,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
   const tables = useChessStore((s) => s.tables);
   const table = tables.find((t) => t._id?.toString() === tableId);
 
+  
   if (!table) {
     return (
       <div className="h-[70vh] flex items-center justify-center text-muted-foreground">
@@ -32,8 +32,9 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
       </div>
     );
   }
+  
 
-  const currentPlayerColor = table.players.find(
+  const currentPlayerColor = table?.players.find(
     (p) => p.id === playerUser?._id
   )?.color;
 
@@ -247,4 +248,4 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ mode, tableId }) => {
   );
 };
 
-export default ChessBoard;
+export default ChessBoardUI;

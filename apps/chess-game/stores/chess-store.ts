@@ -2,9 +2,10 @@ import { create } from "zustand";
 
 import type { PlayerDoc } from "@/models/player";
 import type { TableDoc } from "@/models/table";
-import { GameState, Position } from "@/lib/chess-types";
-import { initializeBoard, isValidMove, movePiece } from "@/lib/chess-logic";
+import { GameState, Position } from "@/game/chess-types";
+import {  isValidMove, movePiece } from "@/game/chess-logic";
 import { Logger } from "@/lib/utils";
+import { ChessBoard } from "@/game/chess-board";
 
 export interface ChessStore {
   tables: TableDoc[];
@@ -30,7 +31,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
   tables: get()?.tables ?? [],
 
   gameState: {
-    board: initializeBoard(),
+    board: new ChessBoard("white").board,
     currentTurn: "white",
     selectedPiece: null,
     validMoves: [],
@@ -169,7 +170,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
   resetGame: () => {
     set({
       gameState: {
-        board: initializeBoard(),
+        board: new ChessBoard("white").board,
         currentTurn: "white",
         selectedPiece: null,
         validMoves: [],

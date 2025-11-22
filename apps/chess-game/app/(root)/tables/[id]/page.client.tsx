@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/context/user-context";
 import { useState } from "react";
 import { TableService } from "@/services/table.service";
+import { GameService } from "@/services/game.service";
 
 interface PageClientProps {
   id: string;
@@ -25,6 +26,7 @@ export default function PageClient({ id }: PageClientProps) {
   const router = useRouter();
 
   const tableService = new TableService();
+  const gameService = new GameService();
 
   const [isReady, setIsReady] = useState<boolean>(false);
 
@@ -35,9 +37,14 @@ export default function PageClient({ id }: PageClientProps) {
     return;
   }
 
-
   const handleStartGame = () => {
-    router.push("/game");
+
+
+
+    
+
+    
+    //router.push("/game");
   };
 
   const handleLeaveTable = () => {
@@ -76,8 +83,6 @@ export default function PageClient({ id }: PageClientProps) {
   }
 
   console.log(table.players);
-
-
 
   return (
     <>

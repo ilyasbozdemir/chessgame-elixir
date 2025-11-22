@@ -1,11 +1,12 @@
 import { Schema, model, Types, models } from "mongoose";
+import { TablePlayerSchema } from "./table-player";
 
 const MoveSchema = new Schema(
   {
-    from: { type: String, required: true }, // "e2"
-    to: { type: String, required: true }, // "e4"
-    piece: { type: String, required: true }, // "pawn", "knight" vs
-    fen: { type: String, required: true }, // position after move
+    from: { type: String, required: true },
+    to: { type: String, required: true },
+    piece: { type: String, required: true },
+    fen: { type: String, required: true },
     playedAt: { type: Date, default: Date.now },
   },
   { _id: false }
@@ -17,8 +18,8 @@ const GameSchema = new Schema(
 
     tableId: { type: Schema.Types.ObjectId, ref: "Table", required: true },
 
-    whiteId: { type: Schema.Types.ObjectId, ref: "Player", required: true },
-    blackId: { type: Schema.Types.ObjectId, ref: "Player", required: true },
+    white: { type: TablePlayerSchema, required: true },
+    black: { type: TablePlayerSchema, required: true },
 
     status: {
       type: String,
@@ -27,12 +28,56 @@ const GameSchema = new Schema(
     },
 
     winner: {
-      type: Schema.Types.ObjectId,
-      ref: "Player",
+      type: String,
+      enum: ["white", "black", "draw", null],
+      default: null,
+    },
+
+    whiteScore: { type: Number, default: null },
+    blackScore: { type: Number, default: null },
+
+    endReason: {
+      type: String,
+      enum: [
+        "checkmate",
+        "resign",
+        "timeout",
+        "draw-agreement",
+        "abort",
+        "disconnect",
+        null,
+      ],
       default: null,
     },
 
     moves: { type: [MoveSchema], default: [] },
+
+    currentFEN: {
+      type: String,
+      required: true,
+      default: "startpos",
+    },
+
+    whiteTimeMs: {
+      type: Number,
+      default: null,
+    },
+
+    blackTimeMs: {
+      type: Number,
+      default: null,
+    },
+
+    gameType: {
+      type: String,
+      enum: ["bullet", "blitz", "rapid", "classical"],
+      default: "blitz",
+    },
+
+    incrementMs: {
+      type: Number,
+      default: 0,
+    },
 
     startedAt: { type: Date, default: Date.now },
     finishedAt: { type: Date, default: null },
@@ -44,9 +89,3 @@ const GameSchema = new Schema(
 );
 
 export const Game = models.Game || model("Game", GameSchema);
-
-export type GameDoc = typeof Game extends infer M
-  ? M extends { prototype: infer T }
-    ? T
-    : never
-  : never;
