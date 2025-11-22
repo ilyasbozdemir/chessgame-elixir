@@ -58,7 +58,7 @@ export function GameControls() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 my-3">
       {/* Timers */}
       <div className="flex items-center justify-between gap-4">
         {/* White Timer */}
@@ -78,8 +78,10 @@ export function GameControls() {
         </div>
       </div>
 
-      {/* Game Controls */}
-      <div className="flex items-center justify-center gap-2">
+      {/* Game Controls 
+
+      
+          <div className="flex items-center justify-center gap-2">
         <Button
           variant="outline"
           size="lg"
@@ -113,6 +115,9 @@ export function GameControls() {
         </Button>
       </div>
 
+      
+      */}
+  
       <Dialog open={showResignDialog} onOpenChange={setShowResignDialog}>
         <DialogContent>
           <DialogHeader>

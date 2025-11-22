@@ -122,6 +122,7 @@ const ChessBoardUI: React.FC<ChessBoardUIProps> = ({ mode, tableId }) => {
 
   return (
     <>
+    
       <GameControls />
 
       <div className="w-full max-w-6xl grid lg:grid-cols-[1fr_auto_1fr] gap-3 sm:gap-6 items-start">
