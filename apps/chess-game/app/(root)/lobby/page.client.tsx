@@ -19,7 +19,7 @@ interface PageClientProps {
   //
 }
 
-const PageClient: React.FC<PageClientProps> = ({}) => {
+const PageClient: React.FC<PageClientProps> = ({ }) => {
   const tableService = new TableService();
 
   const { user, playerUser, loading: userLoading } = useUser();

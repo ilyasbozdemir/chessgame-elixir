@@ -89,7 +89,7 @@ export class TableService {
     });
 
     try {
-      const updatedTable = await joinTableAction(tableId, playerId);
+      const updatedTable = await joinTableAction(tableId, playerId, ready);
 
       if (!updatedTable) {
         this.logger.warn(
