@@ -9,6 +9,11 @@ interface DebugBoxProps {
 }
 
 export function DebugBox({ label, data, collapsed = false }: DebugBoxProps) {
+  // Sadece development ortamında göster
+  if (process.env.NODE_ENV !== "development") {
+    return null;
+  }
+
   return (
     <details
       className="border rounded p-2 bg-muted/40 text-xs font-mono whitespace-pre-wrap"

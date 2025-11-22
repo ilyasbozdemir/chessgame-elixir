@@ -8,12 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useChessStore } from "@/lib/chess-store";
+import { useChessStore } from "@/stores/chess-store";
 import { Crown, LogOut, Swords, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
-import { user } from "@/utils";
 import { useUser } from "@/context/user-context";
+import { useState } from "react";
+import { TableService } from "@/services/table.service";
 
 interface PageClientProps {
   id: string;
@@ -23,16 +24,19 @@ export default function PageClient({ id }: PageClientProps) {
   const { user, playerUser, loading: userLoading } = useUser();
   const router = useRouter();
 
-  const leaveTable = useChessStore((s) => s.leaveTable);
-  const startGame = useChessStore((s) => s.startGame);
-  const gameState = useChessStore((s) => s.gameState);
-  const setPlayerReady = useChessStore((s) => s.setPlayerReady);
+  const tableService = new TableService();
+
+  const [isReady, setIsReady] = useState<boolean>(false);
 
   const tables = useChessStore((s) => s.tables);
   const table = tables.find((t) => t._id?.toString() === id);
 
+  if (!table) {
+    return;
+  }
+
+
   const handleStartGame = () => {
-    startGame();
     router.push("/game");
   };
 
@@ -46,14 +50,21 @@ export default function PageClient({ id }: PageClientProps) {
     return true;
   };
 
-  const handleReady = () => {
-    // TODO
-  };
+  const toggleReady = async () => {
+    if (!playerUser?._id || !table?._id) return;
 
-  const handleJoinTable = async (tableId: string) => {
-    if (playerUser) {
-      console.log("🎮 Oyuncu masaya eklendi:", user?.displayName);
-    }
+    // Yeni ready durumu
+    const newReady = !isReady;
+
+    // Server tarafına gönder
+    await tableService.setReady(
+      table?._id.toString(),
+      playerUser?._id.toString(),
+      newReady
+    );
+
+    // Local state'i güncelle
+    setIsReady(newReady);
   };
 
   if (!table) {
@@ -63,6 +74,10 @@ export default function PageClient({ id }: PageClientProps) {
       </div>
     );
   }
+
+  console.log(table.players);
+
+
 
   return (
     <>
@@ -170,32 +185,42 @@ export default function PageClient({ id }: PageClientProps) {
               </div>
             </div>
 
-            {playerUser && table?.players?.length === 2 && (
-              <Button
-                onClick={handleReady}
-                className="w-full"
-                size="default"
-                variant={
-                  table.players.find(
-                    (p) => p.id?.toString() === playerUser._id?.toString()
-                  )?.isReady
-                    ? "outline"
-                    : "default"
-                }
-              >
-                {table.players.find(
-                  (p) => p.id?.toString() === playerUser._id?.toString()
-                )?.isReady
-                  ? "Hazır Değilim"
-                  : "Hazırım"}
-              </Button>
-            )}
-
-            {(table.players ?? []).length === 1 && (
+            {table.players?.length === 2 ? (
+              playerUser?.userId === table.ownerId ? (
+                <Button
+                  onClick={handleStartGame}
+                  className="w-full"
+                  disabled={!table.players.every((p) => p.isReady)}
+                >
+                  Oyunu Başlat
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    onClick={toggleReady}
+                    className="w-full"
+                    size="default"
+                    variant={
+                      table.players.find(
+                        (p) => p.id?.toString() === playerUser?._id?.toString()
+                      )?.isReady
+                        ? "outline"
+                        : "default"
+                    }
+                  >
+                    {table.players.find(
+                      (p) => p.id?.toString() === playerUser?._id?.toString()
+                    )?.isReady
+                      ? "Hazır Değilim"
+                      : "Hazırım"}
+                  </Button>
+                </>
+              )
+            ) : table.players?.length === 1 ? (
               <div className="text-center text-xs sm:text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
                 İkinci oyuncunun katılması bekleniyor...
               </div>
-            )}
+            ) : null}
           </CardContent>
         </Card>
       </div>

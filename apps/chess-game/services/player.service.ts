@@ -1,5 +1,5 @@
 // services/players.service.ts
-import { useChessStore } from "@/lib/chess-store";
+import { useChessStore } from "@/stores/chess-store";
 import { Logger } from "@/lib/utils";
 import { PlayerDoc } from "@/models/player";
 import { UserDoc } from "@/models/user";

@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { SOCKET_CHANNELS, SOCKET_EVENTS } from "@/const/elixir-socket-names";
 import { useChannel } from "@/context/channel-context";
-import { useChessStore } from "@/lib/chess-store";
+import { useChessStore } from "@/stores/chess-store";
 import { Logger } from "@/lib/utils";
 import { TableService } from "@/services/table.service";
 import { GameService } from "@/services/game.service";

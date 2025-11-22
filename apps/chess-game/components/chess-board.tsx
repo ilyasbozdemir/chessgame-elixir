@@ -1,6 +1,6 @@
 "use client";
 
-import { useChessStore } from "@/lib/chess-store";
+import { useChessStore } from "@/stores/chess-store";
 import { getPieceSymbol } from "@/lib/chess-logic";
 import type { Position } from "@/lib/chess-types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

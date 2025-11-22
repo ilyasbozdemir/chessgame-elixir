@@ -1,15 +1,15 @@
 // services/table.service.ts
 import { Logger } from "@/lib/utils";
-import { PlayerDoc } from "@/models/player";
 
 import {
   createTableAction,
   deleteTableAction,
   joinTableAction,
   listTablesAction,
+  setPlayerReadyAction,
 } from "@/app/actions/db/table";
 
-import { useChessStore } from "@/lib/chess-store";
+import { useChessStore } from "@/stores/chess-store";
 
 const isBrowser = typeof window !== "undefined";
 
@@ -27,7 +27,7 @@ export class TableService {
     this.logger.success("✅ Masa oluşturuldu:", result.id);
 
     if (data.ownerId) {
-      await this.addPlayer(result._id, data.ownerId.toString());
+      await this.addPlayer(result._id, data.ownerId.toString(), true);
     }
 
     // 🧠 Client tarafındaysak Zustand store’a ekle
@@ -82,7 +82,7 @@ export class TableService {
   // ---------------------------------------------------
 
   /** 👤 Oyuncuyu masaya ata */
-  async addPlayer(tableId: string, playerId: string) {
+  async addPlayer(tableId: string, playerId: string, ready: boolean = false) {
     this.logger.info("👤 addPlayer() çağrıldı:", {
       tableId,
       playerId,
@@ -128,7 +128,7 @@ export class TableService {
       const { tables } = useChessStore.getState();
       useChessStore.setState({
         tables: tables.filter((t) => {
-          if (!t._id) return true; 
+          if (!t._id) return true;
           return t._id.toString() !== tableId;
         }),
       });
@@ -144,7 +144,17 @@ export class TableService {
 
   /** 🟢 Oyuncuyu "hazır" olarak işaretle */
   async setReady(tableId: string, playerId: string, ready: boolean) {
-    // tablo.readiness[playerId] = ready
+    const result = await setPlayerReadyAction(tableId, playerId, ready);
+
+    if (isBrowser) {
+      const { tables } = useChessStore.getState();
+
+      useChessStore.setState({
+        tables: tables.map((t) => (t._id?.toString() === tableId ? result : t)),
+      });
+    }
+
+    return result;
   }
 
   /** 🕹️ Masa dolduysa oyunu başlat */

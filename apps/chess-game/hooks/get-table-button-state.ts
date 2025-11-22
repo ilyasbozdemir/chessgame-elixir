@@ -1,6 +1,6 @@
-// hooks/use-table-button.ts
-import { useMemo } from "react";
-import { useChessStore } from "@/lib/chess-store";
+import { useMemo, useEffect } from "react";
+import { useChessStore } from "@/stores/chess-store";
+import { useTableButtonStore } from "@/stores/table-button-store";
 import type { PlayerDoc } from "@/models/player";
 
 type Handlers = {
@@ -15,7 +15,9 @@ export function useTableButtonResolver(
   handlers?: Handlers
 ) {
   const tables = useChessStore((s) => s.tables);
+  const { setButton } = useTableButtonStore();
 
+  // --- ÇÖZÜCÜ FONKSİYON ---
   const resolve = useMemo(() => {
     return (tableId: string | null | undefined) => {
       if (!tableId) {
@@ -43,46 +45,53 @@ export function useTableButtonResolver(
       const isEmpty = players.length === 0;
       const isPlaying = table.status === "playing";
 
-      // label & action
+      let label = "";
+      let disabled = false;
+      let action = () => {};
+
       if (isPlaying) {
-        return {
-          label: "Oyunu İzle",
-          disabled: false,
-          action: () => handlers?.onWatch?.(tableId),
-        };
+        label = "Oyunu İzle";
+        action = () => handlers?.onWatch?.(tableId);
+      } else if (meInTable) {
+        label = "Masaya Git";
+        action = () => handlers?.onGoToTable?.(tableId);
+      } else if (isEmpty) {
+        label = "Masayı İncele";
+        action = () => handlers?.onPreview?.(tableId);
+      } else if (isFull) {
+        label = "Masa Dolu";
+        disabled = true;
+      } else {
+        label = "Masaya Katıl";
+        action = () => handlers?.onJoin?.(tableId);
       }
 
-      if (meInTable) {
-        return {
-          label: "Masaya Git",
-          disabled: false,
-          action: () => handlers?.onGoToTable?.(tableId),
-        };
-      }
-
-      if (isEmpty) {
-        return {
-          label: "Masayı İncele",
-          disabled: false,
-          action: () => handlers?.onPreview?.(tableId),
-        };
-      }
-
-      if (isFull && !isPlaying) {
-        return {
-          label: "Masa Dolu",
-          disabled: true,
-          action: () => {},
-        };
-      }
-
-      return {
-        label: "Masaya Katıl",
-        disabled: false,
-        action: () => handlers?.onJoin?.(tableId),
-      };
+      return { label, disabled, action };
     };
   }, [tables, player, handlers]);
+
+  const tableButtonStore = useTableButtonStore.getState();
+
+  useEffect(() => {
+    tables.forEach((table) => {
+      const tableId = table._id?.toString() || "null";
+      const result = resolve(tableId);
+      if (!result) return;
+
+      const currentState = tableButtonStore.buttons[tableId];
+
+      if (
+        !currentState ||
+        currentState.label !== result.label ||
+        currentState.disabled !== result.disabled
+      ) {
+        setButton(tableId, {
+          label: result.label,
+          disabled: result.disabled,
+        });
+      }
+    });
+  }, [tables, resolve, setButton, tableButtonStore.buttons]);
 
   return resolve;
 }

@@ -1,10 +1,10 @@
 import { create } from "zustand";
-import type { GameState, Position } from "./chess-types";
-import { initializeBoard, isValidMove, movePiece } from "./chess-logic";
 
 import type { PlayerDoc } from "@/models/player";
 import type { TableDoc } from "@/models/table";
-import { Logger } from "./utils";
+import { GameState, Position } from "@/lib/chess-types";
+import { initializeBoard, isValidMove, movePiece } from "@/lib/chess-logic";
+import { Logger } from "@/lib/utils";
 
 export interface ChessStore {
   tables: TableDoc[];
@@ -21,10 +21,8 @@ export interface ChessStore {
   makeMove: (to: Position) => void;
   resetGame: () => void;
 
- 
   deleteTable: (tableId: string, player: PlayerDoc) => Promise<void>;
 
-  joinTable: (tableId: string, player: PlayerDoc) => void;
   leaveTable: (table: TableDoc, player: PlayerDoc) => void;
 }
 
@@ -71,8 +69,9 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     // const { players } = get();
     //if (players.length !== 2) return;
 
-    const colors: ("white" | "black")[] =
-      Math.random() > 0.5 ? ["white", "black"] : ["black", "white"];
+    const colors: ("white" | "black")[] = Math.random() > 0.5
+      ? ["white", "black"]
+      : ["black", "white"];
 
     set((state) => ({
       /* players: state.players.map((p, i) => ({
@@ -116,11 +115,11 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     const playerColor = players.find(
       (p) => p._id === currentPlayer?._id
     )?.color;
-    
+
     if (piece.color !== currentTurn || piece.color !== playerColor) {
       return;
     }
-*/
+    */
     const validMoves = isValidMove(board, position);
 
     set((state) => ({
@@ -139,7 +138,7 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     if (!selectedPiece) return;
 
     const isValid = validMoves.some(
-      (move) => move.row === to.row && move.col === to.col
+      (move) => move.row === to.row && move.col === to.col,
     );
 
     if (!isValid) return;
@@ -156,12 +155,12 @@ export const useChessStore = create<ChessStore>((set, get) => ({
         validMoves: [],
         capturedPieces: capturedPiece
           ? {
-              ...state.gameState.capturedPieces,
-              [capturedPiece.color]: [
-                ...state.gameState.capturedPieces[capturedPiece.color],
-                capturedPiece,
-              ],
-            }
+            ...state.gameState.capturedPieces,
+            [capturedPiece.color]: [
+              ...state.gameState.capturedPieces[capturedPiece.color],
+              capturedPiece,
+            ],
+          }
           : state.gameState.capturedPieces,
       },
     }));
@@ -184,7 +183,6 @@ export const useChessStore = create<ChessStore>((set, get) => ({
     });
   },
 
-
   deleteTable: async (tableId: string, player: PlayerDoc): Promise<void> => {
     const { tables } = get();
     const table = tables.find((t) => t._id?.toString() === tableId);
@@ -204,46 +202,12 @@ export const useChessStore = create<ChessStore>((set, get) => ({
       tables: state.tables.filter((t) => t._id?.toString() !== tableId),
     }));
   },
-  joinTable: (tableId: string, player: PlayerDoc): void => {
-    const { tables } = get();
-
-    const table = tables.find((t) => t._id?.toString() === tableId);
-    if (!table || (table.players?.length ?? 0) >= 2) return;
-
-    // 🧩 normalize + yeni player ekle
-    const normalizedPlayers = (table.players ?? []).map((p) => ({
-      id: (p as any).id ?? (p as any)._id ?? null,
-      name: p.name,
-      color: p.color,
-      isReady: p.isReady,
-    }));
-
-    const tablePlayer = {
-      id: player._id ?? null,
-      name: "player.name",
-      color: "white",
-      isReady: false,
-    };
-
-    const updatedTable = {
-      ...table,
-      players: [...normalizedPlayers, tablePlayer],
-    };
-
-    set((state) => ({
-      ...state,
-      tables: state.tables.map((t) =>
-        t._id?.toString() === tableId ? updatedTable : t
-      ),
-      currentPlayer: player,
-    }));
-  },
 
   leaveTable: (table: TableDoc, player: PlayerDoc) => {
     if (!table || !player) return;
 
     const updatedPlayers = (table.players ?? []).filter(
-      (p) => p.id?.toString() !== player._id?.toString()
+      (p) => p.id?.toString() !== player._id?.toString(),
     );
 
     const updatedTable = {

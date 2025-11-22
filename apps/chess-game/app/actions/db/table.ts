@@ -60,7 +60,11 @@ export async function listTablesAction() {
   return JSON.parse(JSON.stringify(docs));
 }
 
-export async function joinTableAction(tableId: string, ownerId: string) {
+export async function joinTableAction(
+  tableId: string,
+  ownerId: string,
+  isReady: boolean = false
+) {
   await connectToDatabase();
 
   // 🎯 1) Masayı bul
@@ -99,7 +103,7 @@ export async function joinTableAction(tableId: string, ownerId: string) {
     id: player._id.toString(),
     name: user.displayName,
     color,
-    isReady: false,
+    isReady,
   };
 
   table.players.push(playerEntry);
@@ -112,24 +116,35 @@ export async function joinTableAction(tableId: string, ownerId: string) {
   return safe;
 }
 
-export async function leaveTableAction(tableId: string, playerId: string) {
-  await connectToDatabase();
-  await Table.updateOne(
-    { id: tableId },
-    { $pull: { players: { id: playerId } } }
-  );
-  return { ok: true };
-}
-
 export async function setPlayerReadyAction(
   tableId: string,
   playerId: string,
   isReady: boolean
 ) {
   await connectToDatabase();
+
+  const result = await Table.updateOne(
+    {
+      _id: tableId,
+      "players.id": playerId,
+    },
+    {
+      $set: {
+        "players.$.isReady": isReady,
+      },
+    }
+  );
+
+  // Güncellenmiş tabloyu geri gönder
+  const updated = await Table.findById(tableId).lean();
+  return JSON.parse(JSON.stringify(updated));
+}
+
+export async function leaveTableAction(tableId: string, playerId: string) {
+  await connectToDatabase();
   await Table.updateOne(
-    { id: tableId, "players.id": playerId },
-    { $set: { "players.$.isReady": isReady } }
+    { id: tableId },
+    { $pull: { players: { id: playerId } } }
   );
   return { ok: true };
 }

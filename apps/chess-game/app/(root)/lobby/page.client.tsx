@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { useChessStore } from "@/lib/chess-store";
 
 import { PlayCircle, Trophy, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -13,12 +12,16 @@ import { TableList } from "./components/tables/table-list";
 import { StatsWrapper } from "./components/stats/stat-wrapper";
 import { useUser } from "@/context/user-context";
 import { usePresence } from "@/context/presence-context";
+import { TableService } from "@/services/table.service";
+import { useChessStore } from "@/stores/chess-store";
 
 interface PageClientProps {
   //
 }
 
 const PageClient: React.FC<PageClientProps> = ({}) => {
+  const tableService = new TableService();
+
   const { user, playerUser, loading: userLoading } = useUser();
 
   const { lobbyCount, gameCount, globalCount } = usePresence();
@@ -39,23 +42,31 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
 
   const waitingTables = useMemo(
     () => sortedTables.filter((t) => t.status === "waiting"),
-    [sortedTables],
+    [sortedTables]
   );
 
   const activeTables = useMemo(
     () => sortedTables.filter((t) => t.status === "playing"),
-    [sortedTables],
+    [sortedTables]
   );
 
   const resolveTableButton = useTableButtonResolver(playerUser, {
     onPreview: (id) => router.push(`/tables/${id}`),
 
     onJoin: async (tableId: string) => {
-      if (playerUser && user) {
+      if (playerUser && user?._id) {
+        const joinTable = await tableService.addPlayer(
+          tableId,
+          user?._id.toString()
+        );
 
-        
+        if (!joinTable.ok) {
+          console.warn("❌ Oyuncu masaya eklenemedi:", joinTable.error);
+          return;
+        }
 
-        console.log("🎮 Oyuncu masaya eklendi:", user?.displayName);
+        console.log("🎮 Oyuncu masaya eklendi:", user.displayName);
+        console.log("🧩 Masa:", joinTable.table);
       }
     },
     onGoToTable: (id) => router.push(`/tables/${id}`),
@@ -130,9 +141,9 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
               badgeLabel={`${waitingTables.length} Masa`}
               resolve={resolveTableButton}
               renderDelete={(table) => {
-                return table.ownerId === playerUser?.userId
-                  ? <DeleteTableDialog table={table} />
-                  : null;
+                return table.ownerId === playerUser?.userId ? (
+                  <DeleteTableDialog table={table} />
+                ) : null;
               }}
             />
 

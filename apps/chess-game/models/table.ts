@@ -35,7 +35,7 @@ export type TableDoc = Omit<
   name: string;
   ownerId?: Types.ObjectId | null;
   ownerName?: string | null;
- players: { 
+  players: {
     id: Types.ObjectId | null;
     name: string;
     color: "white" | "black" | null;

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-import { useChessStore } from "@/lib/chess-store";
+import { useChessStore } from "@/stores/chess-store";
 import { TableDoc } from "@/models/table";
 import { Trash2 } from "lucide-react";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
