@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, RotateCcw } from "lucide-react";
 import { useUser } from "@/context/user-context";
+import { useEffect, useState } from "react";
+import { GameService } from "@/services/game.service";
+import { GameControls } from "./game-controls";
 interface ChessBoardUIProps {
   mode?: "play" | "spectate" | "replay";
   tableId?: string;
@@ -17,6 +20,10 @@ interface ChessBoardUIProps {
 const ChessBoardUI: React.FC<ChessBoardUIProps> = ({ mode, tableId }) => {
   const { user, playerUser, loading: userLoading, login, logout } = useUser();
 
+  const [game, setGame] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const { gameState, selectPiece, makeMove, resetGame } = useChessStore();
   const { board, selectedPiece, validMoves, currentTurn, capturedPieces } =
     gameState;
@@ -24,15 +31,6 @@ const ChessBoardUI: React.FC<ChessBoardUIProps> = ({ mode, tableId }) => {
   const tables = useChessStore((s) => s.tables);
   const table = tables.find((t) => t._id?.toString() === tableId);
 
-  
-  if (!table) {
-    return (
-      <div className="h-[70vh] flex items-center justify-center text-muted-foreground">
-        Masa bulunamadı veya yükleniyor...
-      </div>
-    );
-  }
-  
 
   const currentPlayerColor = table?.players.find(
     (p) => p.id === playerUser?._id
@@ -93,8 +91,39 @@ const ChessBoardUI: React.FC<ChessBoardUIProps> = ({ mode, tableId }) => {
     return (row + col) % 2 === 0 ? "bg-muted" : "bg-card";
   };
 
+  useEffect(() => {
+    if (!tableId) return;
+
+    const fetchGame = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const gameService = new GameService();
+        const res = await gameService.getById(tableId);
+        console.log("Fetched game:", res);
+
+        if (res && res.ok && res.game) {
+          setGame(res.game);
+        } else {
+          setGame(null);
+          setError(res?.error || "Game not found");
+        }
+      } catch (err: any) {
+        setGame(null);
+        setError(err.message || "Error fetching game");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGame();
+  }, [tableId]);
+
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex items-center justify-center p-2 sm:p-4">
+    <>
+      <GameControls />
+
       <div className="w-full max-w-6xl grid lg:grid-cols-[1fr_auto_1fr] gap-3 sm:gap-6 items-start">
         {mode === "spectate" && (
           <div className="col-span-full flex items-center justify-end text-muted-foreground text-sm mb-2">
@@ -244,7 +273,7 @@ const ChessBoardUI: React.FC<ChessBoardUIProps> = ({ mode, tableId }) => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import ChessBoardUI from "@/components/chess-board";
 
 interface PageClientProps {
@@ -8,5 +7,9 @@ interface PageClientProps {
 }
 
 export default function PageClient({ id }: PageClientProps) {
-  return <ChessBoardUI mode="play" gameId={id} />;
+  return (
+    <>
+      <ChessBoardUI mode="play" gameId={id} />;
+    </>
+  );
 }

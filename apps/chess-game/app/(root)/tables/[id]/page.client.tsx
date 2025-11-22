@@ -22,7 +22,7 @@ interface PageClientProps {
 }
 
 export default function PageClient({ id }: PageClientProps) {
-  const { user, playerUser, loading: userLoading } = useUser();
+  const { user, playerUser } = useUser();
   const router = useRouter();
 
   const tableService = new TableService();
@@ -37,14 +37,14 @@ export default function PageClient({ id }: PageClientProps) {
     return;
   }
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
+    const result = await gameService.createGame(table._id!.toString());
 
-
-
-    
-
-    
-    //router.push("/game");
+    if (result.ok) {
+      router.push(`/game/${result.gameId}`);
+    } else {
+      console.error("Game başlatılamadı:", result.error);
+    }
   };
 
   const handleLeaveTable = () => {

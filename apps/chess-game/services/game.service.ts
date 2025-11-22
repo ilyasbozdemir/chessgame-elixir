@@ -1,6 +1,14 @@
 // services/game.service.ts
-import { createGameAction } from "@/app/actions/db/game";
+import {
+  createGameAction,
+  getAllGamesAction,
+  getGameByIdAction,
+} from "@/app/actions/db/game";
 import { Logger } from "@/lib/utils";
+import { useChessStore } from "@/stores/chess-store";
+import { table } from "console";
+
+const isBrowser = typeof window !== "undefined";
 
 export class GameService {
   private logger = new Logger("ChessGame-GameService");
@@ -12,18 +20,76 @@ export class GameService {
   // ---------------------------------------------------
 
   /** 🆕 Oyun oluştur */
-  async create(data: { tableId?: string; mode?: string }) {
-    const result = await createGameAction(data.tableId!, data.mode || "10+0");
+  async createGame(tableId: string, mode?: string) {
+    if (!tableId) {
+      return {
+        ok: false,
+        error: "TableId boş",
+        gameId: undefined,
+        game: undefined,
+      };
+    }
+
+    try {
+      const result = await createGameAction(tableId, mode || "10+0");
+
+      if (isBrowser && result?.ok) {
+        const { tables } = useChessStore.getState();
+        useChessStore.setState({
+          tables: tables.map((t) =>
+            t._id?.toString() === tableId ? { ...t, gameId: result.gameId } : t
+          ),
+        });
+      }
+
+      return (
+        result ?? {
+          ok: false,
+          error: "Server action returned undefined",
+          gameId: undefined,
+          game: undefined,
+        }
+      );
+    } catch (err: any) {
+      return {
+        ok: false,
+        error: err.message || "Bilinmeyen hata",
+        gameId: undefined,
+        game: undefined,
+      };
+    }
+  }
+
+  /** 🆕 Oyunu başlat */
+
+  async startGame(gameId: string) {
+    //
   }
 
   /** 📄 Tüm oyunları listele */
   async list() {
-    // return all games
+    try {
+      const result = await getAllGamesAction();
+
+      if (isBrowser && result?.ok) {
+        //
+      }
+
+      return result;
+    } catch (err: any) {
+      this.logger.error("❌ list() hata:", err.message);
+      return { ok: false, error: err.message, games: [] };
+    }
   }
 
   /** 📘 Tek oyun detayı */
   async getById(gameId: string) {
-    // return game detail
+    try {
+      return await getGameByIdAction(gameId);
+    } catch (err) {
+      this.logger.error("getByIdAction hata:", err);
+      return null;
+    }
   }
 
   /** ✏️ Oyunu güncelle */

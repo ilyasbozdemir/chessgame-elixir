@@ -1,4 +1,5 @@
 "use server";
+import { Types } from "mongoose";
 
 import { connectToDatabase } from "@/lib/mongodb";
 
@@ -30,7 +31,7 @@ export async function createGameAction(
   }
 
   // 3️⃣ Başlangıç FEN
-  const initialFen = "startpos"; 
+  const initialFen = "startpos";
 
   // 4️⃣ Süre hesapla (örneğin 10+0 ise 10 dakika)
   const baseMinutes = parseInt(timeControl.split("+")[0]);
@@ -66,5 +67,29 @@ export async function createGameAction(
     ok: true,
     gameId: gameDoc._id.toString(),
     game: JSON.parse(JSON.stringify(gameDoc)),
+  };
+}
+
+export async function getGameByIdAction(gameId: string) {
+  await connectToDatabase();
+
+
+  const game = await Game.findById(new Types.ObjectId(gameId)); 
+
+
+  if (!game) {
+    return { ok: false, error: "Game not found" };
+  }
+
+  return { ok: true, game: JSON.parse(JSON.stringify(game)) };
+}
+
+export async function getAllGamesAction() {
+  await connectToDatabase();
+
+  const games = await Game.find().sort({ startedAt: -1 });
+  return {
+    ok: true,
+    games: games.map((g) => JSON.parse(JSON.stringify(g))),
   };
 }
