@@ -1,128 +1,126 @@
-"use client";
+"use client"
 
-import { useChessStore } from "@/stores/chess-store";
-import { getPieceSymbol } from "@/game/chess-logic";
-import type { Position } from "@/game/chess-types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Eye, RotateCcw } from "lucide-react";
-import { useUser } from "@/context/user-context";
-import { useEffect, useState } from "react";
-import { GameService } from "@/services/game.service";
-import { GameControls } from "./game-controls";
+import { useChessStore } from "@/stores/chess-store"
+import { getPieceSymbol } from "@/game/chess-logic"
+import type { Position } from "@/game/chess-types"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Eye, RotateCcw } from "lucide-react"
+import { useUser } from "@/context/user-context"
+import { useEffect, useState } from "react"
+import { GameService } from "@/services/game.service"
+import { GameControls } from "./game/game-controls"
 interface ChessBoardUIProps {
-  mode?: "play" | "spectate" | "replay";
-  tableId?: string;
-  gameId?: string;
+  mode?: "play" | "spectate" | "replay"
+  tableId?: string
+  gameId?: string
 }
 
 const ChessBoardUI: React.FC<ChessBoardUIProps> = ({ mode, tableId }) => {
-  const { user, playerUser, loading: userLoading, login, logout } = useUser();
+  const { user, playerUser, loading: userLoading, login, logout } = useUser()
 
-  const [game, setGame] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [game, setGame] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const { gameState, selectPiece, makeMove, resetGame } = useChessStore();
+  const { gameState, selectPiece, makeMove, resetGame } = useChessStore()
   const { board, selectedPiece, validMoves, currentTurn, capturedPieces } =
-    gameState;
+    gameState
 
-  const tables = useChessStore((s) => s.tables);
-  const table = tables.find((t) => t._id?.toString() === tableId);
-
+  const tables = useChessStore((s) => s.tables)
+  const table = tables.find((t) => t._id?.toString() === tableId)
 
   const currentPlayerColor = table?.players.find(
     (p) => p.id === playerUser?._id
-  )?.color;
+  )?.color
 
-  const isMyTurn = currentPlayerColor === currentTurn;
+  const isMyTurn = currentPlayerColor === currentTurn
 
   const handleSquareClick = (row: number, col: number) => {
-    if (!isMyTurn) return;
+    if (!isMyTurn) return
 
-    const position: Position = { row, col };
-    const piece = board[row][col];
+    const position: Position = { row, col }
+    const piece = board[row][col]
 
     // Eğer seçili taş varsa ve geçerli hamle yapılıyorsa
     if (selectedPiece) {
       const isValidMove = validMoves.some(
         (move) => move.row === row && move.col === col
-      );
+      )
 
       if (isValidMove) {
-        makeMove(position);
-        return;
+        makeMove(position)
+        return
       }
 
       if (piece && piece.color === currentPlayerColor) {
-        selectPiece(position);
-        return;
+        selectPiece(position)
+        return
       }
 
-      selectPiece(position);
-      return;
+      selectPiece(position)
+      return
     }
 
     if (piece && piece.color === currentPlayerColor) {
-      selectPiece(position);
+      selectPiece(position)
     }
-  };
+  }
 
   const isSquareSelected = (row: number, col: number) => {
-    return selectedPiece?.row === row && selectedPiece?.col === col;
-  };
+    return selectedPiece?.row === row && selectedPiece?.col === col
+  }
 
   const isValidMoveSquare = (row: number, col: number) => {
-    return validMoves.some((move) => move.row === row && move.col === col);
-  };
+    return validMoves.some((move) => move.row === row && move.col === col)
+  }
 
   const getSquareColor = (row: number, col: number) => {
-    if (isSquareSelected(row, col)) return "bg-yellow-400 dark:bg-yellow-600";
+    if (isSquareSelected(row, col)) return "bg-yellow-400 dark:bg-yellow-600"
 
     if (isValidMoveSquare(row, col)) {
-      const hasEnemyPiece = board[row][col] !== null;
+      const hasEnemyPiece = board[row][col] !== null
       // Düşman taşı varsa kırmızımsı, yoksa yeşilimsi
       return hasEnemyPiece
         ? "bg-red-400/60 dark:bg-red-600/60"
-        : "bg-green-400/60 dark:bg-green-600/60";
+        : "bg-green-400/60 dark:bg-green-600/60"
     }
 
-    return (row + col) % 2 === 0 ? "bg-muted" : "bg-card";
-  };
+    return (row + col) % 2 === 0 ? "bg-muted" : "bg-card"
+  }
 
   useEffect(() => {
-    if (!tableId) return;
+    if (!tableId) return
 
     const fetchGame = async () => {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
       try {
-        const gameService = new GameService();
-        const res = await gameService.getById(tableId);
-        console.log("Fetched game:", res);
+        const gameService = new GameService()
+        const res = await gameService.getById(tableId)
+        console.log("Fetched game:", res)
 
         if (res && res.ok && res.game) {
-          setGame(res.game);
+          setGame(res.game)
         } else {
-          setGame(null);
-          setError(res?.error || "Game not found");
+          setGame(null)
+          setError(res?.error || "Game not found")
         }
       } catch (err: any) {
-        setGame(null);
-        setError(err.message || "Error fetching game");
+        setGame(null)
+        setError(err.message || "Error fetching game")
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchGame();
-  }, [tableId]);
+    fetchGame()
+  }, [tableId])
 
   return (
     <>
-    
       <GameControls />
 
       <div className="w-full max-w-6xl grid lg:grid-cols-[1fr_auto_1fr] gap-3 sm:gap-6 items-start">
@@ -275,7 +273,7 @@ const ChessBoardUI: React.FC<ChessBoardUIProps> = ({ mode, tableId }) => {
         </Card>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default ChessBoardUI;
+export default ChessBoardUI

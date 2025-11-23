@@ -11,7 +11,6 @@ export function ClientLayout2({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background">
-
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <AppSidebar2 />
@@ -26,7 +25,6 @@ export function ClientLayout2({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <div className="flex flex-1 flex-col lg:pl-56">
         <AppNavbar onMenuClick={() => setIsMobileMenuOpen(true)} />
-
 
         {children}
       </div>

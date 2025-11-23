@@ -135,5 +135,5 @@ export function GameControls() {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }

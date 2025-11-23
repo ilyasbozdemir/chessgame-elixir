@@ -7,5 +7,15 @@ interface PageClientProps {
 }
 
 export default function PageClient({ gameId }: PageClientProps) {
-  return <ChessBoardUI mode="spectate" gameId={gameId} />
+  return <>
+
+
+    {
+      /*
+        <ChessBoardUI mode="spectate" gameId={gameId} />
+      */
+    }
+
+
+  </>
 }
