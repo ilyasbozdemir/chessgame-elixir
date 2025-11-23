@@ -13,6 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { CapturedPiecesDialog } from "@/components/game/captured-pieces-dialog";
+import { PlayerCard2 } from "@/components/game/player-card-2";
+import { cn } from "@/lib/utils";
 
 interface PageClientProps {
   id: string;
@@ -28,12 +30,20 @@ export default function PageClient({ id }: PageClientProps) {
   const { toast } = useToast();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isGameEnded, setIsGameEnded] = useState(false);
-
+  const [currentTurn, setCurrentTurn] = useState<"white" | "black">("white");
   const [moves, setMoves] = useState<Move[]>([
     { number: 1, white: "e4", black: "e5" },
     { number: 2, white: "Nf3", black: "Nc6" },
     { number: 3, white: "Bb5", black: "a6" },
   ]);
+
+  const [capturedPieces, setCapturedPieces] = useState<{
+    white: string[];
+    black: string[];
+  }>({ white: [], black: [] });
+
+  const [whiteTimeLeft, setWhiteTimeLeft] = useState(600); // 10 minutes in seconds
+  const [blackTimeLeft, setBlackTimeLeft] = useState(600); // 10 minutes in seconds
 
   const gameData = {
     id,
@@ -95,11 +105,43 @@ export default function PageClient({ id }: PageClientProps) {
         <div className="lg:hidden flex flex-col h-full">
           {/* Üst Oyuncu - Kompakt */}
           <div className="flex-shrink-0 mb-2">
-            <PlayerCard
+            <PlayerCard  // bu 
               player={gameData.player2}
               position="top"
               className="p-2"
             />
+          </div>
+
+          <div className="mb-4">
+            <PlayerCard2 // bu veya olucak
+              name="Rakip"
+              rating={1500}
+              capturedPieces={capturedPieces.black}
+              isCurrentTurn={currentTurn === "black"}
+              isTop
+              timeLeft={blackTimeLeft}
+            />
+          </div>
+
+          <div className="mb-2 text-center">
+            <div
+              className={cn(
+                "inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all",
+                currentTurn === "white"
+                  ? "bg-primary/10 text-primary border-2 border-primary/50"
+                  : "bg-secondary/10 text-secondary-foreground border-2 border-secondary/50"
+              )}
+            >
+              <div
+                className={cn(
+                  "w-3 h-3 rounded-full animate-pulse",
+                  currentTurn === "white" ? "bg-primary" : "bg-secondary"
+                )}
+              />
+              <span>
+                {currentTurn === "white" ? "Sizin Sıranız" : "Rakibin Sırası"}
+              </span>
+            </div>
           </div>
 
           {/* Satranç Tahtası - Tam Ekran */}
@@ -107,14 +149,17 @@ export default function PageClient({ id }: PageClientProps) {
             <ChessBoard onMove={handleMove} />
           </div>
 
-          {/* Alt Oyuncu - Kompakt */}
-          <div className="flex-shrink-0 mt-2">
+          {/* Alt Oyuncu - Kompakt
+              <div className="flex-shrink-0 mt-20">
             <PlayerCard
               player={gameData.player1}
               position="bottom"
               className="p-2"
             />
           </div>
+          
+          */}
+      
         </div>
 
         {/* Desktop View */}

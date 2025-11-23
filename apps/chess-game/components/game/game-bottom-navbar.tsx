@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Phone, Smile, Settings } from "lucide-react";
+import { MessageCircle, Phone, Smile, Settings, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { MoveHistoryDrawer } from "./move-history-drawer";
@@ -30,6 +30,7 @@ type BottomNavBarProps = {
   notificationsEnabled: boolean;
   onToggleNotifications: () => void;
   moveHistory: Move[];
+  onNewGame?: () => void;
   currentPlayer: {
     name: string;
     avatar?: string;
@@ -54,6 +55,7 @@ export function BottomNavBar({
   notificationsEnabled,
   onToggleNotifications,
   moveHistory,
+  onNewGame,
   currentPlayer,
   opponent,
 }: BottomNavBarProps) {
@@ -63,10 +65,52 @@ export function BottomNavBar({
   const [menuOpen, setMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(1);
 
+  const formatTime = (seconds?: number) => {
+    if (seconds === undefined) return null;
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
     <>
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-card to-card/95 backdrop-blur-md border-t border-border/50 shadow-2xl">
         <div className="max-w-7xl mx-auto px-2 py-2">
+          {/* Player Info Bar */}
+          <div className="flex items-center justify-between mb-2 pb-2 border-b border-border/50 px-2">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-sm">{currentPlayer.name}</span>
+                {currentPlayer.rating && (
+                  <Badge variant="secondary" className="text-xs">
+                    {currentPlayer.rating}
+                  </Badge>
+                )}
+              </div>
+              
+              {/* Captured Pieces */}
+              <div className="flex flex-wrap gap-0.5">
+                {currentPlayer.capturedPieces.map((piece, i) => (
+                  <span key={i} className="text-base leading-none">
+                    {piece}
+                  </span>
+                ))}
+              </div>
+            </div>
+            
+            {currentPlayer.timeLeft !== undefined && (
+              <div className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-mono text-sm font-semibold",
+                currentPlayer.timeLeft < 60 
+                  ? "bg-destructive/20 text-destructive animate-pulse" 
+                  : "bg-muted text-foreground"
+              )}>
+                <Clock className="w-3.5 h-3.5" />
+                {formatTime(currentPlayer.timeLeft)}
+              </div>
+            )}
+          </div>
+
           <div className="flex items-center justify-around">
             {/* Chat Button */}
             <Button
@@ -117,8 +161,9 @@ export function BottomNavBar({
               <span className="text-[10px] font-medium">Tepki</span>
             </Button>
 
+            {/* Game Menu Drawer */}
             <GameMenuDrawer
-         open={menuOpen}
+              open={menuOpen}
               onOpenChange={setMenuOpen}
               moveHistory={moveHistory}
               boardRotated={boardRotated}
@@ -127,8 +172,7 @@ export function BottomNavBar({
               onToggleSound={onToggleSound}
               notificationsEnabled={notificationsEnabled}
               onToggleNotifications={onToggleNotifications}
-              currentPlayer={currentPlayer}
-              opponent={opponent}
+              onNewGame={onNewGame}
             />
           </div>
         </div>
@@ -145,4 +189,3 @@ export function BottomNavBar({
     </>
   );
 }
-
