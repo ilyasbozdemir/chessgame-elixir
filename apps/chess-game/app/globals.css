@@ -39,6 +39,21 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --sidebar-width: 0px;
+
+
+    /* Chess Board Kareleri */
+  --chess-light-classic: 52.4 0.32 0.91;
+  --chess-dark-classic: 28.2 0.3 0.5;
+  --chess-light-modern: 0 0% 93%;
+  --chess-dark-modern: 0 0% 33%;
+  --chess-light-emerald: 140 0.25 0.85;
+  --chess-dark-emerald: 145 0.4 0.35;
+
+  /* Chess Taşları */
+  --chess-piece-white: 0 0% 100%;
+  --chess-piece-black: 0 0% 0%;
+
+
 }
 
 .dark {
@@ -74,6 +89,18 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+
+    /* Chess Board Kareleri */
+  --chess-light-classic: 52.4 0.32 0.91;
+  --chess-dark-classic: 28.2 0.3 0.5;
+  --chess-light-modern: 0 0% 93%;
+  --chess-dark-modern: 0 0% 33%;
+  --chess-light-emerald: 140 0.25 0.85;
+  --chess-dark-emerald: 145 0.4 0.35;
+
+  /* Chess Taşları */
+  --chess-piece-white: 0 0% 100%;
+  --chess-piece-black: 0 0% 0%;
 }
 
 @theme inline {

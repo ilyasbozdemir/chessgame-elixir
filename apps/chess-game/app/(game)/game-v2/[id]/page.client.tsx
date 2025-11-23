@@ -2,13 +2,10 @@
 
 import { GameControls } from "@/components/game/game-controls";
 import { CapturedPieces } from "@/components/game/captured-pieces";
-import { ChatBox } from "@/components/game/chat-box";
 import { ChessBoard } from "@/components/game/chess-board";
-import { EmojiReactions } from "@/components/game/emoji-reactions";
 import { GameEndDialog } from "@/components/game/game-end-dialog";
 import { MoveHistory } from "@/components/game/move-history";
 import { PlayerCard } from "@/components/game/player-card";
-import { VoiceChat } from "@/components/game/voice.chat";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
