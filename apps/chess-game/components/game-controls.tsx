@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { Play, Pause, RotateCcw, Flag } from 'lucide-react'
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { Play, Pause, RotateCcw, Flag } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,52 +10,52 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 export function GameControls() {
-  const [whiteTime, setWhiteTime] = useState(600) // 10 minutes in seconds
-  const [blackTime, setBlackTime] = useState(600)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [showResignDialog, setShowResignDialog] = useState(false)
-  const [currentTurn, setCurrentTurn] = useState<'white' | 'black'>('white')
+  const [whiteTime, setWhiteTime] = useState(600); // 10 minutes in seconds
+  const [blackTime, setBlackTime] = useState(600);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showResignDialog, setShowResignDialog] = useState(false);
+  const [currentTurn, setCurrentTurn] = useState<"white" | "black">("white");
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
   useEffect(() => {
-    if (!isPlaying) return
+    if (!isPlaying) return;
 
     const interval = setInterval(() => {
-      if (currentTurn === 'white') {
-        setWhiteTime(prev => {
+      if (currentTurn === "white") {
+        setWhiteTime((prev) => {
           if (prev <= 0) {
-            setIsPlaying(false)
-            return 0
+            setIsPlaying(false);
+            return 0;
           }
-          return prev - 1
-        })
+          return prev - 1;
+        });
       } else {
-        setBlackTime(prev => {
+        setBlackTime((prev) => {
           if (prev <= 0) {
-            setIsPlaying(false)
-            return 0
+            setIsPlaying(false);
+            return 0;
           }
-          return prev - 1
-        })
+          return prev - 1;
+        });
       }
-    }, 1000)
+    }, 1000);
 
-    return () => clearInterval(interval)
-  }, [isPlaying, currentTurn])
+    return () => clearInterval(interval);
+  }, [isPlaying, currentTurn]);
 
   const handleResign = () => {
-    setShowResignDialog(false)
-    setIsPlaying(false)
-    alert('Pes ettiniz!')
-  }
+    setShowResignDialog(false);
+    setIsPlaying(false);
+    alert("Pes ettiniz!");
+  };
 
   return (
     <div className="flex flex-col gap-4 my-3">
@@ -78,10 +78,7 @@ export function GameControls() {
         </div>
       </div>
 
-      {/* Game Controls 
-
-      
-          <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-2">
         <Button
           variant="outline"
           size="lg"
@@ -104,9 +101,9 @@ export function GameControls() {
           <RotateCcw className="h-5 w-5" />
           Geri Al
         </Button>
-        <Button 
-          variant="outline" 
-          size="lg" 
+        <Button
+          variant="outline"
+          size="lg"
           className="gap-2 text-destructive hover:text-destructive"
           onClick={() => setShowResignDialog(true)}
         >
@@ -115,19 +112,20 @@ export function GameControls() {
         </Button>
       </div>
 
-      
-      */}
-  
       <Dialog open={showResignDialog} onOpenChange={setShowResignDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Pes Etmek İstediğinize Emin Misiniz?</DialogTitle>
             <DialogDescription>
-              Bu oyunu kaybetmiş sayılacaksınız ve ELO puanınız düşebilir. Bu işlem geri alınamaz.
+              Bu oyunu kaybetmiş sayılacaksınız ve ELO puanınız düşebilir. Bu
+              işlem geri alınamaz.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowResignDialog(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowResignDialog(false)}
+            >
               İptal
             </Button>
             <Button variant="destructive" onClick={handleResign}>
@@ -137,5 +135,5 @@ export function GameControls() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

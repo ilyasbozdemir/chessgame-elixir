@@ -1,61 +1,59 @@
-"use client"
+"use client";
 
-import { Home, LayoutDashboard, FileText, Settings, Users, BarChart3, Calendar, Mail, X } from 'lucide-react'
-import Link from "next/link"
-import { usePathname } from 'next/navigation'
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import {
+  Home,
+  Settings,
+  Users,
+  X,
+  Crown,
+  Trophy,
+  History,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const menuItems = [
   {
-    title: "Dashboard",
+    title: "Lobiye Dön",
     icon: Home,
+    href: "/lobby",
+  },
+  {
+    title: "Yeni Oyun",
+    icon: Crown,
     href: "/",
   },
   {
-    title: "Analytics",
-    icon: BarChart3,
-    href: "/analytics",
+    title: "Turnuvalar",
+    icon: Trophy,
+    href: "/tournaments",
   },
   {
-    title: "Projects",
-    icon: LayoutDashboard,
-    href: "/projects",
-  },
-  {
-    title: "Documents",
-    icon: FileText,
-    href: "/documents",
-  },
-  {
-    title: "Calendar",
-    icon: Calendar,
-    href: "/calendar",
-  },
-  {
-    title: "Messages",
-    icon: Mail,
-    href: "/messages",
-  },
-  {
-    title: "Team",
+    title: "Arkadaşlar",
     icon: Users,
-    href: "/team",
+    href: "/friends",
   },
   {
-    title: "Settings",
+    title: "Geçmiş",
+    icon: History,
+    href: "/history",
+  },
+  {
+    title: "Ayarlar",
     icon: Settings,
     href: "/settings",
   },
-]
+];
 
 interface MobileSidebarProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <>
@@ -76,12 +74,21 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
       >
         {/* Header */}
         <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <LayoutDashboard className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-lg font-semibold text-sidebar-foreground">Dashboard</span>
+          <div className="flex h-16 items-center border-b border-sidebar-border px-4">
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-lg font-semibold group"
+            >
+              <div className="p-2 rounded-full bg-primary/15 ">
+                <Crown className="w-6 h-6 text-primary" />
+              </div>
+              <span className="tracking-tight">
+                <span className="font-bold">Chess</span>
+                <span className="text-primary font-bold">Game</span>
+              </span>
+            </Link>
           </div>
+
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
           </Button>
@@ -90,7 +97,9 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         {/* Navigation */}
         <nav className="flex-1 space-y-1 px-3 py-4">
           {menuItems.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href;
+            const Icon = item.icon; // ← burası önemli
+
             return (
               <Link
                 key={item.href}
@@ -103,23 +112,25 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                 )}
               >
-                <item.icon className="h-5 w-5" />
+                <Icon className="h-4 w-4" /> 
                 {item.title}
               </Link>
-            )
+            );
           })}
         </nav>
 
         {/* Footer */}
         <div className="border-t border-sidebar-border p-4">
           <div className="rounded-lg bg-sidebar-accent/50 p-4">
-            <p className="text-xs font-medium text-sidebar-foreground">Need help?</p>
+            <p className="text-xs font-medium text-sidebar-foreground">
+              Yardıma mı ihtiyacınız var?
+            </p>
             <p className="mt-1 text-xs text-sidebar-foreground/60">
-              Check our documentation
+              Destek ekibimizle iletişime geçin.
             </p>
           </div>
         </div>
       </aside>
     </>
-  )
+  );
 }
