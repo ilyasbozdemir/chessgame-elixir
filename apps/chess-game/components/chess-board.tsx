@@ -100,7 +100,6 @@ const ChessBoardUI: React.FC<ChessBoardUIProps> = ({ mode, tableId }) => {
       try {
         const gameService = new GameService()
         const res = await gameService.getById(tableId)
-        console.log("Fetched game:", res)
 
         if (res && res.ok && res.game) {
           setGame(res.game)

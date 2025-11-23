@@ -11,7 +11,7 @@ type PlayerCard2Props = {
   capturedPieces: string[];
   isCurrentTurn: boolean;
   isTop?: boolean;
-  timeLeft?: number; 
+  timeLeft?: number;
 };
 
 export function PlayerCard2({
@@ -27,9 +27,9 @@ export function PlayerCard2({
     if (seconds === undefined) return null;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
-  
+
   const timeDisplay = formatTime(timeLeft);
   return (
     <div
@@ -40,7 +40,7 @@ export function PlayerCard2({
           : "bg-card border-border"
       )}
     >
-      <Avatar className="h-12 w-12">
+      <Avatar className="h-12 w-12 border-2 border-border cursor-pointer">
         <AvatarImage src={avatar} alt={name} />
         <AvatarFallback>
           <User className="h-6 w-6" />
@@ -56,7 +56,7 @@ export function PlayerCard2({
             </Badge>
           )}
         </div>
-        
+
         {/* Captured Pieces */}
         <div className="flex flex-wrap gap-0.5 mt-1 min-h-[20px]">
           {capturedPieces.length > 0 ? (
@@ -75,17 +75,19 @@ export function PlayerCard2({
 
       <div className="flex flex-col items-end gap-2">
         {timeDisplay && (
-          <div className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-mono text-sm font-semibold",
-            isCurrentTurn && timeLeft && timeLeft < 60 
-              ? "bg-destructive/20 text-destructive animate-pulse" 
-              : "bg-muted text-foreground"
-          )}>
+          <div
+            className={cn(
+              "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-mono text-sm font-semibold",
+              isCurrentTurn && timeLeft && timeLeft < 60
+                ? "bg-destructive/20 text-destructive animate-pulse"
+                : "bg-muted text-foreground"
+            )}
+          >
             <Clock className="w-3.5 h-3.5" />
             {timeDisplay}
           </div>
         )}
-        
+
         {isCurrentTurn && (
           <div className="flex items-center gap-1 text-primary animate-pulse">
             <Crown className="h-4 w-4" />

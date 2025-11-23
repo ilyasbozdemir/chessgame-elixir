@@ -15,6 +15,7 @@ interface GameContextType {
   leaveMatch: () => void;
   pushMove: (to: any) => void;
   pushStart: () => void;
+  pushResign: () => void;
 }
 
 const GameContext = createContext<GameContextType>({
@@ -22,6 +23,7 @@ const GameContext = createContext<GameContextType>({
   leaveMatch: () => {},
   pushMove: () => {},
   pushStart: () => {},
+  pushResign: () => {},
 });
 
 export const GameProvider = ({ children }: { children: React.ReactNode }) => {
@@ -29,27 +31,23 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
   const { joinChannel, leaveChannel, getChannel } = useChannel();
   const { playerUser } = useUser();
 
-
-
   const { startGame, resetGame, makeMove } = useChessStore();
 
   const [matchId, setMatchId] = useState<string | null>(null);
 
-useEffect(() => {
-  (async () => {
-    const tableService = new TableService();
-    const gameService = new GameService(); 
-    const tournamentService = new TournamentService();
+  useEffect(() => {
+    (async () => {
+      const tableService = new TableService();
+      const gameService = new GameService();
+      const tournamentService = new TournamentService();
 
-    await Promise.all([
-      tableService.list(),
-      // gameService.list(),        
-      // tournamentService.list(),  
-    ]);
-
-  })();
-}, []);
-
+      await Promise.all([
+        tableService.list(),
+        // gameService.list(),
+        // tournamentService.list(),
+      ]);
+    })();
+  }, []);
 
   // Channel join
   const joinMatch = (matchId: string) => {
@@ -86,6 +84,12 @@ useEffect(() => {
     ch.push(SOCKET_EVENTS.MATCH.START, {});
   };
 
+  const pushResign = () => {
+    const ch = matchId ? getChannel(SOCKET_CHANNELS.GAME.MATCH(matchId)) : null;
+    if (!ch) return;
+    ch.push(SOCKET_EVENTS.MATCH.RESIGN, {});
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -93,6 +97,7 @@ useEffect(() => {
         leaveMatch,
         pushMove,
         pushStart,
+        pushResign,
       }}
     >
       {children}

@@ -8,8 +8,8 @@ type CapturedPiecesProps = {
 };
 
 const mockCapturedPieces = {
-  white: ["♟", "♟", "♞", "♝"],
-  black: ["♙", "♙", "♙", "♘"],
+  white: [],
+  black: [],
 };
 
 export function CapturedPieces({ className }: CapturedPiecesProps) {

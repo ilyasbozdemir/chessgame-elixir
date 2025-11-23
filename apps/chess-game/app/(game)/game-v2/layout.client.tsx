@@ -17,8 +17,8 @@ export function ClientLayout2({ children }: { children: React.ReactNode }) {
     black: string[];
   }>({ white: [], black: [] });
 
-  const [whiteTimeLeft, setWhiteTimeLeft] = useState(600); // 10 minutes in seconds
-  const [blackTimeLeft, setBlackTimeLeft] = useState(600); // 10 minutes in seconds
+  const [whiteTimeLeft, setWhiteTimeLeft] = useState(600); 
+  const [blackTimeLeft, setBlackTimeLeft] = useState(600); 
 
   return (
     <div>

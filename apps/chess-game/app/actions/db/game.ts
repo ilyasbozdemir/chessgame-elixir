@@ -58,6 +58,7 @@ export async function createGameAction(
     increment: parseInt(timeControl.split("+")[1] || "0"),
 
     moves: [],
+    currentTurn: "white",
 
     startedAt: new Date(),
     finishedAt: null,
@@ -73,9 +74,7 @@ export async function createGameAction(
 export async function getGameByIdAction(gameId: string) {
   await connectToDatabase();
 
-
-  const game = await Game.findById(new Types.ObjectId(gameId)); 
-
+  const game = await Game.findById(new Types.ObjectId(gameId));
 
   if (!game) {
     return { ok: false, error: "Game not found" };

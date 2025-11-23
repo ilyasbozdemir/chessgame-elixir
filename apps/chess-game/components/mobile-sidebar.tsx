@@ -119,17 +119,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="border-t border-sidebar-border p-4">
-          <div className="rounded-lg bg-sidebar-accent/50 p-4">
-            <p className="text-xs font-medium text-sidebar-foreground">
-              Yardıma mı ihtiyacınız var?
-            </p>
-            <p className="mt-1 text-xs text-sidebar-foreground/60">
-              Destek ekibimizle iletişime geçin.
-            </p>
-          </div>
-        </div>
+    
       </aside>
     </>
   );

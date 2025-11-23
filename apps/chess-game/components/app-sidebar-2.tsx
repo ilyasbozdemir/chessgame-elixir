@@ -14,6 +14,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 const menuItems = [
   {
@@ -48,16 +49,27 @@ const menuItems = [
   },
 ];
 
-const moveHistory = [
-  { move: 1, white: "e4", black: "e5" },
-  { move: 2, white: "Nf3", black: "Nc6" },
-  { move: 3, white: "Bc4", black: "Bc5" },
-  { move: 4, white: "c3", black: "Nf6" },
-  { move: 5, white: "d4", black: "exd4" },
+type Move = {
+  move: number;
+  white: string;
+  black?: string;
+};
+
+const moveHistory: Move[] = [
+  // { move: 1, white: "e4", black: "e5" },
+  // { move: 2, white: "Nf3", black: "Nc6" },
+  // { move: 3, white: "Bc4", black: "Bc5" },
+  // { move: 4, white: "c3", black: "Nf6" },
+  // { move: 5, white: "d4", black: "exd4" },
 ];
 
 export function AppSidebar2() {
   const pathname = usePathname();
+
+  const [capturedPieces, setCapturedPieces] = useState<{
+    white: string[];
+    black: string[];
+  }>({ white: [], black: [] });
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-56 border-r border-sidebar-border bg-sidebar transition-transform lg:translate-x-0">
@@ -155,13 +167,30 @@ export function AppSidebar2() {
             <span className="text-sidebar-foreground/60 text-xs mr-1">
               Beyaz:
             </span>
-            ♟♞♝
+            {capturedPieces.white.length > 0 ? (
+              capturedPieces.white.map((piece, idx) => (
+                <span key={idx}>{piece}</span>
+              ))
+            ) : (
+              <span className="text-xs text-sidebar-foreground/40">
+                Hiç taş alınmadı
+              </span>
+            )}
           </div>
+
           <div className="flex items-center gap-1 text-base">
             <span className="text-sidebar-foreground/60 text-xs mr-1">
               Siyah:
             </span>
-            ♙♘
+            {capturedPieces.black.length > 0 ? (
+              capturedPieces.black.map((piece, idx) => (
+                <span key={idx}>{piece}</span>
+              ))
+            ) : (
+              <span className="text-xs text-sidebar-foreground/40">
+                Hiç taş alınmadı
+              </span>
+            )}
           </div>
         </div>
       </div>

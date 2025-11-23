@@ -69,7 +69,7 @@ export function BottomNavBar({
     if (seconds === undefined) return null;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
@@ -80,14 +80,16 @@ export function BottomNavBar({
           <div className="flex items-center justify-between mb-2 pb-2 border-b border-border/50 px-2">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-sm">{currentPlayer.name}</span>
+                <span className="font-semibold text-sm">
+                  {currentPlayer.name}
+                </span>
                 {currentPlayer.rating && (
                   <Badge variant="secondary" className="text-xs">
                     {currentPlayer.rating}
                   </Badge>
                 )}
               </div>
-              
+
               {/* Captured Pieces */}
               <div className="flex flex-wrap gap-0.5">
                 {currentPlayer.capturedPieces.map((piece, i) => (
@@ -97,14 +99,16 @@ export function BottomNavBar({
                 ))}
               </div>
             </div>
-            
+
             {currentPlayer.timeLeft !== undefined && (
-              <div className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-mono text-sm font-semibold",
-                currentPlayer.timeLeft < 60 
-                  ? "bg-destructive/20 text-destructive animate-pulse" 
-                  : "bg-muted text-foreground"
-              )}>
+              <div
+                className={cn(
+                  "flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-mono text-sm font-semibold",
+                  currentPlayer.timeLeft < 60
+                    ? "bg-destructive/20 text-destructive animate-pulse"
+                    : "bg-muted text-foreground"
+                )}
+              >
                 <Clock className="w-3.5 h-3.5" />
                 {formatTime(currentPlayer.timeLeft)}
               </div>
@@ -112,6 +116,20 @@ export function BottomNavBar({
           </div>
 
           <div className="flex items-center justify-around">
+            {/* Voice Chat Button */}
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={() => setVoiceOpen(true)}
+              className={cn(
+                "flex-col h-auto py-2 px-3 rounded-xl transition-all hover:bg-primary/10",
+                voiceOpen && "bg-primary/10"
+              )}
+            >
+              <Phone className="h-5 w-5 mb-1" />
+              <span className="text-[10px] font-medium">Sesli</span>
+            </Button>
+
             {/* Chat Button */}
             <Button
               variant="ghost"
@@ -125,26 +143,10 @@ export function BottomNavBar({
               <MessageCircle className="h-5 w-5 mb-1" />
               <span className="text-[10px] font-medium">Sohbet</span>
               {unreadCount > 0 && (
-                <Badge 
-                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-destructive text-destructive-foreground text-[10px] animate-pulse"
-                >
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-destructive text-destructive-foreground text-[10px] animate-pulse">
                   {unreadCount}
                 </Badge>
               )}
-            </Button>
-
-            {/* Voice Chat Button */}
-            <Button
-              variant="ghost"
-              size="lg"
-              onClick={() => setVoiceOpen(true)}
-              className={cn(
-                "flex-col h-auto py-2 px-3 rounded-xl transition-all hover:bg-primary/10",
-                voiceOpen && "bg-primary/10"
-              )}
-            >
-              <Phone className="h-5 w-5 mb-1" />
-              <span className="text-[10px] font-medium">Sesli</span>
             </Button>
 
             {/* Emoji Button */}
@@ -179,8 +181,8 @@ export function BottomNavBar({
       </div>
 
       {/* Dialogs */}
-      <ChatDialog 
-        open={chatOpen} 
+      <ChatDialog
+        open={chatOpen}
         onOpenChange={setChatOpen}
         onUnreadCountChange={setUnreadCount}
       />

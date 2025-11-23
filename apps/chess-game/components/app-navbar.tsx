@@ -193,7 +193,7 @@ export function AppNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
               className="relative h-10 gap-2 rounded-full pl-2 pr-3"
             >
               <Avatar className="h-8 w-8">
-                <AvatarImage src="/diverse-user-avatars.png" alt="User" />
+                <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" alt="User" />
                 <AvatarFallback className="bg-primary text-primary-foreground">
                   AK
                 </AvatarFallback>

@@ -50,6 +50,12 @@ const GameSchema = new Schema(
       default: null,
     },
 
+    currentTurn: {
+      type: String,
+      enum: ["white", "black"],
+      default: "white",
+    },
+
     moves: { type: [MoveSchema], default: [] },
 
     currentFEN: {

@@ -534,7 +534,7 @@ export default function FriendsPage() {
                   <div className="text-center space-y-3">
                     <div className="flex items-center justify-center gap-4">
                       <Avatar className="w-16 h-16">
-                        <AvatarImage src="/diverse-user-avatars.png" alt="Sen" />
+                        <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" alt="Sen" />
                         <AvatarFallback>AK</AvatarFallback>
                       </Avatar>
                       <div className="text-2xl font-bold text-muted-foreground">VS</div>

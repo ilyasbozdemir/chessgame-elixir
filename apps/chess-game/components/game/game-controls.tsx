@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 
 export function GameControls() {
-  const [whiteTime, setWhiteTime] = useState(600); // 10 minutes in seconds
+  const [whiteTime, setWhiteTime] = useState(600); 
   const [blackTime, setBlackTime] = useState(600);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showResignDialog, setShowResignDialog] = useState(false);
