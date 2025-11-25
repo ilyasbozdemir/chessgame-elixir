@@ -137,7 +137,6 @@ export default function PageClient({ id }: PageClientProps) {
 
         {/* Masaüstü Görünüm */}
         <div className="hidden lg:flex flex-col items-center gap-4 w-full max-w-[900px] mx-auto">
-          <GameControls2 />
 
           <PlayerCard
             player={{

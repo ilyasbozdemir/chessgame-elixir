@@ -6,7 +6,7 @@ import {
 } from "@/app/actions/db/game";
 import { Logger } from "@/lib/utils";
 import { useChessStore } from "@/stores/chess-store";
-import { table } from "console";
+
 
 const isBrowser = typeof window !== "undefined";
 

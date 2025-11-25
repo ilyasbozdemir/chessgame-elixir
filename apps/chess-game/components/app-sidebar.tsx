@@ -18,6 +18,7 @@ import {
   Award,
   MessageCircle,
   Globe,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -39,7 +40,7 @@ const sidebarItems = [
   { href: "/learn", label: "Öğren", icon: GraduationCap },
   { href: "/tournament", label: "Turnuvalar", icon: Trophy },
   { href: "/news", label: "Haberler", icon: Newspaper },
-  { href: "/community", label: "Topluluk", icon: Globe },
+  { href: "/clubs", label: "Kulüpler", icon: Building2 },
   { href: "/friends", label: "Arkadaşlar", icon: Users },
   { href: "/leaderboard", label: "Liderlik Tablosu", icon: Award },
   { href: "/about", label: "Hakkında", icon: Info },
