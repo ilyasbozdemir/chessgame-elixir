@@ -26,6 +26,10 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
 export function AppNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
+
+
+
+
   const [isDark, setIsDark] = useState(true);
 
   const toggleTheme = () => {

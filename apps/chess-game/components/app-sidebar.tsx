@@ -19,6 +19,8 @@ import {
   MessageCircle,
   Globe,
   Building2,
+  User,
+  LayoutDashboard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +35,8 @@ import { useUser } from "@/context/user-context";
 
 const sidebarItems = [
   { href: "/", label: "Ana Sayfa", icon: Home },
-  { href: "/lobby", label: "Oyna", icon: Gamepad2 },
+  { href: "/play", label: "Oyna", icon: Gamepad2 },
+  { href: "/lobby", label: "Lobby", icon: Gamepad2 },
   { href: "/watch", label: "İzle", icon: Eye },
   { href: "/chat", label: "Mesajlar", icon: MessageCircle },
   { href: "/puzzles", label: "Bulmacalar", icon: Puzzle },
@@ -44,6 +47,12 @@ const sidebarItems = [
   { href: "/friends", label: "Arkadaşlar", icon: Users },
   { href: "/leaderboard", label: "Liderlik Tablosu", icon: Award },
   { href: "/about", label: "Hakkında", icon: Info },
+];
+
+const accountItems = [
+  { href: "/profile", label: "Profilim", icon: User },
+  { href: "/settings", label: "Ayarlar", icon: User },
+  { href: "/dashboard", label: "Kontrol Paneli", icon: LayoutDashboard },
 ];
 
 interface AppSidebarProps {
@@ -163,16 +172,31 @@ export function AppSidebar({ isOpen, onClose, width }: AppSidebarProps) {
             })}
           </nav>
 
-          {/* Settings */}
-          <div className="p-3 border-t border-sidebar-border">
-            <Link
-              href="/settings"
-              onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-            >
-              <Settings className="w-5 h-5 shrink-0" />
-              <span>Ayarlar</span>
-            </Link>
+          <div className="p-3 border-t border-sidebar-border space-y-1">
+            <div className="px-3 py-2 text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">
+              Hesabım
+            </div>
+            {accountItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium",
+                    isActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  )}
+                >
+                  <Icon className="w-5 h-5 shrink-0" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </aside>

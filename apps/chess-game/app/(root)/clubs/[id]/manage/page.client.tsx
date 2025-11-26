@@ -2,11 +2,21 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Trash2, Shield, Edit2, Ban, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Trash2,
+  Shield,
+  Edit2,
+  Ban,
+  Users,
+  MessageSquare,
+  Send,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { useParams } from "next/navigation";
 
 const mockClubData = {
@@ -72,6 +82,25 @@ export default function ManageClubPage() {
   const [searchMember, setSearchMember] = useState("");
   const [editingRole, setEditingRole] = useState<number | null>(null);
   const [selectedRole, setSelectedRole] = useState("");
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      sender: "Sistem",
+      content: "Antrenman Programı Güncellendi",
+      targetAudience: "Tüm Üyeler (1250 kişi)",
+      time: "2 saat önce",
+    },
+    {
+      id: 2,
+      sender: "Sistem",
+      content: "Turnya Katılım Çağrısı",
+      targetAudience: "Yöneticiler (5 kişi)",
+      time: "1 gün önce",
+    },
+  ]);
+  const [messageTitle, setMessageTitle] = useState("");
+  const [messageContent, setMessageContent] = useState("");
+  const [targetAudience, setTargetAudience] = useState("Tüm Üyeler");
 
   const filteredMembers = members.filter((m) =>
     m.name.toLowerCase().includes(searchMember.toLowerCase())
@@ -88,8 +117,25 @@ export default function ManageClubPage() {
     setMembers(members.filter((m) => m.id !== memberId));
   };
 
+  const handleSendMessage = () => {
+    if (messageTitle.trim() && messageContent.trim()) {
+      setMessages([
+        {
+          id: messages.length + 1,
+          sender: "Sen",
+          content: messageTitle,
+          targetAudience: targetAudience,
+          time: "Az önce",
+        },
+        ...messages,
+      ]);
+      setMessageTitle("");
+      setMessageContent("");
+    }
+  };
+
   return (
-    <div className="container mx-auto p-6 h-[calc(100vh-8rem)]">
+    <div className="container mx-auto p-6 space-y-6">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center gap-4">
@@ -136,6 +182,10 @@ export default function ManageClubPage() {
             <TabsTrigger value="members" className="gap-2">
               <Users className="w-4 h-4" />
               Üyeler
+            </TabsTrigger>
+            <TabsTrigger value="messages" className="gap-2">
+              <MessageSquare className="w-4 h-4" />
+              İletişim
             </TabsTrigger>
             <TabsTrigger value="settings" className="gap-2">
               <Edit2 className="w-4 h-4" />
@@ -272,6 +322,71 @@ export default function ManageClubPage() {
                     </tbody>
                   </table>
                 </div>
+              </div>
+            </Card>
+          </TabsContent>
+
+          {/* İletişim Tab */}
+          <TabsContent value="messages" className="space-y-4">
+            <Card className="p-6">
+              <h3 className="font-semibold mb-4">Mesaj Gönder</h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Başlık</label>
+                  <Input
+                    placeholder="Mesaj başlığı..."
+                    value={messageTitle}
+                    onChange={(e) => setMessageTitle(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Mesaj İçeriği</label>
+                  <Textarea
+                    placeholder="Mesajınızı yazın..."
+                    value={messageContent}
+                    onChange={(e) => setMessageContent(e.target.value)}
+                    className="min-h-32"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Hedef Kitle</label>
+                  <select
+                    value={targetAudience}
+                    onChange={(e) => setTargetAudience(e.target.value)}
+                    className="w-full px-3 py-2 border border-input rounded-md text-sm"
+                  >
+                    <option>Tüm Üyeler</option>
+                    <option>Yöneticiler</option>
+                    <option>Moderatörler</option>
+                    <option>Yeni Üyeler</option>
+                  </select>
+                </div>
+                <Button onClick={handleSendMessage} className="w-full gap-2">
+                  <Send className="w-4 h-4" />
+                  Mesajı Gönder
+                </Button>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <h3 className="font-semibold mb-4">Gönderilen Mesajlar</h3>
+              <div className="space-y-3">
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <p className="font-medium text-sm">{msg.content}</p>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
+                        {msg.time}
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Hedef: {msg.targetAudience}
+                    </p>
+                  </div>
+                ))}
               </div>
             </Card>
           </TabsContent>

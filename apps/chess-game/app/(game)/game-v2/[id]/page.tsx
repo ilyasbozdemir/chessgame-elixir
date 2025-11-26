@@ -1,3 +1,4 @@
+import { DebugBox } from "@/components/debug-box";
 import PageClient from "./page.client";
 import { GameService } from "@/services/game.service";
 import { notFound } from "next/navigation";
@@ -17,5 +18,9 @@ export default async function Page({ params }: PageProps) {
     return notFound();
   }
 
-  return <PageClient id={id} />;
+  return (
+    <>
+      <PageClient id={id} />
+    </>
+  );
 }
