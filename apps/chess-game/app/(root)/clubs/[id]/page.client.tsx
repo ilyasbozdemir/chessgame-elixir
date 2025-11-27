@@ -19,6 +19,7 @@ import {
   Flame,
   MessageCircle,
   X,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -484,6 +485,9 @@ export function MessageThreadModal({
 export default function ClubDetailPage() {
   const { id } = useParams();
   const router = useRouter();
+
+  const [joined, setJoined] = useState<boolean>(false);
+
   const [activeCategory, setActiveCategory] = useState("genel");
   const [selectedReply, setSelectedReply] = useState<Discussion | null>(null);
   const [selectedConversation, setSelectedConversation] =
@@ -575,20 +579,28 @@ export default function ClubDetailPage() {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button size="lg" className="gap-2">
-              <Users className="w-5 h-5" />
-              <span className="hidden sm:inline">Kulübe Katıl</span>
-              <span className="sm:hidden">Katıl</span>
-            </Button>
             <Button
               size="lg"
-              variant="outline"
-              className="gap-2 bg-transparent"
-              onClick={() => document.getElementById("messaging-tab")?.click()}
+              className="gap-2"
+              onClick={() => setJoined(!joined)}
             >
-              <MessageSquare className="w-5 h-5" />
-              <span className="hidden sm:inline">İletişime Geç</span>
-              <span className="sm:hidden">Mesaj</span>
+              {joined ? (
+                <Check className="w-5 h-5" />
+              ) : (
+                <Users className="w-5 h-5" />
+              )}
+
+              {joined ? (
+                <>
+                  <span className="hidden sm:inline">Kayıtlı</span>
+                  <span className="sm:hidden">✔</span>
+                </>
+              ) : (
+                <>
+                  <span className="hidden sm:inline">Kulübe Katıl</span>
+                  <span className="sm:hidden">Katıl</span>
+                </>
+              )}
             </Button>
           </div>
 

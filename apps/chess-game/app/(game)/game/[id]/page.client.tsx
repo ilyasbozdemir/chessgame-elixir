@@ -32,6 +32,7 @@ export default function PageClient({ id }: PageClientProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isGameEnded, setIsGameEnded] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"white" | "black">("white");
@@ -56,6 +57,9 @@ export default function PageClient({ id }: PageClientProps) {
   ) => {
     //
   };
+
+
+
 
   useEffect(() => {
     if (!id) return;
@@ -137,7 +141,6 @@ export default function PageClient({ id }: PageClientProps) {
 
         {/* Masaüstü Görünüm */}
         <div className="hidden lg:flex flex-col items-center gap-4 w-full max-w-[900px] mx-auto">
-
           <PlayerCard
             player={{
               name: game.black.name,
