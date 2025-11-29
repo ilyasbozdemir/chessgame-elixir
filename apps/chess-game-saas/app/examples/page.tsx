@@ -38,42 +38,42 @@ export default function ExamplesPage() {
                 title="Temel Oyun"
                 description="İki oyunculu temel satranç oyunu kurulumu"
                 tags={["Next.js", "React"]}
-                githubUrl="https://github.com/yourusername/chessgame/tree/main/examples/basic-game"
+                githubUrl="https://github.com/ilyasbozdemir/chessgame-elixir/tree/main/examples/basic-game"
               />
               <ExampleCard
                 icon={<Bot className="w-6 h-6" />}
                 title="AI Rakip"
                 description="Stockfish entegrasyonu ile AI'ya karşı oynama"
                 tags={["Elixir", "AI"]}
-                githubUrl="https://github.com/yourusername/chessgame/tree/main/examples/ai-opponent"
+                githubUrl="https://github.com/ilyasbozdemir/chessgame-elixir/tree/main/examples/ai-opponent"
               />
               <ExampleCard
                 icon={<Users className="w-6 h-6" />}
                 title="Çoklu Oyuncu Lobby"
                 description="Oyuncu eşleştirme ve oda sistemi"
                 tags={["Phoenix", "WebSocket"]}
-                githubUrl="https://github.com/yourusername/chessgame/tree/main/examples/multiplayer-lobby"
+                githubUrl="https://github.com/ilyasbozdemir/chessgame-elixir/tree/main/examples/multiplayer-lobby"
               />
               <ExampleCard
                 icon={<Trophy className="w-6 h-6" />}
                 title="Turnuva Sistemi"
                 description="Otomatik eşleştirme ve sıralama tablosu"
                 tags={["MongoDB", "Backend"]}
-                githubUrl="https://github.com/yourusername/chessgame/tree/main/examples/tournament"
+                githubUrl="https://github.com/ilyasbozdemir/chessgame-elixir/tree/main/examples/tournament"
               />
               <ExampleCard
                 icon={<Eye className="w-6 h-6" />}
                 title="Seyirci Modu"
                 description="Canlı oyunları izleme ve replay"
                 tags={["React", "WebSocket"]}
-                githubUrl="https://github.com/yourusername/chessgame/tree/main/examples/spectator-mode"
+                githubUrl="https://github.com/ilyasbozdemir/chessgame-elixir/tree/main/examples/spectator-mode"
               />
               <ExampleCard
                 icon={<Code2 className="w-6 h-6" />}
                 title="Discord Bot"
                 description="Discord sunucunuzda satranç oynama"
                 tags={["Discord.js", "Bot"]}
-                githubUrl="https://github.com/yourusername/chessgame/tree/main/examples/discord-bot"
+                githubUrl="https://github.com/ilyasbozdemir/chessgame-elixir/tree/main/examples/discord-bot"
               />
             </div>
           </div>

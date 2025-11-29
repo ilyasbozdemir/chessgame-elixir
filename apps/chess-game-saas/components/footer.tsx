@@ -80,7 +80,7 @@ export function Footer() {
             <h3 className="font-semibold mb-4">Bağlantılar</h3>
             <div className="flex gap-3">
               <a
-                href="https://github.com/yourusername/chessgame"
+                href="https://github.com/ilyasbozdemir/chessgame-elixir"
                 className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background hover:bg-accent hover:border-primary/50 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"

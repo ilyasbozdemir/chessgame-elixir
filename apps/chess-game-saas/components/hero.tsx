@@ -32,7 +32,7 @@ export function Hero() {
             <InstallCommand />
             <Button size="lg" variant="outline" asChild>
               <a
-                href="https://github.com/yourusername/chessgame"
+                href="https://github.com/ilyasbozdemir/chessgame-elixir"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="gap-2"

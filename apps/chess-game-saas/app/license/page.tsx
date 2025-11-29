@@ -130,7 +130,7 @@ export default function LicensePage() {
               <div className="text-center pt-8">
                 <Button size="lg" asChild>
                   <a
-                    href="https://github.com/yourusername/chessgame/blob/main/LICENSE"
+                    href="https://github.com/ilyasbozdemir/chessgame-elixir/blob/main/LICENSE"
                     target="_blank"
                     rel="noopener noreferrer"
                   >

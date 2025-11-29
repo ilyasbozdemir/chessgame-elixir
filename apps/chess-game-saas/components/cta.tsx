@@ -23,7 +23,7 @@ export function CTA() {
                 Şimdi İndirin
               </Button>
               <Button size="lg" variant="outline" asChild className="gap-2 min-w-[200px] bg-transparent">
-                <a href="https://github.com/yourusername/chessgame" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/ilyasbozdemir/chessgame-elixir" target="_blank" rel="noopener noreferrer">
                   <Github className="w-5 h-5" />
                   GitHub
                 </a>

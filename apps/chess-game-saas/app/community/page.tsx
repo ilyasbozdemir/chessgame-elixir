@@ -51,7 +51,7 @@ export default function CommunityPage() {
                 description="Kod katkısında bulunun, hata bildirin veya yeni özellikler önerin. Her katkı değerlidir."
                 action={
                   <Button className="w-full bg-transparent" variant="outline" asChild>
-                    <a href="https://github.com/yourusername/chessgame" target="_blank" rel="noopener noreferrer">
+                    <a href="https://github.com/ilyasbozdemir/chessgame-elixir" target="_blank" rel="noopener noreferrer">
                       <Star className="w-4 h-4 mr-2" />
                       GitHub'da Star Verin
                     </a>
