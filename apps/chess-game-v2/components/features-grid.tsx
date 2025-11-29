@@ -41,7 +41,7 @@ const features = [
     description: "Yarışmalara katılın ve ödüller kazanın",
     color: "text-yellow-500 dark:text-yellow-400",
     bgColor: "bg-yellow-500/10",
-    href: "/tournaments",
+    href: "/play/online/tournaments",
   },
   {
     icon: TrendingUp,

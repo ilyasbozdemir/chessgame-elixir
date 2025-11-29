@@ -28,7 +28,7 @@ const menuItems = [
   {
     title: "Turnuvalar",
     icon: Trophy,
-    href: "/tournaments",
+    href: "/play/online/tournaments",
   },
   {
     title: "Arkadaşlar",

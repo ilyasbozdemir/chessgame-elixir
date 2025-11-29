@@ -9,7 +9,7 @@ const menuItems = [
   {
     title: "Yeni Oyun",
     icon: Crown,
-    href: "/",
+    href: "/play",
   },
   {
     title: "Canlı Oyunlar",
@@ -19,7 +19,7 @@ const menuItems = [
   {
     title: "Turnuvalar",
     icon: Trophy,
-    href: "/tournaments",
+    href: "/play/online/tournaments",
   },
   {
     title: "Arkadaşlar",

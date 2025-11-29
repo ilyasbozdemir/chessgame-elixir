@@ -17,7 +17,7 @@ import {
 
 const menuItems = [
   { title: "Ana Sayfa", url: "/", icon: Home },
-  { title: "Yeni Oyun", url: "/new-game", icon: Plus },
+  { title: "Yeni Oyun", url: "/play", icon: Plus },
   { title: "Oyunlarım", url: "/games", icon: Trophy },
   { title: "Geçmiş", url: "/history", icon: Clock },
   { title: "Ayarlar", url: "/settings", icon: Settings },

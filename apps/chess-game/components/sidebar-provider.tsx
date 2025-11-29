@@ -18,7 +18,7 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
     "/watch",
     "/spectate",
     "/tables",
-    "/tournaments",
+    "/play/online/tournaments",
     "/puzzles",
     "/leaderboard",
     "/profile",

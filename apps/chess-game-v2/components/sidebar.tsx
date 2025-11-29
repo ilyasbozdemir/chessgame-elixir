@@ -24,7 +24,7 @@ const mainMenuItems = [
   { icon: BookOpen, label: "Öğren", href: "/learn" },
   { icon: Video, label: "İzle", href: "/watch" },
   { icon: Users, label: "Topluluk", href: "/community" },
-  { icon: Trophy, label: "Turnuvalar", href: "/tournaments" },
+  { icon: Trophy, label: "Turnuvalar", href: "/play/online/tournaments" },
 ]
 
 const moreItems = [

@@ -1,23 +1,36 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Header } from "@/components/header"
-import { DynamicSidebar } from "@/components/dynamic-sidebar"
-import { QuickPlaySection } from "@/components/quick-play-section"
-import { FeaturesGrid } from "@/components/features-grid"
-import { LiveGamesSection } from "@/components/live-games-section"
-import { ToolsSection } from "@/components/tools-section"
-import { LobbyDialog } from "@/components/lobby-dialog"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Menu, Users, Radio, Trophy, MessageSquare, Send } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { useState } from "react";
+import { Header } from "@/components/header";
+import { DynamicSidebar } from "@/components/dynamic-sidebar";
+import { QuickPlaySection } from "@/components/quick-play-section";
+import { FeaturesGrid } from "@/components/features-grid";
+import { LiveGamesSection } from "@/components/live-games-section";
+import { ToolsSection } from "@/components/tools-section";
+import { LobbyDialog } from "@/components/lobby-dialog";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Menu, Users, Radio, Trophy, MessageSquare, Send } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function HomePage() {
-  const [isLobbyOpen, setIsLobbyOpen] = useState(false)
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const [isLobbyOpen, setIsLobbyOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const [stats, setStats] = useState({
+    playing: 12345,
+    lobby: 678,
+    tournaments: 90,
+    online: 7842,
+  });
+
+  function formatNumber(num: number) {
+    if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + "M";
+    if (num >= 1_000) return (num / 1_000).toFixed(1) + "K";
+    return num.toString();
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -31,7 +44,10 @@ export default function HomePage() {
 
         {/* Mobile Sidebar */}
         <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
-          <SheetTrigger asChild className="lg:hidden fixed bottom-20 left-4 z-40">
+          <SheetTrigger
+            asChild
+            className="lg:hidden fixed bottom-20 left-4 z-40"
+          >
             <Button size="icon" className="rounded-full shadow-lg h-14 w-14">
               <Menu className="w-6 h-6" />
             </Button>
@@ -51,7 +67,9 @@ export default function HomePage() {
                     <Radio className="w-5 h-5 text-green-500" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">1,247</p>
+                    <p className="text-2xl font-bold">
+                      {formatNumber(stats.playing)}
+                    </p>
                     <p className="text-xs text-muted-foreground">Oyunda</p>
                   </div>
                 </div>
@@ -63,7 +81,9 @@ export default function HomePage() {
                     <Users className="w-5 h-5 text-blue-500" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">3,842</p>
+                    <p className="text-2xl font-bold">
+                      {formatNumber(stats.lobby)}
+                    </p>
                     <p className="text-xs text-muted-foreground">Lobide</p>
                   </div>
                 </div>
@@ -75,8 +95,12 @@ export default function HomePage() {
                     <Trophy className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">52</p>
-                    <p className="text-xs text-muted-foreground">Aktif Turnuva</p>
+                    <p className="text-2xl font-bold">
+                      {formatNumber(stats.tournaments)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Aktif Turnuva
+                    </p>
                   </div>
                 </div>
               </Card>
@@ -87,7 +111,9 @@ export default function HomePage() {
                     <MessageSquare className="w-5 h-5 text-purple-500" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">8.2K</p>
+                    <p className="text-2xl font-bold">
+                      {formatNumber(stats.online)}
+                    </p>
                     <p className="text-xs text-muted-foreground">Çevrimiçi</p>
                   </div>
                 </div>
@@ -111,25 +137,53 @@ export default function HomePage() {
                     <h3 className="font-semibold">Global Sohbet</h3>
                     <div className="ml-auto flex items-center gap-1">
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-xs text-muted-foreground">8.2K çevrimiçi</span>
+                      <span className="text-xs text-muted-foreground">
+                        8.2K çevrimiçi
+                      </span>
                     </div>
                   </div>
 
                   <ScrollArea className="flex-1 pr-4">
                     <div className="space-y-4">
                       {[
-                        { user: "Ahmet_47", msg: "Kimse 5+0 blitz oynamak ister mi?", time: "2 dk önce" },
-                        { user: "GrandMaster_TR", msg: "Yeni turnuva başladı!", time: "5 dk önce" },
-                        { user: "SatrancKrali", msg: "Bugün bulmacalardan 95/100 yaptım 🎉", time: "8 dk önce" },
-                        { user: "Beginner123", msg: "Açılışlar hakkında kaynak önerir misiniz?", time: "12 dk önce" },
-                        { user: "ProPlayer99", msg: "Canlı yayında 2500+ ELO turnuvası var!", time: "15 dk önce" },
+                        {
+                          user: "Ahmet_47",
+                          msg: "Kimse 5+0 blitz oynamak ister mi?",
+                          time: "2 dk önce",
+                        },
+                        {
+                          user: "GrandMaster_TR",
+                          msg: "Yeni turnuva başladı!",
+                          time: "5 dk önce",
+                        },
+                        {
+                          user: "SatrancKrali",
+                          msg: "Bugün bulmacalardan 95/100 yaptım 🎉",
+                          time: "8 dk önce",
+                        },
+                        {
+                          user: "Beginner123",
+                          msg: "Açılışlar hakkında kaynak önerir misiniz?",
+                          time: "12 dk önce",
+                        },
+                        {
+                          user: "ProPlayer99",
+                          msg: "Canlı yayında 2500+ ELO turnuvası var!",
+                          time: "15 dk önce",
+                        },
                       ].map((chat, i) => (
                         <div key={i} className="space-y-1">
                           <div className="flex items-baseline gap-2">
-                            <span className="text-sm font-semibold text-primary">{chat.user}</span>
-                            <span className="text-xs text-muted-foreground">{chat.time}</span>
+                            <span className="text-sm font-semibold text-primary">
+                              {chat.user}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {chat.time}
+                            </span>
                           </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed">{chat.msg}</p>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {chat.msg}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -151,5 +205,5 @@ export default function HomePage() {
       {/* Lobby Dialog */}
       <LobbyDialog open={isLobbyOpen} onOpenChange={setIsLobbyOpen} />
     </div>
-  )
+  );
 }

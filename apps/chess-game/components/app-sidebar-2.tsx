@@ -25,7 +25,7 @@ const menuItems = [
   {
     title: "Yeni Oyun",
     icon: Crown,
-    href: "/",
+    href: "/play",
   },
   {
     title: "Turnuvalar",
