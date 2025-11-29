@@ -75,3 +75,15 @@ export class Logger {
 export function getAvatarUrl(seed: string): string {
   return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
 }
+
+
+export function getDisplayInitials(displayName?: string) {
+  if (!displayName?.trim()) return "N/A";
+
+  return displayName
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .map(word => word.charAt(0).toUpperCase())
+    .join("");
+}

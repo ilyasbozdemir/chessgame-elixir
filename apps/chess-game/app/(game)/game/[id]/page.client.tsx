@@ -32,7 +32,6 @@ export default function PageClient({ id }: PageClientProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isGameEnded, setIsGameEnded] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"white" | "black">("white");
@@ -57,9 +56,6 @@ export default function PageClient({ id }: PageClientProps) {
   ) => {
     //
   };
-
-
-
 
   useEffect(() => {
     if (!id) return;

@@ -24,11 +24,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { useUser } from "@/context/user-context";
+import { getAvatarUrl, getDisplayInitials } from "@/lib/utils";
 
 export function AppNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
-
-
-
+  const {
+    user,
+    playerUser,
+    loading: userLoading,
+    refresh,
+    login,
+    logout,
+  } = useUser();
 
   const [isDark, setIsDark] = useState(true);
 
@@ -186,7 +193,7 @@ export function AppNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
         </Button>
 
         <Badge variant="secondary" className="hidden sm:flex font-semibold">
-          1842
+          0
         </Badge>
 
         {/* User Menu */}
@@ -197,21 +204,24 @@ export function AppNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
               className="relative h-10 gap-2 rounded-full pl-2 pr-3"
             >
               <Avatar className="h-8 w-8">
-                <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" alt="User" />
+                <AvatarImage
+                  src={getAvatarUrl(user?.displayName || "user")}
+                  alt="User"
+                />
                 <AvatarFallback className="bg-primary text-primary-foreground">
-                  AK
+                  {getDisplayInitials(user?.displayName || "UN")}
                 </AvatarFallback>
               </Avatar>
               <span className="hidden text-sm font-medium lg:inline-block">
-                Alex Kaya
+                {user?.displayName}
               </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="flex flex-col">
-                <p className="text-sm font-medium">Alex Kaya</p>
-                <p className="text-xs text-muted-foreground">Rating: 1842</p>
+                <p className="text-sm font-medium">{user?.displayName}</p>
+                <p className="text-xs text-muted-foreground">Rating: 0</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
