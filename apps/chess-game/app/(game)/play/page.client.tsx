@@ -4,16 +4,16 @@ import { Button } from "@/components/ui/button";
 import { ChessBoard } from "@/components/game/chess-board";
 
 import {
-  Play,
-  Users,
+  BookOpen,
   Coffee,
   Cpu,
-  Trophy,
-  Zap,
-  BookOpen,
-  LifeBuoy,
-  Search,
   Heart,
+  LifeBuoy,
+  Play,
+  Search,
+  Trophy,
+  Users,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -106,11 +106,6 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
               <div className="flex justify-center">
                 <div className="space-y-4 w-full max-w-2xl">
                   <ChessBoard />
-
-                  <Button className="w-full" size="lg">
-                    <Play className="w-4 h-4 mr-2" />
-                    Oyunu Başlat
-                  </Button>
                 </div>
               </div>
             </div>

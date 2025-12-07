@@ -14,6 +14,7 @@ import { useUser } from "@/context/user-context";
 import { usePresence } from "@/context/presence-context";
 import { TableService } from "@/services/table.service";
 import { useChessStore } from "@/stores/chess-store";
+import { GameModeDialog } from "./components/dialogs/game-mode-dialog";
 
 interface PageClientProps {
   //
@@ -132,6 +133,7 @@ const PageClient: React.FC<PageClientProps> = ({ }) => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Lobi</h2>
             <CreateTableDialog />
+            <GameModeDialog />
           </div>
 
           <div className="container mx-auto px-4 py-8">
