@@ -59,7 +59,7 @@ const mockMembers = [
     id: 2,
     name: "Fatih Yıldız",
     role: "Yönetici",
-    rating: 2150,
+    rating: 0,
     image:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&fit=crop",
     joinedDate: "2016",

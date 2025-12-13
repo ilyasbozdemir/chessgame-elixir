@@ -8,12 +8,35 @@ import { ChessBoard } from "@/components/game/chess-board";
 import { GameCard } from "@/components/game/game-card";
 import { PlayersList } from "@/components/game/players-list";
 import { NewGamePanel } from "@/components/game/new-game-panel";
+import { GamePlayerCard } from "@/components/game-player-card";
+import { useUser } from "@/context/user-context";
+import { useState } from "react";
+import { getAvatarUrl } from "@/lib/utils";
 
 interface PageClientProps {
   //
 }
 
 const PageClient: React.FC<PageClientProps> = ({}) => {
+  const {
+    user,
+    playerUser,
+    loading: userLoading,
+    refresh,
+    login,
+    logout,
+  } = useUser();
+
+  const [opponentTime, setOpponentTime] = useState(0);
+  const [playerTime, setPlayerTime] = useState(0);
+  const [isPlayerTurn, setIsPlayerTurn] = useState(true);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
   return (
     <div className="flex min-h-screen w-full bg-background">
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -23,12 +46,20 @@ const PageClient: React.FC<PageClientProps> = ({}) => {
             <div className="lg:col-span-8 space-y-4">
               <div className="flex justify-center">
                 <div className="space-y-4 w-full max-w-2xl">
+                  <GamePlayerCard
+                    name="Rakip"
+                    rating={0}
+                    time={formatTime(opponentTime)}
+                    isActive={!isPlayerTurn}
+                  />
                   <ChessBoard />
-
-                  <Button className="w-full" size="lg">
-                    <Play className="w-4 h-4 mr-2" />
-                    Oyunu Başlat
-                  </Button>
+                  <GamePlayerCard
+                    name={user?.displayName || "user"}
+                    avatar={getAvatarUrl(user?.displayName || "user")}
+                    rating={0}
+                    time={formatTime(playerTime)}
+                    isActive={isPlayerTurn}
+                  />
                 </div>
               </div>
             </div>

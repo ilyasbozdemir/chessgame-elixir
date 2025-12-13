@@ -66,7 +66,7 @@ const MOCK_COACHES: Coach[] = [
     id: "c3",
     name: "WIM Elif Demir",
     title: "Woman IM",
-    rating: 2150,
+    rating: 0,
     price: 300,
     specialties: ["Pozisyonel Oyun", "Blitz Eğitimi"]
   }

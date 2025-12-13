@@ -47,7 +47,7 @@ const mockLeaderboard = [
     rank: 4,
     name: "Ali Çelik",
     avatar: "AÇ",
-    rating: 2150,
+    rating: 0,
     gamesPlayed: 512,
     winRate: 61,
     trend: "up",
