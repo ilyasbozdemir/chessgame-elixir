@@ -41,6 +41,14 @@ defmodule ChessRealtimeServerWeb.ChessChannel do
     {:noreply, socket}
   end
 
+  @impl true
+  def handle_info(:update_presence_count, socket) do
+    topic = socket.assigns.topic
+    count = Presence.list(topic) |> map_size()
+    broadcast!(socket, "presence_count", %{count: count})
+    {:noreply, socket}
+  end
+
   # ----------------------------------------
   # tamamen dinamik event yöneticisi
   # ----------------------------------------
@@ -92,13 +100,5 @@ defmodule ChessRealtimeServerWeb.ChessChannel do
     end
 
     :ok
-  end
-
-  @impl true
-  def handle_info(:update_presence_count, socket) do
-    topic = socket.assigns.topic
-    count = Presence.list(topic) |> map_size()
-    broadcast!(socket, "presence_count", %{count: count})
-    {:noreply, socket}
   end
 end

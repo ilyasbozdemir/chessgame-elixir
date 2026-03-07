@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: chess_game
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  chess_realtime_server:
+    build:
+      context: ./apps/backend/chess_realtime_server
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=ecto://postgres:postgres@db/chess_game
+      - SECRET_KEY_BASE=Q2hlc3NSZWFsdGltZVNlcnZlcl9TZWNyZXRfS2V5X0Jhc2VfTG9uZ19Fbm91Z2hfVG9fUGFzc19DaGVja3M=
+      - PHX_HOST=localhost
+      - PORT=4000
+      - PHX_SERVER=true
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

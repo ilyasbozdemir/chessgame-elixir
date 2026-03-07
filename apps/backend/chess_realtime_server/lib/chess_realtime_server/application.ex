@@ -16,7 +16,9 @@ defmodule ChessRealtimeServer.Application do
       # {ChessRealtimeServer.Worker, arg},
       # Start to serve requests, typically the last entry
       ChessRealtimeServerWeb.Endpoint,
-       ChessRealtimeServerWeb.Presence
+      ChessRealtimeServerWeb.Presence,
+      ChessRealtimeServer.GameServer,
+      ChessRealtimeServer.ChatServer
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

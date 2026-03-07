@@ -1,0 +1,21 @@
+{
+    "name": "chessgame-elixir",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+        "apps/*"
+    ],
+    "scripts": {
+        "db:up": "docker compose up -d db",
+        "db:down": "docker compose stop db",
+        "backend:deps": "cd apps/backend/chess_realtime_server && mix deps.get",
+        "backend:setup": "cd apps/backend/chess_realtime_server && mix setup",
+        "backend:dev": "cd apps/backend/chess_realtime_server && mix phx.server",
+        "main:dev": "pnpm --filter chess-game-app dev",
+        "v2:dev": "pnpm --filter chess-game-dashboard dev",
+        "saas:dev": "pnpm --filter chess-game-saas dev",
+        "start:all": "pnpm run db:up && pnpm run backend:setup && pnpm run backend:dev",
+        "dev": "pnpm run db:up && pnpm run backend:dev",
+        "docker:down": "docker compose down"
+    }
+}

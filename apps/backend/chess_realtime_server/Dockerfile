@@ -1,5 +1,5 @@
 # === 1. Builder aşaması ===
-FROM hexpm/elixir:1.18.1-erlang-27.0.1-debian-bookworm-20240904 AS builder
+FROM elixir:1.15-slim AS builder
 
 # Ortam değişkenleri
 ENV MIX_ENV=prod \
@@ -14,7 +14,7 @@ RUN apt-get update -y && \
 WORKDIR /app
 
 # Mix deps ve lock dosyaları kopyalanır
-COPY mix.exs mix.lock ./
+COPY mix.exs ./
 COPY config config
 
 # Bağımlılıkları indir
@@ -23,8 +23,8 @@ RUN mix local.hex --force && \
     mix deps.get --only $MIX_ENV
 
 # Assets (varsa)
-COPY assets assets
-RUN cd assets && yarn install && yarn build
+# COPY assets assets
+# RUN cd assets && yarn install && yarn build
 
 # Uygulama kodu
 COPY lib lib
@@ -32,7 +32,7 @@ COPY priv priv
 
 # Release derlemesi
 RUN mix compile && \
-    mix assets.deploy && \
+    # mix assets.deploy && \
     mix release
 
 # === 2. Runner aşaması ===
