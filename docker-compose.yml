@@ -1,21 +1,51 @@
 services:
   db:
     image: postgres:15-alpine
+    container_name: chess-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: chess_game
+      POSTGRES_DB: chess_realtime_server_dev
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio
+    container_name: chess-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - miniodata:/data
+
+  gotrue:
+    image: supabase/gotrue:v2.132.3
+    container_name: chess-auth
+    depends_on:
+      - db
+    ports:
+      - "9999:9999"
+    environment:
+      GOTRUE_EXTERNAL_DB_URL: postgres://postgres:postgres@db:5432/chess_realtime_server_dev?sslmode=disable
+      GOTRUE_SITE_URL: http://localhost:3000
+      GOTRUE_JWT_SECRET: super-secret-jwt-key-replace-me-in-prod
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "false"
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      GOTRUE_DB_MAX_POOL_SIZE: 20
 
   chess_realtime_server:
     build:
       context: ./apps/backend/chess_realtime_server
       dockerfile: Dockerfile
     environment:
-      - DATABASE_URL=ecto://postgres:postgres@db/chess_game
+      - DATABASE_URL=ecto://postgres:postgres@db/chess_realtime_server_dev
       - SECRET_KEY_BASE=Q2hlc3NSZWFsdGltZVNlcnZlcl9TZWNyZXRfS2V5X0Jhc2VfTG9uZ19Fbm91Z2hfVG9fUGFzc19DaGVja3M=
       - PHX_HOST=localhost
       - PORT=4000
@@ -27,3 +57,4 @@ services:
 
 volumes:
   pgdata:
+  miniodata:
