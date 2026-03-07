@@ -7,20 +7,27 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, RotateCcw, Flag, MessageSquare, Clock, User } from "lucide-react"
 import Link from "next/link"
+import { ChessBoard } from "@/components/chess-board"
 
 export default function GamePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const [isLoading, setIsLoading] = useState(true)
   const [gameTime, setGameTime] = useState({ white: 600, black: 600 }) // 10 minutes each
+  const [fen, setFen] = useState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
 
   useEffect(() => {
     // Simulate loading
     const timer = setTimeout(() => {
       setIsLoading(false)
-    }, 2000)
+    }, 1200)
 
     return () => clearTimeout(timer)
   }, [])
+
+  const handleMove = (from: string, to: string, piece: any) => {
+    console.log(`Move: ${from} -> ${to}`, piece)
+    // Future: send to backend
+  }
 
   if (isLoading) {
     return (
@@ -38,7 +45,7 @@ export default function GamePage({ params }: { params: Promise<{ id: string }> }
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header onOpenLobby={() => { }} />
 
       <div className="container mx-auto p-4 max-w-7xl">
         <div className="mb-4">
@@ -57,7 +64,7 @@ export default function GamePage({ params }: { params: Promise<{ id: string }> }
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
+                  <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
                     <User className="w-5 h-5" />
                   </div>
                   <div>
@@ -78,35 +85,22 @@ export default function GamePage({ params }: { params: Promise<{ id: string }> }
             </Card>
 
             {/* Chess Board */}
-            <Card className="p-4 aspect-square bg-gradient-to-br from-background to-secondary/20">
-              <div className="w-full h-full grid grid-cols-8 grid-rows-8 gap-0 border-2 border-border rounded-lg overflow-hidden">
-                {Array.from({ length: 64 }).map((_, i) => {
-                  const row = Math.floor(i / 8)
-                  const col = i % 8
-                  const isLight = (row + col) % 2 === 0
-                  return (
-                    <div
-                      key={i}
-                      className={`flex items-center justify-center text-2xl font-semibold cursor-pointer hover:opacity-80 transition-opacity ${
-                        isLight ? "bg-amber-100 dark:bg-amber-900/30" : "bg-orange-600 dark:bg-orange-800"
-                      }`}
-                    >
-                      {/* Chess pieces will go here */}
-                      {i === 0 && "♜"}
-                      {i === 7 && "♜"}
-                      {i === 56 && "♖"}
-                      {i === 63 && "♖"}
-                    </div>
-                  )
-                })}
-              </div>
+            <Card className="p-2 md:p-4 aspect-square shadow-xl border-primary/20 bg-card/50 backdrop-blur-sm">
+              <ChessBoard
+                mode="game"
+                initialPosition={fen}
+                onMove={handleMove}
+                onPositionChange={(newFen) => setFen(newFen)}
+                className="w-full h-full"
+              />
             </Card>
+
 
             {/* Player Info */}
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-semibold">
+                  <div className="w-10 h-10 rounded-full bg-linear-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-semibold">
                     SEN
                   </div>
                   <div>

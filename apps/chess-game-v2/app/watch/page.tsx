@@ -48,7 +48,7 @@ export default function WatchPage() {
               </TabsList>
 
               <TabsContent value="live" className="space-y-6 mt-6">
-                <Card className="p-6 bg-gradient-to-br from-red-500/10 to-orange-500/10 border-red-500/20">
+                <Card className="p-6 bg-linear-to-br from-red-500/10 to-orange-500/10 border-red-500/20">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
                     <span className="font-semibold text-red-500">CANLI</span>
@@ -73,7 +73,7 @@ export default function WatchPage() {
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
                       <Card key={i} className="overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow">
-                        <div className="aspect-video bg-gradient-to-br from-primary/20 to-orange-500/20 flex items-center justify-center relative">
+                        <div className="aspect-video bg-linear-to-br from-primary/20 to-orange-500/20 flex items-center justify-center relative">
                           <Play className="w-12 h-12 text-primary group-hover:scale-110 transition-transform" />
                           <div className="absolute top-2 left-2">
                             <Badge variant="destructive" className="gap-1">
@@ -146,7 +146,7 @@ export default function WatchPage() {
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
                     <Card key={i} className="overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow">
-                      <div className="aspect-video bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center relative">
+                      <div className="aspect-video bg-linear-to-br from-muted to-muted/50 flex items-center justify-center relative">
                         <Play className="w-12 h-12 text-primary group-hover:scale-110 transition-transform" />
                       </div>
                       <div className="p-4">

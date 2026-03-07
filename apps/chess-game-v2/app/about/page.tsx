@@ -33,7 +33,7 @@ export default function AboutPage() {
 
         <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-4xl mx-auto w-full">
           <div className="space-y-6">
-            <Card className="p-8 bg-gradient-to-br from-primary/10 to-orange-500/10">
+            <Card className="p-8 bg-linear-to-br from-primary/10 to-orange-500/10">
               <h1 className="text-3xl font-bold mb-4">Hakkımızda</h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 ChessGame, satranç severleri bir araya getiren modern bir platformdur. Amacımız, her seviyeden oyuncuya

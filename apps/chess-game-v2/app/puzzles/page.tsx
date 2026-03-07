@@ -89,7 +89,7 @@ export default function PuzzlesPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <Card className="p-6">
                 <h3 className="text-xl font-semibold mb-4">Günlük Bulmaca</h3>
-                <div className="aspect-square bg-gradient-to-br from-background to-secondary/20 rounded-lg mb-4 flex items-center justify-center">
+                <div className="aspect-square bg-linear-to-br from-background to-secondary/20 rounded-lg mb-4 flex items-center justify-center">
                   <p className="text-6xl">♔</p>
                 </div>
                 <div className="flex items-center justify-between">

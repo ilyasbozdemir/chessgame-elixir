@@ -1,13 +1,13 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-export type PieceType = "p" | "n" | "b" | "r" | "q" | "k"
-export type PieceColor = "w" | "b"
+export type PieceType = 'p' | 'n' | 'b' | 'r' | 'q' | 'k';
+export type PieceColor = 'w' | 'b';
 
 interface ChessPieceProps {
-  type: PieceType
-  color: PieceColor
-  isDragging?: boolean
-  className?: string
+  type: PieceType;
+  color: PieceColor;
+  isDragging?: boolean;
+  className?: string;
 }
 
 const pieceSymbols = {
@@ -27,10 +27,10 @@ const pieceSymbols = {
     n: "♞",
     p: "♟",
   },
-}
+};
 
 export const ChessPiece = ({ type, color, isDragging, className }: ChessPieceProps) => {
-  const symbol = pieceSymbols[color][type]
+  const symbol = pieceSymbols[color][type];
 
   return (
     <div
@@ -38,18 +38,18 @@ export const ChessPiece = ({ type, color, isDragging, className }: ChessPiecePro
         "flex items-center justify-center w-full h-full cursor-grab active:cursor-grabbing",
         "transition-all duration-200",
         isDragging && "opacity-50 scale-110",
-        className,
+        className
       )}
     >
       <span
         className={cn(
           "text-5xl md:text-6xl lg:text-7xl leading-none",
-          color === "w" ? "text-chess-piece-white" : "text-chess-piece-black",
-          "drop-shadow-md select-none",
+          color === 'w' ? "text-chess-piece-white" : "text-chess-piece-black",
+          "drop-shadow-md select-none"
         )}
       >
         {symbol}
       </span>
     </div>
-  )
-}
+  );
+};

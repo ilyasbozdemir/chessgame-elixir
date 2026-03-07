@@ -93,7 +93,7 @@ export default function LearnPage() {
                   className="p-6 hover:shadow-lg transition-all cursor-pointer group hover:border-primary/50"
                 >
                   <div className="space-y-4">
-                    <div className="w-24 h-24 mx-auto bg-gradient-to-br from-primary/10 to-orange-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="w-24 h-24 mx-auto bg-linear-to-br from-primary/10 to-orange-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
                       <ChessPiece type={lesson.piece} color="w" className="scale-75" />
                     </div>
 
@@ -116,7 +116,7 @@ export default function LearnPage() {
               ))}
             </div>
 
-            <Card className="p-6 bg-gradient-to-br from-primary/10 to-orange-500/10 border-primary/20">
+            <Card className="p-6 bg-linear-to-br from-primary/10 to-orange-500/10 border-primary/20">
               <div className="flex items-start justify-between gap-4 flex-col md:flex-row">
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold mb-2">İleri Seviye Dersler</h3>
