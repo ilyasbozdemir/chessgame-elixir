@@ -1,10 +1,10 @@
 {
-  "name": "chess-game-app",
+  "name": "chess-game-premium",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "next dev",
+    "dev": "next dev -p 3003",
     "lint": "eslint .",
     "start": "next start"
   },
