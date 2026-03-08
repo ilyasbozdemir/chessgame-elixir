@@ -6,23 +6,21 @@
         "apps/*"
     ],
     "scripts": {
-        "db:up": "docker compose up -d db",
-        "db:down": "docker compose stop db",
-        "infra:up": "docker compose up -d db gotrue minio",
-        "infra:down": "docker compose stop db gotrue minio",
-        "backend:deps": "cd apps/backend/chess_realtime_server && mix deps.get",
-        "backend:setup": "cd apps/backend/chess_realtime_server && mix setup",
         "backend:dev": "cd apps/backend/chess_realtime_server && mix phx.server",
         "saas:dev": "pnpm --filter chess-game-saas dev",
         "app:dev": "pnpm --filter chess-game-app dev",
-        "frontend:dev": "pnpm --filter chess-game-app dev",
+        "infra:up": "docker compose up -d db gotrue minio",
+        "infra:down": "docker compose stop db gotrue minio",
+        "dev": "pnpm run infra:up && concurrently -n \"BACKEND,SAAS,APP\" -c \"magenta,blue,green\" \"pnpm run backend:dev\" \"pnpm run saas:dev\" \"pnpm run app:dev\"",
+        "dev:stop": "docker compose stop",
+        "dev:clean": "docker compose down --volumes --remove-orphans",
         "v1:dev": "pnpm --filter chess-game-legacy dev",
         "v2:dev": "pnpm --filter chess-game-premium dev",
-        "docker:dev": "docker compose up chess_saas chess_app chess_realtime_server db gotrue minio",
         "docker:up": "docker compose up -d",
         "docker:down": "docker compose down",
-        "docker:build": "docker compose build",
-        "docker:logs": "docker compose logs -f",
-        "dev": "pnpm run infra:up && pnpm run backend:dev"
+        "docker:logs": "docker compose logs -f"
+    },
+    "devDependencies": {
+        "concurrently": "^9.1.2"
     }
 }
