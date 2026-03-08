@@ -1,0 +1,15 @@
+FROM node:20-alpine
+
+# pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+# Deps önce kopyala (cache layer)
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install --frozen-lockfile
+
+# Kaynak kod volume mount edilecek — COPY gerekmez dev'de
+EXPOSE 3001
+
+CMD ["pnpm", "dev"]
