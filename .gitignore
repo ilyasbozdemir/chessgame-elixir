@@ -22,15 +22,19 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 .DS_Store
+Thumbs.db
 *.log
 tmp/
-*.lock
+# don't ignore pnpm-lock.yaml — needed for frozen-lockfile installs
 
 # Editor
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 .idea/
 *.swp
 *.swo
+.elixir_ls/
 
 # Docker
 *.pid

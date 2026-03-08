@@ -1,15 +1,20 @@
 FROM node:20-alpine
 
-# pnpm
+# pnpm global kurulum
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-# Deps önce kopyala (cache layer)
+# package.json'u kopyala, deps kur (bu layer cache'lenir)
 COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --frozen-lockfile
 
-# Kaynak kod volume mount edilecek — COPY gerekmez dev'de
+# Kaynak kod volume mount ile gelecek (hot-reload için)
+# Bu COPY sadece image build'de fallback
+COPY . .
+
 EXPOSE 3000
 
+# Dev server başlat — watchpack için polling gerekiyor (Docker volume latency)
+ENV WATCHPACK_POLLING=true
 CMD ["pnpm", "dev"]

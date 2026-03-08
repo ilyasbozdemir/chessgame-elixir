@@ -1,6 +1,6 @@
 services:
   # ─────────────────────────────────────────────
-  # 1. PostgreSQL
+  # 1. PostgreSQL — dev'de ephemeral (container gidince data uçar)
   # ─────────────────────────────────────────────
   db:
     image: postgres:15-alpine
@@ -12,8 +12,8 @@ services:
       POSTGRES_DB: chess_realtime_server_dev
     ports:
       - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+    # DEV: volume yok → container rm -f chess-db deyince data uçar
+    # PROD için: volumes: - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -21,7 +21,7 @@ services:
       retries: 10
 
   # ─────────────────────────────────────────────
-  # 2. GoTrue Auth (Supabase Auth uyumlu)
+  # 2. GoTrue Auth
   # ─────────────────────────────────────────────
   gotrue:
     image: supabase/gotrue:v2.155.1
@@ -35,34 +35,32 @@ services:
     environment:
       GOTRUE_DATABASE_DRIVER: postgres
       GOTRUE_DATABASE_URL: postgres://postgres:postgres@db:5432/chess_realtime_server_dev?sslmode=disable
-      GOTRUE_SITE_URL: http://localhost:3000 # SaaS landing → 3000
+      GOTRUE_SITE_URL: http://localhost:3000
       GOTRUE_JWT_SECRET: super-secret-jwt-key-replace-me-in-prod
       GOTRUE_JWT_EXP: 3600
       GOTRUE_MAILER_AUTOCONFIRM: "true"
       GOTRUE_DB_MAX_POOL_SIZE: 20
       GOTRUE_EXTERNAL_EMAIL_ENABLED: "false"
-      # Redirect'ler hem SaaS hem App'i kapsar
       GOTRUE_URI_ALLOW_LIST: "http://localhost:3000/**,http://localhost:3001/**"
 
   # ─────────────────────────────────────────────
-  # 3. MinIO (Object Storage / Avatar vb.)
+  # 3. MinIO — dev'de ephemeral
   # ─────────────────────────────────────────────
   minio:
     image: minio/minio
     container_name: chess-minio
     restart: unless-stopped
     ports:
-      - "9000:9000" # S3 API
-      - "9001:9001" # Web console
+      - "9000:9000"
+      - "9001:9001"
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     command: server /data --console-address ":9001"
-    volumes:
-      - miniodata:/data
+    # DEV: volume yok → uçar
 
   # ─────────────────────────────────────────────
-  # 4. Elixir Phoenix Backend (WebSocket + API)
+  # 4. Elixir Phoenix Backend
   # ─────────────────────────────────────────────
   chess_realtime_server:
     build:
@@ -79,13 +77,13 @@ services:
       PHX_HOST: localhost
       PORT: 4000
       PHX_SERVER: "true"
-      # CORS: Allow SaaS (3000) and App (3001)
       CORS_ORIGINS: "http://localhost:3000,http://localhost:3001"
     ports:
       - "4000:4000"
 
   # ─────────────────────────────────────────────
-  # 5. SaaS Landing Page  →  http://localhost:3000
+  # 5. SaaS Landing → http://localhost:3000
+  #    node_modules container içinde, host'a sızmaz
   # ─────────────────────────────────────────────
   chess_saas:
     build:
@@ -94,21 +92,24 @@ services:
     container_name: chess-saas
     restart: unless-stopped
     volumes:
+      # Kaynak kod host'tan mount edilir (hot-reload)
       - ./apps/chess-game-saas:/app
-      - saas_node_modules:/app/node_modules
-      - saas_next:/app/.next
+      # node_modules anonymous volume → container'a ait, host'a sızmaz
+      - /app/node_modules
+      # .next build cache de container'a ait
+      - /app/.next
     ports:
       - "3000:3000"
     environment:
       NODE_ENV: development
-      PORT: 3000
       NEXT_PUBLIC_APP_URL: http://localhost:3001
       NEXT_PUBLIC_SOCKET_URL: ws://localhost:4000/socket
+      NEXT_PUBLIC_AUTH_URL: http://localhost:9999
     depends_on:
       - chess_realtime_server
 
   # ─────────────────────────────────────────────
-  # 6. Chess App (Ana Uygulama)  →  http://localhost:3001
+  # 6. Chess App → http://localhost:3001
   # ─────────────────────────────────────────────
   chess_app:
     build:
@@ -118,13 +119,12 @@ services:
     restart: unless-stopped
     volumes:
       - ./apps/chess-game:/app
-      - app_node_modules:/app/node_modules
-      - app_next:/app/.next
+      - /app/node_modules
+      - /app/.next
     ports:
       - "3001:3001"
     environment:
       NODE_ENV: development
-      PORT: 3001
       NEXT_PUBLIC_SAAS_URL: http://localhost:3000
       NEXT_PUBLIC_SOCKET_URL: ws://localhost:4000/socket
       NEXT_PUBLIC_MINIO_URL: http://localhost:9000
@@ -132,10 +132,6 @@ services:
     depends_on:
       - chess_realtime_server
 
-volumes:
-  pgdata:
-  miniodata:
-  saas_node_modules:
-  saas_next:
-  app_node_modules:
-  app_next:
+# Named volumes YOK → her şey ephemeral
+# pnpm run docker:down ile container'lar silinir, veri uçar
+# pnpm run docker:up ile temiz başlar
