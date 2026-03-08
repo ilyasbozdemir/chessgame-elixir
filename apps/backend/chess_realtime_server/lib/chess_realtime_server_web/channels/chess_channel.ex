@@ -29,13 +29,22 @@ defmodule ChessRealtimeServerWeb.ChessChannel do
 
     # sadece lobby veya table için Presence takibi
     if String.contains?(topic, "lobby") or String.contains?(topic, "table") do
-      {:ok, _} = Presence.track(socket, player, %{online_at: System.system_time(:second)})
+      user = ChessRealtimeServer.Accounts.get_user_by_username(player)
+      is_licensed = if user, do: ChessRealtimeServer.Accounts.is_license_valid?(user), else: false
+      
+      meta = %{
+        online_at: System.system_time(:second),
+        is_licensed: is_licensed,
+        username: player
+      }
+
+      {:ok, _} = Presence.track(socket, player, meta)
       state = Presence.list(topic)
       count = map_size(state)
 
       push(socket, "presence_state", state)
       broadcast!(socket, "presence_count", %{count: count})
-      IO.puts("📡 [PRESENCE] #{player} in #{topic} (#{count} online)")
+      IO.puts("📡 [PRESENCE] #{player} in #{topic} (#{count} online, licensed: #{is_licensed})")
     end
 
     {:noreply, socket}

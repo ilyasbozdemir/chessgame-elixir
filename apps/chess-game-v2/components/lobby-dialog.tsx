@@ -5,24 +5,25 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Users, Clock, Target, Zap, User } from "lucide-react"
+import { Users, Clock, Target, Zap, User, Star } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
+import { useEffect, useState } from "react"
+import { socketManager } from "@/lib/phoenix-socket"
 
 interface LobbyDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-const activePlayers = [
-  { name: "Oyuncu 1", rating: 1850, time: "3+0", avatar: "🏆" },
-  { name: "Oyuncu 2", rating: 1620, time: "5+3", avatar: "⭐" },
-  { name: "Oyuncu 3", rating: 2100, time: "10+0", avatar: "👑" },
-  { name: "Oyuncu 4", rating: 1450, time: "1+0", avatar: "🎯" },
-  { name: "Oyuncu 5", rating: 1890, time: "15+10", avatar: "💎" },
-]
+interface PresencePlayer {
+  username: string
+  rating?: number
+  is_licensed: boolean
+  online_at: number
+}
 
 const gameFormats = [
   { icon: Zap, label: "Bullet", times: ["1+0", "1+1", "2+1"] },
@@ -32,6 +33,28 @@ const gameFormats = [
 ]
 
 export function LobbyDialog({ open, onOpenChange }: LobbyDialogProps) {
+  const [players, setPlayers] = useState<PresencePlayer[]>([])
+
+  useEffect(() => {
+    if (open) {
+      socketManager.connect()
+      const channel = socketManager.joinChannel("game:lobby:players")
+
+      if (channel) {
+        channel.on("presence_state", (state: any) => {
+          const list = Object.keys(state).map(id => state[id].metas[0])
+          setPlayers(list)
+        })
+
+        channel.on("presence_diff", (diff: any) => {
+          // Handle real-time updates
+          console.log("Presence changed", diff)
+        })
+      }
+    } else {
+      socketManager.leaveChannel("game:lobby:players")
+    }
+  }, [open])
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -92,25 +115,38 @@ export function LobbyDialog({ open, onOpenChange }: LobbyDialogProps) {
           <TabsContent value="lobby" className="mt-4 flex-1 overflow-hidden flex flex-col">
             <ScrollArea className="flex-1 pr-2">
               <div className="space-y-2">
-                {activePlayers.map((player, index) => (
+                {players.length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Şu an lobide kimse yok. İlk sen ol!
+                  </div>
+                )}
+                {players.map((player, index) => (
                   <Card key={index} className="p-3 hover:border-primary/50 cursor-pointer transition-all">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                        <div className="text-xl sm:text-2xl flex-shrink-0">{player.avatar}</div>
+                        <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-xl">
+                          <User className="w-5 h-5" />
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-card-foreground text-sm sm:text-base truncate">
-                            {player.name}
+                          <div className="font-semibold text-card-foreground text-sm sm:text-base flex items-center gap-2">
+                            {player.username}
+                            {player.is_licensed && (
+                              <Badge className="bg-yellow-500 hover:bg-yellow-600 text-[10px] h-4 px-1 gap-0.5 border-none">
+                                <Star className="w-2.5 h-2.5 fill-current" />
+                                PRO
+                              </Badge>
+                            )}
                           </div>
                           <div className="flex items-center gap-1 sm:gap-2 mt-1 flex-wrap">
                             <Badge variant="secondary" className="text-xs">
-                              {player.rating}
+                              {player.rating || 1500}
                             </Badge>
-                            <span className="text-xs text-muted-foreground">{player.time}</span>
+                            <span className="text-xs text-muted-foreground">Aktif</span>
                           </div>
                         </div>
                       </div>
                       <Button size="sm" className="flex-shrink-0">
-                        Katıl
+                        Maç Yap
                       </Button>
                     </div>
                   </Card>

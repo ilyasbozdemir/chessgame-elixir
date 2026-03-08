@@ -16,82 +16,68 @@ in real time over a **WebSocket connection**. Spectators can also follow ongoing
 ```
 chessgame-elixir/
 ├── apps/
-│   ├── chess-game/                  # 🧩 Next.js 15 (frontend)
-│   ├── backend/                     # ⚙️ backend layer
-│   │   ├── chess_realtime_server/   # Elixir Phoenix (realtime backend)
-│   │   ├── mongodb/                 # MongoDB service/config
-│   │   └── postgres/                # PostgreSQL service/config
+│   ├── chess-game-v1/               # 🧩 Legacy Next.js (V1)
+│   ├── chess-game-v2/               # 🚀 Modern Dashboard (Next.js 15 + Tailwind v4)
+│   ├── backend/
+│   │   ├── chess_realtime_server/   # ⚡ Elixir Phoenix (Realtime Logic & Persistence)
 └── README.md
 ```
 
 **Technologies:**
 
-- ⚡ **Elixir Phoenix** – Realtime server (channel management, WebSocket)
-- 🧩 **Next.js 15 (App Router)** – Modern React frontend
-- 🧠 **Zustand** – Global state management (game, player, table)
-- 💨 **TailwindCSS + shadcn/ui** – UI design and responsive layout
-- 🐳 **Docker / Postgres** – Development environment and database layer
-- 🔁 **WebSocket Event Bridge** – Data flow between Elixir ↔ Next.js
-- ☁️ **Pulumi** – Infrastructure‑as‑Code (IaC) management
+- ⚡ **Elixir Phoenix** – Realtime game server (GenServer, Channels, Presence).
+- 🧩 **Next.js 15 (App Router)** – V2 Dashboard with high-premium UI.
+- 🔐 **GoTrue (Netlify/Supabase)** – Self-hosted JWT-based Authentication.
+- 📦 **MinIO (S3 Compatible)** – Object storage for avatars and game assets.
+- 🐘 **PostgreSQL 15** – Relational database for persistence (Users, Matches, Moves).
+- 🔁 **Phoenix Channels** – Low-latency WebSocket bridge between Elixir ↔ React.
 
 ---
 
-## 🚀 Features
+## 🚀 Services & Endpoints (Development)
 
-### 🎮 Lobby System
-
-- Players join the lobby by entering a name.
-- They can create a new table or join open tables.
-- When both players mark themselves “ready”, the game can start.
-
-### ♟️ Realtime Chess Board
-
-- Valid chess moves according to the rules.
-- Turn order and piece positions are tracked in real time.
-- Client‑side validation for move legality.
-- Captured pieces and turns are displayed live.
-
-### 🌐 Spectate Mode
-
-- Ongoing matches can be watched live (`/spectate/[gameId]`).
-- Player states, turn order, and board movements update in real time.
+| Service | Port | Description |
+| :--- | :--- | :--- |
+| **Frontend (V2)** | `3000` | UI Dashboard & Game Client |
+| **Backend (API)** | `4000` | Phoenix Realtime Server |
+| **Auth (GoTrue)** | `9999` | User Management & JWT Issuance |
+| **Storage (MinIO)** | `9000` | S3 API (Storage) |
+| **MinIO Console** | `9001` | Storage Management UI |
+| **Postgres** | `5432` | Relational Database |
 
 ---
 
-## ⚙️ Setup
+## ⚙️ Quick Start
 
-### 1️⃣ Frontend (Next.js)
-
+### 1️⃣ Start Infrastructure (Docker)
 ```bash
-cd apps/chess-game
-pnpm install
-pnpm dev
+docker compose up -d
 ```
 
-Frontend: <http://localhost:3000>
-
-### 2️⃣ Backend (Elixir / Phoenix)
-
+### 2️⃣ Start Backend (Elixir)
 ```bash
 cd apps/backend/chess_realtime_server
 mix deps.get
+mix ecto.setup
 mix phx.server
 ```
 
-Backend: <http://localhost:4000>
+### 3️⃣ Start Frontend (V2)
+```bash
+npm run frontend:dev
+```
 
 ---
 
 ## 🧩 Roadmap
 
-- [x] Lobby creation and player management
-- [x] Table‑scoped game flow
-- [x] Route guards & state management
-- [ ] Spectator (watch) screen
-- [ ] Elixir ↔ Next.js WebSocket bridge
-- [ ] Postgres persistence
-- [ ] Authentication
-- [ ] Game history storage
+- [x] **Lobby System**: Realtime presence with "PRO" license status.
+- [x] **Auth Integration**: GoTrue self-hosted authentication.
+- [x] **Persistence**: Chess matches and moves saved to Postgres.
+- [x] **Storage**: MinIO integration for profile assets.
+- [x] **Chess Logic**: Rule validation (Migrated from V1).
+- [ ] **Matchmaking**: Elo-based pairing algorithm.
+- [ ] **Tournament System**: Swiss-style automated tournaments.
 
 ---
 
@@ -100,3 +86,4 @@ Backend: <http://localhost:4000>
 **İlyas Bozdemir**  
 Full‑Stack Developer | React, .NET, Elixir, Docker  
 🔗 [GitHub](https://github.com/ilyasbozdemir) • [LinkedIn](https://www.linkedin.com/in/bozdemir-ilyas/)
+
