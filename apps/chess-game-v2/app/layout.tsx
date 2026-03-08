@@ -1,28 +1,22 @@
-import type React from "react";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
-const inter = Inter({ subsets: ["latin"] });
+import "./globals.css";
+import { AppProviders } from "./providers";
 
 export const metadata: Metadata = {
-  title: "ChessGame - Online Satranç Platformu",
-  description:
-    "Modern online satranç platformu. Bullet, Blitz, Rapid oyunlar, bulmacalar ve daha fazlası.",
-  generator: "ilyasbozdemir.dev",
+  title: "Chess Game",
+  description: "Play chess online against friends or AI.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="tr">
-      <body className={`${inter.className} antialiased`}>
-        {children}
-        <MobileBottomNav />
+    <html lang="en">
+      <body className="font-sans antialiased">
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

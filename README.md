@@ -16,8 +16,8 @@ in real time over a **WebSocket connection**. Spectators can also follow ongoing
 ```
 chessgame-elixir/
 ├── apps/
-│   ├── chess-game-v1/               # 🧩 Legacy Next.js (V1)
-│   ├── chess-game-v2/               # 🚀 Modern Dashboard (Next.js 15 + Tailwind v4)
+│   ├── chess-game/                  # 🚀 Premium Game Dashboard (Next.js 15)
+│   ├── chess-game-saas/             # 🎨 Marketing Landing Page (SaaS)
 │   ├── backend/
 │   │   ├── chess_realtime_server/   # ⚡ Elixir Phoenix (Realtime Logic & Persistence)
 └── README.md
@@ -39,6 +39,7 @@ chessgame-elixir/
 | Service | Port | Description |
 | :--- | :--- | :--- |
 | **Frontend (V2)** | `3000` | UI Dashboard & Game Client |
+| **SaaS Landing** | `3001` | Marketing Page |
 | **Backend (API)** | `4000` | Phoenix Realtime Server |
 | **Auth (GoTrue)** | `9999` | User Management & JWT Issuance |
 | **Storage (MinIO)** | `9000` | S3 API (Storage) |
@@ -62,7 +63,7 @@ mix ecto.setup
 mix phx.server
 ```
 
-### 3️⃣ Start Frontend (V2)
+### 3️⃣ Start Unified App
 ```bash
 npm run frontend:dev
 ```

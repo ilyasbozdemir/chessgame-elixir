@@ -5,6 +5,7 @@ import { Crown, Github, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useEffect, useState } from "react";
+import { RealtimeStats } from "@/components/realtime-stats";
 
 export function Navbar() {
   const [stars, setStars] = useState<number | null>(null);
@@ -24,18 +25,24 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-lg font-semibold group"
-        >
-          <div className="p-2 rounded-full bg-primary/15 group-hover:bg-primary/25 transition-colors">
-            <Crown className="w-6 h-6 text-primary" />
+        <div className="flex items-center gap-6">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-lg font-semibold group"
+          >
+            <div className="p-2 rounded-full bg-primary/15 group-hover:bg-primary/25 transition-colors">
+              <Crown className="w-6 h-6 text-primary" />
+            </div>
+            <span className="tracking-tight">
+              <span className="font-bold">Chess</span>
+              <span className="text-primary font-bold">Game</span>
+            </span>
+          </Link>
+
+          <div className="hidden lg:block">
+            <RealtimeStats />
           </div>
-          <span className="tracking-tight">
-            <span className="font-bold">Chess</span>
-            <span className="text-primary font-bold">Game</span>
-          </span>
-        </Link>
+        </div>
 
         <div className="flex items-center gap-3">
           <Button
@@ -61,8 +68,8 @@ export function Navbar() {
 
           <ModeToggle />
 
-          <Button size="sm" asChild>
-            <Link href="#signin">Kayıt Ol</Link>
+          <Button size="sm" asChild className="font-bold bg-primary shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+            <a href="http://localhost:3000">Hemen Oyna</a>
           </Button>
         </div>
       </div>

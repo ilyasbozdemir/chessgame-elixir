@@ -24,13 +24,15 @@ export function Hero() {
           </h1>
 
           <p className="mx-auto max-w-2xl text-lg sm:text-xl text-muted-foreground text-pretty leading-relaxed">
-            Elixir Phoenix ile güçlendirilmiş, MongoDB ile desteklenen, Next.js ile modern arayüze sahip profesyonel
+            Elixir Phoenix ile güçlendirilmiş, PostgreSQL ile desteklenen, Next.js ile modern arayüze sahip profesyonel
             satranç uygulaması. Tek komutla deploy edin.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <InstallCommand />
-            <Button size="lg" variant="outline" asChild>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
+            <Button size="lg" className="h-12 px-8 text-lg font-bold bg-primary shadow-xl shadow-primary/20 hover:scale-105 transition-transform" asChild>
+              <a href="http://localhost:3000">Hemen Oyna</a>
+            </Button>
+            <Button size="lg" variant="outline" className="h-12 px-8" asChild>
               <a
                 href="https://github.com/ilyasbozdemir/chessgame-elixir"
                 target="_blank"
@@ -41,12 +43,10 @@ export function Hero() {
                 GitHub'da Görüntüle
               </a>
             </Button>
-            <Button size="lg" variant="outline" asChild>
-              <a href="https://discord.gg/chessgame" target="_blank" rel="noopener noreferrer" className="gap-2">
-                <MessageSquare className="w-5 h-5" />
-                Discord'a Katıl
-              </a>
-            </Button>
+          </div>
+
+          <div className="pt-12">
+            <InstallCommand />
           </div>
         </div>
       </div>

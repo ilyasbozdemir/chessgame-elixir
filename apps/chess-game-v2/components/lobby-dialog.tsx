@@ -47,8 +47,8 @@ export function LobbyDialog({ open, onOpenChange }: LobbyDialogProps) {
         })
 
         channel.on("presence_diff", (diff: any) => {
-          // Handle real-time updates
-          console.log("Presence changed", diff)
+          console.log("📡 Presence Update:", diff)
+          // Ideally use Presence.syncDiff here
         })
       }
     } else {

@@ -1,4 +1,4 @@
-import { PieceType, PieceColor } from "@/components/chess-piece";
+import { PieceType, PieceColor } from "@/components/chess/chess-piece";
 
 export interface ChessPosition {
   [square: string]: { type: PieceType; color: PieceColor } | null;

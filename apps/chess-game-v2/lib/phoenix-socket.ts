@@ -5,16 +5,25 @@ class PhoenixSocketManager {
   private channels: Map<string, Channel> = new Map();
 
   constructor() {
-    this.socket = new Socket("ws://localhost:4000/socket", {
-      params: { 
-        name: localStorage.getItem("username") || "guest_" + Math.floor(Math.random() * 1000) 
-      }
-    });
+    // Only initialize in browser
+    if (typeof window !== "undefined") {
+      this.socket = new Socket("ws://localhost:4000/socket", {
+        params: { 
+          name: localStorage.getItem("username") || "guest_" + Math.floor(Math.random() * 1000) 
+        },
+        logger: (kind: string, msg: string, data: any) => {
+          // console.log(`${kind}: ${msg}`, data)
+        }
+      });
+    } else {
+      // Mock for SSR
+      this.socket = { connect: () => {}, channel: () => ({ join: () => ({ receive: () => ({ receive: () => {} }) }) }) } as any;
+    }
   }
 
   connect() {
-    this.socket.connect();
-    console.log("Connected to Phoenix Socket");
+    if (this.socket.connect) this.socket.connect();
+    console.log("📡 Connected to Phoenix Socket");
   }
 
   joinChannel(topic: string, params: object = {}) {
@@ -23,8 +32,8 @@ class PhoenixSocketManager {
     const channel = this.socket.channel(topic, params);
     channel
       .join()
-      .receive("ok", (resp) => console.log(`Joined ${topic}`, resp))
-      .receive("error", (resp) => console.error(`Failed to join ${topic}`, resp));
+      .receive("ok", (resp) => console.log(`✅ Joined ${topic}`, resp))
+      .receive("error", (resp) => console.error(`❌ Failed to join ${topic}`, resp));
 
     this.channels.set(topic, channel);
     return channel;
