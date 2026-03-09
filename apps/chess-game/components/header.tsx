@@ -12,8 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useTheme } from "@/hooks/use-theme"
+import { useUser } from "@/context/user-context"
+import { AuthDialog } from "./auth-dialog"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useState } from "react"
 
 interface HeaderProps {
   onOpenLobby: () => void
@@ -46,6 +49,8 @@ const messages = [
 
 export function Header({ onOpenLobby }: HeaderProps) {
   const { theme, toggleTheme } = useTheme()
+  const { user, logout } = useUser()
+  const [isAuthOpen, setIsAuthOpen] = useState(false)
   const unreadNotifications = notifications.filter((n) => n.unread).length
   const unreadMessages = messages.filter((m) => m.unread).length
 
@@ -105,9 +110,8 @@ export function Header({ onOpenLobby }: HeaderProps) {
                   {messages.map((msg) => (
                     <div
                       key={msg.id}
-                      className={`p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors ${
-                        msg.unread ? "bg-primary/5" : ""
-                      }`}
+                      className={`p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors ${msg.unread ? "bg-primary/5" : ""
+                        }`}
                     >
                       <div className="flex gap-3">
                         <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary flex-shrink-0">
@@ -156,9 +160,8 @@ export function Header({ onOpenLobby }: HeaderProps) {
                   {notifications.map((notif) => (
                     <div
                       key={notif.id}
-                      className={`p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors ${
-                        notif.unread ? "bg-primary/5" : ""
-                      }`}
+                      className={`p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors ${notif.unread ? "bg-primary/5" : ""
+                        }`}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1">
@@ -182,33 +185,52 @@ export function Header({ onOpenLobby }: HeaderProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full hover:bg-primary/10 transition-all hover:scale-105"
+                className="rounded-full hover:bg-primary/10 transition-all hover:scale-105 relative"
               >
                 <User className="w-5 h-5" />
+                {user && <span className="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-green-500 ring-1 ring-background" />}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <div className="px-2 py-3 border-b">
-                <p className="text-sm font-medium text-foreground">Misafir Kullanıcı</p>
-                <p className="text-xs text-muted-foreground mt-1">Oturum açarak kaydet</p>
+              <div className="px-2 py-3 border-b border-border/50">
+                <p className="text-sm font-semibold text-foreground">
+                  {user ? user.user_metadata?.username || user.email : "Misafir Kullanıcı"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {user ? "Çevrimiçi" : "Oturum açarak oyna"}
+                </p>
               </div>
-              <DropdownMenuItem asChild className="cursor-pointer">
-                <Link href="/profile" className="flex items-center">
-                  <User className="w-4 h-4 mr-2" />
-                  Profil
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">İstatistikler</DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">Ayarlar</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer font-semibold text-primary">Giriş Yap</DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer" onClick={onOpenLobby}>
-                Anonim Oyna
-              </DropdownMenuItem>
+
+              {user ? (
+                <>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href="/profile" className="flex items-center">
+                      <User className="w-4 h-4 mr-2" />
+                      Profil
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">İstatistikler</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive" onClick={logout}>
+                    Çıkış Yap
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem className="cursor-pointer font-semibold text-primary" onClick={() => setIsAuthOpen(true)}>
+                    Giriş Yap / Üye Ol
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer opacity-70" onClick={onOpenLobby}>
+                    Anonim Lobiye Bak
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
+      <AuthDialog open={isAuthOpen} onOpenChange={setIsAuthOpen} />
     </header>
   )
 }

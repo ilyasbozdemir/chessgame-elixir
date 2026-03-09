@@ -1,7 +1,6 @@
 import { create } from "zustand";
 
-import type { PlayerDoc } from "@/models/player";
-import type { TableDoc } from "@/models/table";
+import { PlayerDoc, TableDoc, UserDoc } from "@/types/game";
 import { GameState, Position } from "@/game/chess-types";
 import {  isValidMove, movePiece } from "@/game/chess-logic";
 import { Logger } from "@/lib/utils";

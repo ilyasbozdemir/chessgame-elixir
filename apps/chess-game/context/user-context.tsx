@@ -1,68 +1,106 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { UserDoc } from "@/models/user";
-import { PlayerDoc } from "@/models/player";
+import { User } from "@supabase/gotrue-js";
+import { auth } from "@/lib/auth";
 
 interface UserContextType {
-  user: UserDoc | null;
-  playerUser: PlayerDoc | null;
+  user: User | null;
+  playerUser: any | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ error: Error | null }>;
+  register: (email: string, password: string, username: string) => Promise<{ data: any; error: Error | null }>;
   logout: () => Promise<void>;
-  refresh: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType>({
   user: null,
   playerUser: null,
   loading: true,
-  login: async () => false,
-  logout: async () => {},
-  refresh: async () => {},
+  login: async () => ({ error: null }),
+  register: async () => ({ data: null, error: null }),
+  logout: async () => { },
 });
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<UserDoc | null>(null);
-  const [playerUser, setPlayerUser] = useState<PlayerDoc | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const refresh = async () => {
-    const res = await fetch("/api/me", { credentials: "include" });
-    const data = await res.json();
-    setUser(data.user ?? null);
-    setPlayerUser(data.player ?? null);
-    setLoading(false);
-  };
+  const playerUser = user ? {
+    _id: user.id,
+    userId: user.id,
+    username: user.user_metadata?.username || user.email?.split("@")[0],
+    rating: {
+      fideClassical: 1200,
+      fideBlitz: 1500,
+    }
+  } : null;
+
+  useEffect(() => {
+    // Ilk session'i al
+    const initSession = async () => {
+      try {
+        const { data: { session }, error } = await auth.getSession();
+        if (session?.user) {
+          setUser(session.user);
+        }
+      } catch (e) {
+        console.error("Auth init error:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    initSession();
+
+    // Session degisimlerini dinle (mesela baska sekmede giris yapilirsa)
+    const { data: { subscription } } = auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const login = async (email: string, password: string) => {
-    const res = await fetch("/api/login", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+    const { data, error } = await auth.signInWithPassword({
+      email,
+      password,
     });
-    if (res.ok) {
-      await refresh();
-      return true;
+    if (data?.user) {
+      setUser(data.user);
     }
-    return false;
+    return { error };
+  };
+
+  const register = async (email: string, password: string, username: string) => {
+    const { data, error } = await auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username: username,
+        },
+      },
+    });
+    // GoTrue'da email onayi kapattigimiz icin direkt user verilir (CONFIRM kapali docker'da)
+    if (data?.user) {
+      setUser(data.user);
+    }
+    return { data, error };
   };
 
   const logout = async () => {
-    await fetch("/api/logout", { method: "POST", credentials: "include" });
+    await auth.signOut();
     setUser(null);
   };
 
-  useEffect(() => {
-    refresh();
-  }, []);
-
   return (
     <UserContext.Provider
-      value={{ user, playerUser, loading, login, logout, refresh }}
+      value={{ user, playerUser, loading, login, register, logout }}
     >
       {children}
     </UserContext.Provider>

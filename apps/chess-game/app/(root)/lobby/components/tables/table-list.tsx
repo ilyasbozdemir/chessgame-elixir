@@ -1,5 +1,7 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
-import type { TableDoc } from "@/models/table";
+import type { TableDoc } from "@/types/game";
 import { TableCard } from "./table-card";
 
 interface TableListProps {

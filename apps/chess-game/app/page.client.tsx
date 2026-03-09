@@ -17,6 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChannel } from "@/context/channel-context";
 import { usePresence } from "@/context/presence-context";
 import { useChat } from "@/context/chat-context";
+import { useUser } from "@/context/user-context";
 import { SOCKET_CHANNELS, SOCKET_EVENTS } from "@/const/elixir-socket-names";
 
 export default function PageClient() {
@@ -27,6 +28,7 @@ export default function PageClient() {
   const { lobbyCount, globalCount } = usePresence();
   const { messages, sendMessage } = useChat();
   const { getChannel, socketConnected } = useChannel();
+  const { user } = useUser();
 
   const [stats, setStats] = useState({
     playing: 0,
@@ -45,8 +47,9 @@ export default function PageClient() {
   }, [lobbyCount, globalCount]);
 
   const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
-    sendMessage(inputValue);
+    if (!inputValue.trim() || !user) return;
+    const senderName = user.user_metadata?.username || user.email?.split("@")[0] || "Anonim";
+    sendMessage(inputValue, senderName);
     setInputValue("");
   };
 
@@ -195,13 +198,14 @@ export default function PageClient() {
 
                   <div className="mt-4 pt-3 border-t flex gap-2">
                     <Input
-                      placeholder="Mesaj yaz..."
+                      placeholder={user ? "Mesaj yaz..." : "Sohbet etmek için giriş yapın"}
                       className="flex-1"
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                      disabled={!user}
                     />
-                    <Button size="icon" onClick={handleSendMessage}>
+                    <Button size="icon" onClick={handleSendMessage} disabled={!user}>
                       <Send className="w-4 h-4" />
                     </Button>
                   </div>

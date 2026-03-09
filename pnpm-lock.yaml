@@ -98,12 +98,12 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: 1.1.6
         version: 1.1.6(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@supabase/gotrue-js':
+        specifier: ^2.98.0
+        version: 2.98.0
       '@vercel/analytics':
         specifier: latest
         version: 1.6.1(next@15.5.12(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)
-      bcryptjs:
-        specifier: ^3.0.3
-        version: 3.0.3
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -125,15 +125,9 @@ importers:
       input-otp:
         specifier: 1.4.1
         version: 1.4.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      jsonwebtoken:
-        specifier: ^9.0.2
-        version: 9.0.3
       lucide-react:
         specifier: ^0.454.0
         version: 0.454.0(react@19.2.0)
-      mongoose:
-        specifier: ^8.19.2
-        version: 8.23.0(socks@2.8.7)
       next:
         specifier: ^15.1.0
         version: 15.5.12(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -2025,6 +2019,10 @@ packages:
   '@sindresorhus/is@4.6.0':
     resolution: {integrity: sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==}
     engines: {node: '>=10'}
+
+  '@supabase/gotrue-js@2.98.0':
+    resolution: {integrity: sha512-848O7lrk5wD8XOVNHQel7lZ5UOjZZMl4jZsEHINQp9i6g9rN6amvuj7B9ruu2dVHyYaaD9IhkwvbxH7OO6O4kQ==}
+    engines: {node: '>=20.0.0'}
 
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
@@ -4899,6 +4897,10 @@ snapshots:
       '@sigstore/protobuf-specs': 0.5.0
 
   '@sindresorhus/is@4.6.0': {}
+
+  '@supabase/gotrue-js@2.98.0':
+    dependencies:
+      tslib: 2.8.1
 
   '@swc/helpers@0.5.15':
     dependencies:

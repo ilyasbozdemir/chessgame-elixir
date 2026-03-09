@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Users } from "lucide-react";
 import { formatTime } from "@/lib/utils";
-import type { TableDoc } from "@/models/table";
+import { PlayerDoc, TableDoc, UserDoc } from "@/types/game";
 import Link from "next/link";
 import { UserService } from "@/services/user.service";
 import { OwnerLink } from "../owner-link";
@@ -37,8 +37,8 @@ export function TableCard({
         {table.status === "waiting"
           ? "♙"
           : table.status === "playing"
-          ? "♚"
-          : "♛"}
+            ? "♚"
+            : "♛"}
       </div>
 
       <CardContent className="p-5 space-y-4 relative z-10">

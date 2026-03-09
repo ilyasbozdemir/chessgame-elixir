@@ -1,8 +1,7 @@
 // services/players.service.ts
 import { useChessStore } from "@/stores/chess-store";
 import { Logger } from "@/lib/utils";
-import { PlayerDoc } from "@/models/player";
-import { UserDoc } from "@/models/user";
+import { PlayerDoc, UserDoc } from "@/types/game";
 
 const isBrowser = typeof window !== "undefined";
 

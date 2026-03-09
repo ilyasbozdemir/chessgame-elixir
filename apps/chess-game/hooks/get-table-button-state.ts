@@ -1,7 +1,7 @@
 import { useMemo, useEffect } from "react";
 import { useChessStore } from "@/stores/chess-store";
 import { useTableButtonStore } from "@/stores/table-button-store";
-import type { PlayerDoc } from "@/models/player";
+import { PlayerDoc, TableDoc, UserDoc } from "@/types/game";
 
 type Handlers = {
   onPreview?: (id: string) => void;

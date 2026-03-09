@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { useChessStore } from "@/stores/chess-store";
-import { TableDoc } from "@/models/table";
+import { PlayerDoc, TableDoc, UserDoc } from "@/types/game";
 import { Trash2 } from "lucide-react";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import {
@@ -39,8 +39,8 @@ export function DeleteTableDialog({ table }: DeleteTableDialogProps) {
       return;
     }
 
-    if (!user || !user._id) {
-      console.warn("User veya user._id yok, tablo silinemedi.");
+    if (!user || !user.id) {
+      console.warn("User veya user.id yok, tablo silinemedi.");
       return;
     }
 

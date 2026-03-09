@@ -15,14 +15,14 @@ interface ChatMessage {
 
 interface ChatContextType {
   messages: ChatMessage[];
-  sendMessage: (content: string) => void;
+  sendMessage: (content: string, senderName: string) => void;
   typing: (isTyping: boolean) => void;
 }
 
 const ChatContext = createContext<ChatContextType>({
   messages: [],
-  sendMessage: () => {},
-  typing: () => {},
+  sendMessage: () => { },
+  typing: () => { },
 });
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -75,12 +75,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [chatChannel]);
 
   // 📨 Mesaj gönder
-  const sendMessage = (content: string) => {
+  const sendMessage = (content: string, senderName: string) => {
     if (!chatChannel) return;
 
     const msg: ChatMessage = {
       id: crypto.randomUUID(),
-      sender: "me",
+      sender: senderName,
       content,
       timestamp: Date.now(),
       mine: true,
@@ -88,7 +88,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
 
     setMessages((prev) => [...prev, msg]);
 
-    chatChannel.push(SOCKET_EVENTS.CHAT.NEW_MESSAGE, { content });
+    chatChannel.push(SOCKET_EVENTS.CHAT.NEW_MESSAGE, { content, sender: senderName });
   };
 
   // 🟦 Typing event
